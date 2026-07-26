@@ -33,6 +33,9 @@ browsable site (search, dark mode).
   startup probes, and why a missing readiness probe breaks rollouts.
 - [`resource-management.md`](./resource-management.md) — requests/limits, LimitRange,
   ResourceQuota, HorizontalPodAutoscaler, PodDisruptionBudget, and how they interact.
+- [`pod-and-node-affinity.md`](./pod-and-node-affinity.md) — node affinity, pod affinity/
+  anti-affinity, required vs. preferred, and why affinity (placement) is a different axis from
+  HPA/KEDA scaling (replica count); worked hands-on with [`affinity-demo/`](../affinity-demo).
 
 ## Security
 

@@ -46,6 +46,7 @@ nav:
       - Workload Types: workload-types.md
       - Probes & Health Checks: probes-and-health-checks.md
       - Resource Management: resource-management.md
+      - Pod & Node Affinity: pod-and-node-affinity.md
   - Security:
       - RBAC: rbac.md
   - Advanced:

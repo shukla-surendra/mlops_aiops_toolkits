@@ -16,7 +16,7 @@ $(DOCS_PY):
 
 docs-install: $(DOCS_PY)
 
-docs-serve: docs-install
+docs: docs-install
 	$(DOCS_MKDOCS) build --strict
 	$(DOCS_MKDOCS) serve
 
