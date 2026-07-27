@@ -40,6 +40,7 @@ nav:
       - Storage & Persistence: storage-and-persistence.md
   - Networking & Access:
       - Accessing Pods & Services: accessing-pods-and-services.md
+      - Service Types: service-types.md
       - Multiple Services, Same Port: multiple-services-same-port.md
       - Network Policies: network-policies.md
   - Workloads & Reliability:

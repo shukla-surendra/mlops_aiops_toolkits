@@ -19,6 +19,9 @@ browsable site (search, dark mode).
 
 - [`accessing-pods-and-services.md`](./accessing-pods-and-services.md) — `kubectl port-forward`
   vs. the production way (Service + Ingress), worked through with `sample-nginx/`.
+- [`service-types.md`](./service-types.md) — `ClusterIP`/`NodePort`/`LoadBalancer`/headless/
+  `ExternalName` compared, plus everyday `kubectl` usage (expose, patch, troubleshoot no
+  endpoints); worked hands-on with [`services-demo/`](../services-demo).
 - [`multiple-services-same-port.md`](./multiple-services-same-port.md) — why N services all
   listening on the same port (e.g. 8080) don't conflict, and the few places port reuse
   actually does (same-Pod containers, `hostPort`, explicit `NodePort` — cross-namespace too).

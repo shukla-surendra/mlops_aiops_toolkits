@@ -1,0 +1,13 @@
+# Default Service type. Stable in-cluster virtual IP, load-balances across every Pod
+# matching the selector. Not reachable from outside the cluster.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-clusterip
+spec:
+  type: ClusterIP
+  selector:
+    app: web-backend
+  ports:
+  - port: 80
+    targetPort: 80

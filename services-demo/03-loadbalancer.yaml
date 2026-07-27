@@ -1,0 +1,15 @@
+# Asks the platform to provision a real external load balancer with its own public
+# IP/DNS name. On a cloud provider (EKS/GKE/AKS) this is the standard way to expose a
+# single Service to the internet. minikube has no cloud to call out to, so it needs
+# `minikube tunnel` running to simulate one - without it, EXTERNAL-IP just stays <pending>.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-loadbalancer
+spec:
+  type: LoadBalancer
+  selector:
+    app: web-backend
+  ports:
+  - port: 80
+    targetPort: 80

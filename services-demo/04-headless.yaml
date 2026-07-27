@@ -1,0 +1,15 @@
+# clusterIP: None means "no virtual IP, no load-balancing." DNS resolves the Service
+# name directly to the set of matching Pod IPs (an A record per Pod) instead of one
+# stable ClusterIP. This is what StatefulSets use so each replica gets its own stable
+# DNS identity - here it's on a plain Deployment just to see the DNS difference.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-headless
+spec:
+  clusterIP: None
+  selector:
+    app: web-backend
+  ports:
+  - port: 80
+    targetPort: 80

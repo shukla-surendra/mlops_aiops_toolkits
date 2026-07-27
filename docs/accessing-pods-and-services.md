@@ -121,3 +121,6 @@ tunnel through the control plane. Production traffic always goes through the dat
 `Service` for stable load-balanced addressing, `Ingress` (or a cloud `LoadBalancer` Service, or
 a Gateway API `Gateway`/`HTTPRoute` on newer clusters) for the actual internet-facing entry
 point.
+
+See [`service-types.md`](./service-types.md) for the full set of Service `type`s, including
+headless and `ExternalName`, with a runnable demo in [`services-demo/`](../services-demo).
