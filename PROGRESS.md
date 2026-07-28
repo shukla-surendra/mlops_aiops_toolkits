@@ -4,7 +4,7 @@
 > To resume in any new session, read this file first. It says exactly where we are,
 > what's next, and how the learning contract works. Everything else is detail.
 
-**Owner:** Surendra Shukla · **Started:** 2026-07-12 · **Mode:** one service at a time, architecture/internals depth (NOT cert-oriented).
+**Owner:** xxx xxxxxxxxxxx · **Started:** 2026-07-12 · **Mode:** one service at a time, architecture/internals depth (NOT cert-oriented).
 
 ---
 
