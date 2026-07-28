@@ -128,6 +128,26 @@ kubectl delete -f 00-deployment.yaml
 # Ctrl-C the `minikube tunnel` terminal
 ```
 
+## Command & flag glossary
+
+Explains every `kubectl` command/flag used above, in the order they first appear.
+
+| Command / flag | Means |
+|---|---|
+| `kubectl apply -f <file>` | Create (or update) whatever's described in that YAML file. Safe to re-run — it converges the cluster to match the file instead of erroring if the thing already exists. |
+| `kubectl get pods` | List Pods. `kubectl get svc`/`kubectl get deploy` etc. work the same way — `get <resource-type>` lists that type. `svc` is just the short name for `services` (`kubectl api-resources` lists every short name). |
+| `-l app=web-backend` | **L**abel filter — only show things whose `labels` include `app: web-backend`. Every Pod from `00-deployment.yaml` carries that label (see `spec.template.metadata.labels`), so this narrows `get pods` down to just this demo's Pods instead of every Pod in the namespace. |
+| `-o wide` | **O**utput format `wide` — the normal columns (`NAME`, `READY`, `STATUS`...) plus a few extra, notably `IP` and `NODE`. Plain `kubectl get pods` doesn't show a Pod's IP; `-o wide` does. |
+| `kubectl run curl-test --image=curlimages/curl ...` | Start one throwaway Pod named `curl-test` from the given container image — a quick way to get a shell *inside* the cluster to test in-cluster-only things like `ClusterIP`, without deploying a whole app for it. |
+| `--rm` | Delete this Pod automatically once it exits. Without it, `curl-test` would sit around afterward as a stopped Pod you'd have to clean up by hand. |
+| `-it` | Attach your terminal to it interactively (`-i` keeps stdin open, `-t` allocates a terminal) so you see the command's output live, the same as running it locally. |
+| `--restart=Never` | Run it as a plain one-shot Pod instead of wrapping it in a Deployment (`kubectl run`'s default). A one-shot Pod is allowed to exit `0` and be done; a Deployment would treat that exit as a crash and keep restarting it. |
+| `-- sh -c "..."` | Everything after the bare `--` is the command to run *inside* that container, instead of being a flag to `kubectl` itself. `sh -c "..."` runs the quoted string as a shell command (needed here because it's a `for` loop, not a single binary + args). |
+| `minikube service <name> --url` | minikube-specific helper: for a `NodePort`/`LoadBalancer` Service, print the URL that's actually reachable from your host machine (works out the right IP/port even when Docker networking on macOS means the node isn't directly reachable). |
+| `minikube tunnel` | minikube-specific helper: opens a network route from your host to the cluster and starts assigning real IPs to `LoadBalancer` Services, simulating what a cloud provider would otherwise do. Keeps running in the foreground — it's what fills in `EXTERNAL-IP` in Part 3. |
+| `nslookup <name>` | Ask DNS "what does this name resolve to?" Used here from inside the cluster to see *how many* IPs a Service name returns — one (ClusterIP), several (headless), or a CNAME (ExternalName) — which is the whole point of Parts 4 and 5. |
+| `kubectl delete -f <file>` | The inverse of `apply` — remove exactly what that file describes. |
+
 ## Reference
 
 | File | Service `type` | Reachable from | Load-balanced |

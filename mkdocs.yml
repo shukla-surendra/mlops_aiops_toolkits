@@ -36,6 +36,7 @@ nav:
       - Kubernetes Fundamentals: kubernetes-fundamentals.md
       - Cluster Architecture: cluster-architecture.md
       - Local Cluster Setup: local-cluster-setup.md
+      - "Minikube on Linux: Bootstrap": minikube-linux-bootstrap.md
       - ConfigMaps & Secrets: configmaps-and-secrets.md
       - Storage & Persistence: storage-and-persistence.md
   - Networking & Access:

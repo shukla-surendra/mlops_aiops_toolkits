@@ -14,6 +14,10 @@ browsable site (search, dark mode).
   config, why Secrets aren't real encryption, the config-reload gotcha.
 - [`storage-and-persistence.md`](./storage-and-persistence.md) — Volume vs PV vs PVC vs
   StorageClass, `volumeClaimTemplates`, what backs storage on minikube vs. EKS.
+- [`minikube-linux-bootstrap.md`](./minikube-linux-bootstrap.md) — installing Docker/minikube/
+  `kubectl` on a bare Linux box and bringing up a multi-node cluster, command by command
+  (what `systemctl enable --now` actually does, `kube-system` Pods explained, scaling nodes,
+  common first-run errors).
 
 ## Networking & Access
 

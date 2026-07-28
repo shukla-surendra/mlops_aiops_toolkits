@@ -8,6 +8,45 @@ controls **who can reach that address from where** — it doesn't change how Pod
 selected (`spec.selector`) or which port forwards to which (`port` / `targetPort`), which
 are the same across every type.
 
+## In plain terms
+
+Your app runs as several copies (Pods), each with its own IP that changes every time a
+copy restarts — nothing else can reliably dial one directly. A Service is a stable phone
+number in front of those copies; dial the number and you get routed to whichever copy is
+available. `type` is just *how wide an audience is allowed to dial that number*, and each
+type builds on the one before it:
+
+1. **`ClusterIP`** — an internal office extension. Any desk **inside the building**
+   (cluster) can dial it and get routed to an available rep (Pod). Nobody outside the
+   building can dial it at all.
+2. **`NodePort`** — the same internal extension, but also patched through to a side door
+   on every building (node), at a fixed door number (port `30000`-`32767`). Now someone
+   outside can walk up to *any* building's side door and get routed in — clunky, but no
+   phone company required. This is what makes local clusters like minikube reachable at
+   all without cloud infrastructure.
+3. **`LoadBalancer`** — pays an actual phone company (your cloud provider) for one clean
+   public number anyone on the internet can dial, which rings through to that same
+   `NodePort` door, which rings through to the same `ClusterIP` extension underneath.
+
+So these aren't three competing options — every `NodePort` and `LoadBalancer` Service
+**still has** a `ClusterIP` doing the actual internal routing; each later type just adds
+another way in from further outside.
+
+4. **Headless** (`clusterIP: None`) — no receptionist at all. Ask for the extension and
+   you get handed the direct-dial list for every rep instead of being routed to one — you
+   (the client) pick who to call.
+5. **`ExternalName`** — not a phone line to your building at all, just a forwarding note
+   ("that department moved, call this outside number instead"). No Pods, no routing —
+   just a name that redirects elsewhere.
+
+**All of these can be active at the same time.** `type` is a property of one Service
+*object*, not a cluster-wide setting — nothing stops you creating five separately-named
+Services, each a different `type`, all with the same `selector` pointing at the same
+Pods. That's exactly what [`services-demo/`](../services-demo) does: after working
+through all five parts, `web-clusterip`, `web-nodeport`, `web-loadbalancer`,
+`web-headless`, and `web-external` all exist simultaneously, all routing to the same 3
+backend Pods — five phone lines into the same office, each with its own reach.
+
 ## `ClusterIP` — the default
 
 A stable virtual IP, internal to the cluster, that load-balances across every Pod matching

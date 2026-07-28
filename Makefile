@@ -20,5 +20,9 @@ docs: docs-install
 	$(DOCS_MKDOCS) build --strict
 	$(DOCS_MKDOCS) serve
 
+mkdocs: docs-install
+	$(DOCS_MKDOCS) build --strict
+	$(DOCS_MKDOCS) serve
+
 docs-clean:
 	rm -rf site
