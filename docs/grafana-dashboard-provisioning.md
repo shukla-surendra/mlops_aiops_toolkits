@@ -2,7 +2,8 @@
 
 Worked example: [`grafana-log-viewer`](../grafana-log-viewer)'s **App Logs (sample-nginx)**
 dashboard. Same mechanism applies to any Grafana install using the `grafana/grafana` chart
-(this one, via its `loki-stack` dependency) — not specific to logging or Loki.
+(this one, via its `loki-stack` dependency) — not specific to logging or Loki. For the general
+concept this is an instance of, see [`sidecar-containers.md`](./sidecar-containers.md).
 
 ## The mechanism
 

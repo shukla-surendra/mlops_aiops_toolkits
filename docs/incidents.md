@@ -339,3 +339,74 @@ dashboard reappears automatically on every future install/upgrade — confirmed 
   who doesn't happen to pick that exact release name. Worth grepping a new chart's default
   `values.yaml` for `{{ .Release.Name }}` outside of label/annotation contexts before trusting
   its cross-component defaults, especially wherever a release name choice feels arbitrary.
+
+## 2026-07-28 — multi-node minikube worker fails to join: `vfkit`, "no route to host"
+
+### Symptom
+
+Deleted and recreated the `minikube` profile with `minikube start --nodes 3` (no `--driver`
+flag). The control-plane node came up, but the second node failed outright:
+
+```
+❌  Exiting due to GUEST_START: failed to start node: adding node: join node to cluster:
+error joining worker node "m02" to cluster: kubeadm join ...: Process exited with status 1
+stderr:
+    [WARNING Service-Kubelet]: kubelet service is not enabled, please run 'systemctl enable kubelet.service'
+error: error execution phase preflight: couldn't validate the identity of the API Server:
+failed to request the cluster-info ConfigMap: Get "https://control-plane.minikube.internal:8443/...":
+dial tcp 192.168.64.3:8443: connect: no route to host
+```
+
+### Investigation
+
+`minikube profile list` showed the driver actually in use:
+
+```
+PROFILE     DRIVER   IP              STATUS     NODES
+fullstack   docker   192.168.49.2               1     # orphaned — backing container already gone
+minikube    vfkit    192.168.64.3    Starting   2
+```
+
+`192.168.64.x` is the giveaway — that's Apple's `vmnet` address range used by VM-based drivers
+(`vfkit`/`hyperkit`), not Docker's bridge range (`192.168.49.x`, seen on the `fullstack`
+profile). Not having passed `--driver` on the `minikube start` command let minikube
+auto-select `vfkit` — its default on Apple Silicon (see
+[`local-cluster-setup.md`](./local-cluster-setup.md#minikube-driver-types)) — rather than
+reusing whatever driver an earlier cluster on this profile happened to use.
+
+### Root cause — VM drivers, not Docker, and multi-node cross-VM routing
+
+With `--driver=docker`, every node is a container on one shared Docker bridge network — trivially
+reachable from every other node. With `--driver=vfkit` (or `hyperkit`), every node is a
+**separate VM**, each with its own `vmnet` interface. The worker node's `kubeadm join` couldn't
+route to the control-plane VM's `192.168.64.3:8443` at all — not a slow/flaky connection, a
+complete "no route to host". This is a known class of problem with VM-based drivers and
+multi-node minikube on macOS: single-node works fine on `vfkit` (it's the default for a reason),
+but adding worker nodes means the driver also has to get inter-VM networking right, and that
+layer is far less battle-tested than Docker's own bridge networking.
+
+### Resolution
+
+Deleted both the broken multi-node `vfkit` cluster and the unrelated orphaned `fullstack`
+profile, then restarted explicitly pinning `--driver=docker`:
+
+```bash
+minikube delete --profile minikube
+minikube delete --profile fullstack     # unrelated cleanup — its container no longer existed
+minikube start --driver=docker --nodes 3
+```
+
+### Lessons
+
+- Never let multi-node `minikube start` auto-pick a driver on macOS — pass `--driver=docker`
+  explicitly. VM drivers (`vfkit`/`hyperkit`) are fine for a single node but are the wrong
+  choice the moment `--nodes` > 1.
+- `minikube profile list`'s `IP` column is a fast tell for which driver a running/failed
+  profile actually used — `192.168.49.x` is Docker's bridge, `192.168.64.x` is `vmnet`
+  (vfkit/hyperkit). Useful when a `minikube start` command's flags aren't in scrollback anymore.
+- A `docker container inspect: No such container` error from `minikube profile list` on an
+  unrelated profile (here, `fullstack`) doesn't mean the profile you're actually debugging is
+  affected — but it's worth cleaning up while you're already deleting/recreating, rather than
+  leaving a permanently-broken profile entry around.
+- See [`local-cluster-setup.md`](./local-cluster-setup.md#minikube-driver-types) for the full
+  rundown of every minikube driver and when each one is actually appropriate.

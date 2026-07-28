@@ -11,7 +11,7 @@ components themselves.
 
 | Option | What it runs | Isolation | Multi-cluster | Notes |
 |---|---|---|---|---|
-| **minikube** | Full k8s in a VM (or container) | VM (vfkit/hyperkit) or Docker container, per **profile** | Yes — one profile per cluster | What this repo uses. Most addon/config flexibility (`minikube addons enable ...`). |
+| **minikube** | Full k8s in a VM (or container) | VM (vfkit/hyperkit) or Docker container, per **profile** — see [driver types](#minikube-driver-types) | Yes — one profile per cluster | What this repo uses. Most addon/config flexibility (`minikube addons enable ...`). |
 | **Docker Desktop Kubernetes** | Full k8s inside Docker Desktop's own VM | Shares Docker Desktop's VM | No — one cluster, on/off toggle | Zero extra install if you already run Docker Desktop. No addon system; upgrades tied to Docker Desktop releases. |
 | **kind** ("Kubernetes in Docker") | Each node is a Docker container | Docker containers | Yes — `kind create cluster --name X` | Fast to create/destroy, good for CI-like throwaway clusters and testing multi-node topologies. Not installed on this machine. |
 | **k3d** (k3s in Docker) | [k3s](https://k3s.io) (lightweight k8s distro) in Docker containers | Docker containers | Yes | Lowest resource footprint, fastest startup. k3s swaps some components (e.g. no etcd by default — uses sqlite). Not installed on this machine. |
@@ -61,6 +61,38 @@ minikube delete -p fullstack                      # tear a profile down complete
 Each profile is a fully independent cluster with its own kubeconfig context, control plane,
 and addons — that's how this repo ended up with two (`minikube` running Kubeflow/Istio/Knative,
 `fullstack` running Kargo/KServe).
+
+### minikube driver types
+
+A minikube **driver** is *what actually backs each node* — a container, a VM, or (on Linux)
+the bare host itself. This choice is independent of Kubernetes itself; it's purely about the
+isolation layer minikube provisions underneath `kubelet`/the container runtime.
+
+| Driver | Platform | Node is... | Multi-node reliability | Notes |
+|---|---|---|---|---|
+| **`docker`** | Any (needs Docker running) | A Docker container per node, all on one bridge network (`192.168.49.x`) | **Reliable** — container-to-container on one bridge just works | Best default for multi-node clusters on any OS, this repo's `fullstack` profile |
+| **`vfkit`** | macOS, Apple Silicon (arm64) | A separate VM per node, via Apple's own Virtualization framework (`192.168.64.x`, `vmnet`) | **Flaky for `--nodes` > 1** — inter-VM routing can fail outright ("no route to host"), see the [2026-07-28 incident](./incidents.md#2026-07-28-multi-node-minikube-worker-fails-to-join-vfkit-no-route-to-host) | minikube's modern default on Apple Silicon; fine single-node |
+| **`hyperkit`** | macOS, Intel only | A separate VM per node, via HyperKit | Same class of cross-VM networking risk as `vfkit` | Legacy — being phased out in favor of `vfkit`; doesn't run on Apple Silicon at all |
+| **`virtualbox`** | macOS (Intel)/Linux/Windows | A separate VM per node, via VirtualBox | Depends on VirtualBox's own host-only networking setup | Doesn't support Apple Silicon; needs VirtualBox installed separately |
+| **`qemu`** | macOS/Linux | A separate VM per node, via QEMU | Similar VM-networking caveats to `vfkit`/`hyperkit` | Fallback when the platform-native VM driver isn't available |
+| **`podman`** | Linux/macOS | A Podman container per node | Reliable, same reasoning as `docker` | Rootless alternative to the `docker` driver |
+| **`ssh`** | Any (targets a remote host) | A container/VM on a **remote** machine you SSH into | N/A — single remote target | For provisioning onto a remote box rather than the local machine |
+| **`none`** | Linux only | Runs directly on the host — no container, no VM | N/A, and generally single-node | No isolation at all; host's Docker/kubelet gets modified directly. CI-only, never recommended for a dev machine |
+
+**Rule of thumb for this repo: always pass `--driver=docker` explicitly for any multi-node
+cluster.** Never rely on minikube auto-selecting a driver — on macOS it defaults to `vfkit`
+(or `hyperkit` on Intel Macs), and while that's fine for a single-node cluster, it's the wrong
+choice the moment `--nodes` is more than 1. Check which driver a given profile is actually
+using with:
+
+```bash
+minikube profile list      # DRIVER and IP columns — 192.168.49.x = docker, 192.168.64.x = vfkit/hyperkit vmnet
+```
+
+The driver is set once, at `minikube start` time, and can't be changed on an existing profile
+— same immutability as `--cpus`/`--memory` (see
+[`minikube-linux-bootstrap.md`](./minikube-linux-bootstrap.md#common-errors)). Switching
+drivers means `minikube delete -p <profile>` and starting over.
 
 ### Docker Desktop Kubernetes
 

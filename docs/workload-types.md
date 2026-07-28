@@ -3,6 +3,11 @@
 All five ultimately create Pods; the difference is the *identity and lifecycle guarantee* each
 one gives those Pods. Grounded in real workloads already in this repo.
 
+Hands-on companions for the Job/CronJob sections below: [`job-demo/`](../job-demo) — three
+manifests covering run-to-completion, retry via `backoffLimit`, and parallel fan-out via
+`completions`/`parallelism` — and [`cronjob-demo/`](../cronjob-demo), a scheduled CronJob built
+on top of it. Both include `kubectl` commands to watch it happen live.
+
 ## Deployment — identical, interchangeable replicas
 
 Covered in depth in [`kubernetes-fundamentals.md`](./kubernetes-fundamentals.md). The default
@@ -76,6 +81,9 @@ to `backoffLimit` attempts). The `helm.sh/hook` annotations aren't a Kubernetes 
 Helm's mechanism for running this Job at a specific point in the install/upgrade lifecycle
 (after install, before upgrade) rather than as a normal templated resource.
 
+Try it hands-on in [`job-demo/`](../job-demo) — including what a failed attempt and a parallel
+fan-out actually look like in `kubectl get pods`, not just in the YAML.
+
 ## CronJob — a Job, on a schedule
 
 ```yaml
@@ -97,6 +105,8 @@ missed run. Trigger one on demand for testing without waiting for the schedule:
 ```bash
 kubectl create job --from=cronjob/<release>-db-backup manual-backup-1 -n <namespace>
 ```
+
+Try it hands-on in [`cronjob-demo/`](../cronjob-demo).
 
 ## Choosing between them
 

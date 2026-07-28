@@ -1,4 +1,4 @@
-site_name: k8n-practice-local docs
+site_name: k8n_explorer docs
 site_description: Kubernetes practice notes and install logs
 docs_dir: docs
 site_dir: site
@@ -49,6 +49,7 @@ nav:
       - Probes & Health Checks: probes-and-health-checks.md
       - Resource Management: resource-management.md
       - Pod & Node Affinity: pod-and-node-affinity.md
+      - Sidecar Containers: sidecar-containers.md
   - Security:
       - RBAC: rbac.md
   - Advanced:
