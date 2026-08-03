@@ -3,6 +3,40 @@
 Running notes on Rust language features encountered while solving problems
 in this crate, for reference.
 
+## `todo!()`
+
+From `010_print_subsequences.rs`:
+
+```rust
+fn subsequences(chars: &[char], i: usize, current: &mut String) {
+    todo!("base case: i == chars.len() -> print current; else recurse twice (include/exclude chars[i])")
+}
+```
+
+`todo!()` is a standard-library macro used as a placeholder for code you
+haven't written yet. It compiles fine no matter what the function's
+signature promises (here, returning `()`) because its return type is the
+special "never type" `!`, which Rust lets coerce into any expected type -
+the compiler trusts that this branch never actually produces a value,
+because calling it panics.
+
+- At compile time: acts like a stub with any type, so the surrounding
+  function type-checks even though there's no real implementation yet.
+- At run time: if actually called, it panics with the message
+  `not yet implemented: <your string>`.
+- The argument is optional and, when present, follows the same
+  `format!`-style syntax as `println!` - so both `todo!()` and
+  `todo!("did x = {}", x)` are valid.
+- Siblings: `unimplemented!()` is essentially identical (conventionally
+  used for "deliberately not implementing this branch," vs. `todo!()` for
+  "not implemented yet, but will be"); `panic!()` is the more general form
+  both are built on.
+
+This is why the scaffolds in this crate compile (`cargo build` succeeds)
+even before you've filled in the logic - `todo!()` satisfies the type
+checker and only fails when you actually run the binary and execution
+reaches that line.
+
 ## `match`
 
 From `008_nth_fibonacci_recursion.rs`:

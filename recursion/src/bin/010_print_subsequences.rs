@@ -59,7 +59,19 @@
 // here since no subproblem is solved twice). O(n) recursion depth.
 
 fn subsequences(chars: &[char], i: usize, current: &mut String) {
-    todo!("base case: i == chars.len() -> print current; else recurse twice (include/exclude chars[i])")
+    if i == chars.len() {
+        println!("{}", current);
+        return;
+    }
+
+    // branch 1: include chars[i]
+    current.push(chars[i]);
+    
+    subsequences(chars, i + 1, current);
+    current.pop(); // backtrack
+
+    // branch 2: exclude chars[i]
+    subsequences(chars, i + 1, current);
 }
 
 fn main() {
