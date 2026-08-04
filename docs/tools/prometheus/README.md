@@ -1,0 +1,54 @@
+# Prometheus
+
+**Category:** observability / monitoring (Kubernetes/EKS)
+**First documented:** 2026-08-04
+
+## What it is
+
+Time-series metrics database. It periodically *scrapes* HTTP `/metrics`
+endpoints, stores the resulting numeric time series, lets you query them
+with **PromQL**, and can fire alerts on thresholds via a companion
+component, **Alertmanager**.
+
+## What it's used for on EKS
+
+- Your own pods need to expose a `/metrics` endpoint for Prometheus to
+  scrape application-level metrics.
+- **node-exporter** — a DaemonSet that exposes node-level metrics (CPU,
+  memory, disk) per EKS node.
+- **kube-state-metrics** — exposes Kubernetes object state (pod/deployment/
+  replica counts, status, restarts) as metrics.
+- Prometheus scrapes all three (your app, node-exporter, kube-state-metrics)
+  to get full cluster + workload visibility.
+
+## Deployment
+
+Most commonly installed via the **`kube-prometheus-stack`** Helm chart,
+which bundles Prometheus + Alertmanager + [Grafana](../grafana/README.md) +
+node-exporter + kube-state-metrics in one install — the standard starting
+point for EKS observability.
+
+## Alternatives / managed options
+
+- **Amazon Managed Service for Prometheus (AMP)** — AWS-managed, Prometheus
+  API-compatible metrics store. You still run a scraper agent on EKS (e.g.
+  the ADOT collector) to ship metrics into it; you're not running/operating
+  the Prometheus server yourself.
+- **CloudWatch Container Insights** — AWS-native metrics (and logs) for EKS
+  in one product, no extra stack to run, but less flexible/portable than
+  self-hosting Prometheus and query semantics differ from PromQL.
+
+## Related
+
+Prometheus, [Loki](../loki/README.md), and [Grafana](../grafana/README.md)
+are commonly deployed together on EKS as the metrics/logs/visualization
+trio. Grafana Labs refers to this combination (plus Tempo for traces, and
+Mimir as a scalable Prometheus-compatible backend) as the **"LGTM" stack** —
+Loki, Grafana, Tempo, Mimir/Prometheus — covering metrics, logs, and traces
+in one Grafana UI.
+
+## Change log
+
+- 2026-08-04: Initial documentation — what it is, EKS metrics sources
+  (node-exporter, kube-state-metrics), kube-prometheus-stack deployment,
+  AMP/CloudWatch alternatives, LGTM stack context.

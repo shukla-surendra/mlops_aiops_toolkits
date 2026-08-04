@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+wheels/
+
+# Virtual environments
+.venv/
+venv/
+
+# uv
+uv.lock.bak
+
+# Jupyter
+.ipynb_checkpoints/
+
+# MLflow / Evidently run artifacts (regenerated on each run, not source)
+mlruns/
+mlflow.db
+evidently_report.html
+executed_output.ipynb
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
