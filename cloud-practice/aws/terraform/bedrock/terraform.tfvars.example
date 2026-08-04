@@ -1,0 +1,13 @@
+# Copy to terraform.tfvars and edit. terraform.tfvars is gitignored.
+
+region  = "us-east-1"
+project = "aws-mastery-bedrock"
+
+# Scope tightly — grant only the models the app needs (cost + security control).
+allowed_model_arns = [
+  "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-haiku-4-5",
+  # "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-opus-4-8",
+]
+
+enable_guardrail          = true
+enable_invocation_logging = true

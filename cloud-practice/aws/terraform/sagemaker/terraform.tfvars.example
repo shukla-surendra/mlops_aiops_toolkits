@@ -1,0 +1,16 @@
+# Copy to terraform.tfvars and edit. terraform.tfvars is gitignored.
+
+region  = "us-east-1"
+project = "aws-mastery-sm"
+
+# You need a serving container image + a trained model artifact.
+# Easiest path: train a model first (see ../../boto3/sagemaker or ../../labs/sagemaker),
+# which produces a model.tar.gz in S3, then point these at it.
+
+container_image = "683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:1.7-1"
+model_data_url  = "s3://YOUR-BUCKET/xgboost/output/model.tar.gz"
+
+instance_type = "ml.m5.large"
+min_capacity  = 1
+max_capacity  = 3
+invocations_target_per_instance = 1000

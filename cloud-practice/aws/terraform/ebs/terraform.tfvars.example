@@ -1,0 +1,17 @@
+# Copy to terraform.tfvars and edit. terraform.tfvars is gitignored.
+
+region            = "us-east-1"
+availability_zone = "us-east-1a"
+project           = "aws-mastery-ebs"
+instance_type     = "t3.micro"
+
+gp3_size_gib   = 20
+gp3_iops       = 3000
+gp3_throughput = 125
+
+# io2 is provisioned-IOPS (more expensive). Enable to experiment.
+create_io2   = false
+io2_size_gib = 20
+io2_iops     = 3000
+
+enable_dlm_backups = true

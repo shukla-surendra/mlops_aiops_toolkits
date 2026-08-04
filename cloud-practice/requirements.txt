@@ -1,0 +1,2 @@
+# Docs tooling (scripts/build_docs.py). Install: pip install -r requirements.txt
+markdown-it-py>=3.0

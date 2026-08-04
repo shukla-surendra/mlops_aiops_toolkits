@@ -1,0 +1,17 @@
+# Copy to terraform.tfvars and edit. terraform.tfvars is gitignored.
+
+region      = "us-east-1"
+project     = "aws-mastery-vpc"
+environment = "dev"
+vpc_cidr    = "10.0.0.0/16"
+azs         = ["us-east-1a", "us-east-1b", "us-east-1c"]
+
+# dev  : single_nat_gateway = true  (cheap; ~$32/mo + data for one NAT GW)
+# prod : single_nat_gateway = false (one per AZ; HA; no cross-AZ egress $)
+single_nat_gateway = true
+
+enable_s3_gateway_endpoint = true
+
+extra_tags = {
+  Owner = "surendra"
+}
