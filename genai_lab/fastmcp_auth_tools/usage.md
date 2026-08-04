@@ -3,7 +3,7 @@
 ## 1. Setup (once)
 
 ```bash
-cd agentsexplore/fastmcp_auth_tools
+cd genai_lab/fastmcp_auth_tools
 python3 -m venv .venv          # if not already created
 source .venv/bin/activate
 pip install -r requirements.txt
