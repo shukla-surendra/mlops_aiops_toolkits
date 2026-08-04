@@ -1,15 +1,24 @@
 # Evidently monitoring demo
 
-Runnable Jupyter notebook demonstrating drift + classification-performance
-monitoring with Evidently and XGBoost, logged to MLflow. Standalone version
-of the pattern documented in
-[`docs/tools/evidently/README.md`](../../docs/tools/evidently/README.md)
-(the 4-hour Databricks batch example) — uses synthetic data and local
-pandas/MLflow instead of Delta tables and Databricks Workflows, so it runs
-anywhere without a cluster.
+Two runnable Jupyter notebooks, both executed end-to-end against the
+uv-managed environment in this folder (see "Known environment quirks"
+below for the real issues that came up and how they're handled):
 
-This has been executed end-to-end (see "Known environment quirks" below
-for the two real issues that came up and how they're handled).
+- **[`evidently_xgboost_monitoring.ipynb`](evidently_xgboost_monitoring.ipynb)**
+  — drift + classification-performance monitoring with Evidently and
+  XGBoost, logged to MLflow. Standalone version of the pattern documented
+  in [`docs/tools/evidently/README.md`](../../docs/tools/evidently/README.md)
+  (the 4-hour Databricks batch example) — uses synthetic data and local
+  pandas/MLflow instead of Delta tables and Databricks Workflows, so it
+  runs anywhere without a cluster.
+- **[`drift_types_with_evidently.ipynb`](drift_types_with_evidently.ipynb)**
+  — companion notebook to
+  [`docs/tools/evidently/drift-detection-concepts.md`](../../docs/tools/evidently/drift-detection-concepts.md).
+  Walks through every widely accepted drift type (data/covariate, label,
+  concept, prediction, plus sudden/gradual/incremental/recurring temporal
+  patterns) as a small, isolated, runnable example each, showing exactly
+  which Evidently metric/preset catches which — including the one case
+  (concept drift) that feature-only drift monitoring cannot see at all.
 
 ## Setup (uv)
 
@@ -27,25 +36,30 @@ separate `pip install` step needed.
 
 ## Run it
 
-Interactively, in Jupyter:
+Interactively, in Jupyter (either notebook):
 
 ```bash
 NLTK_DISABLE_IMPORT_SECURITY=1 uv run jupyter notebook evidently_xgboost_monitoring.ipynb
+NLTK_DISABLE_IMPORT_SECURITY=1 uv run jupyter notebook drift_types_with_evidently.ipynb
 ```
 
-Headlessly, to just execute it end-to-end and bake in the outputs (useful
+Headlessly, to just execute one end-to-end and bake in the outputs (useful
 for CI-style "does it still run" checks):
 
 ```bash
 NLTK_DISABLE_IMPORT_SECURITY=1 uv run jupyter nbconvert --to notebook --execute --inplace evidently_xgboost_monitoring.ipynb
+NLTK_DISABLE_IMPORT_SECURITY=1 uv run jupyter nbconvert --to notebook --execute --inplace drift_types_with_evidently.ipynb
 ```
 
-Then browse the MLflow run (the logged Evidently HTML report + drift
-metric):
+`evidently_xgboost_monitoring.ipynb` also logs to MLflow — browse the run
+(the Evidently HTML report + drift metric) with:
 
 ```bash
 uv run mlflow ui --backend-store-uri sqlite:///mlflow.db
 ```
+
+`drift_types_with_evidently.ipynb` doesn't use MLflow at all — it's pure
+Evidently, focused on the drift taxonomy rather than the logging pipeline.
 
 ## Known environment quirks (already handled, documented for context)
 

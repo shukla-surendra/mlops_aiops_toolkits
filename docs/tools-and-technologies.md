@@ -10,9 +10,13 @@ skill (see `.claude/skills/tech-log/SKILL.md`).
 
 <!-- INDEX_START -->
 - [Databricks Lakehouse Monitoring](tools/databricks-lakehouse-monitoring/README.md) — ML monitoring / observability (Databricks-native)
+- [ELK / EFK Stack (Elasticsearch, Logstash/Fluentd, Kibana)](observability-on-eks.md#logs-the-fork-in-the-road--loki-vs-elkefk) — observability / monitoring (logs)
 - [Evidently (Evidently AI)](tools/evidently/README.md) — ML monitoring / observability
+- [Feast](tools/feast/README.md) — feature store
 - [Grafana](tools/grafana/README.md) — observability / monitoring (Kubernetes/EKS)
 - [Loki](tools/loki/README.md) — observability / monitoring (Kubernetes/EKS)
 - [MLflow](tools/mlflow/README.md) — experiment tracking / model registry / model lifecycle
+- [Observability on EKS (overview)](observability-on-eks.md) — cross-cutting: Prometheus, Grafana, Loki, ELK/EFK, tracing, alerting, alternatives
+- [OpenTelemetry / Tempo / Jaeger](observability-on-eks.md#traces-the-pillar-people-forget) — observability / monitoring (tracing)
 - [Prometheus](tools/prometheus/README.md) — observability / monitoring (Kubernetes/EKS)
 <!-- INDEX_END -->

@@ -36,10 +36,15 @@ Loki is usually added as a second data source afterward.
 
 Part of the metrics/logs/visualization trio commonly run together on EKS
 — see [Prometheus](../prometheus/README.md) for the "LGTM stack" naming
-context (Loki, Grafana, Tempo, Mimir/Prometheus).
+context (Loki, Grafana, Tempo, Mimir/Prometheus), or
+[`docs/observability-on-eks.md`](../../observability-on-eks.md) for the
+full landscape with an integration-flow diagram, including how Kibana
+compares as the alternative visualization layer if logs go through
+Elasticsearch instead of Loki.
 
 ## Change log
 
 - 2026-08-04: Initial documentation — what it is, role as pure
   visualization layer, kube-prometheus-stack bundling, AMG/CloudWatch
   alternatives.
+- 2026-08-04: Linked the consolidated `observability-on-eks.md` overview.

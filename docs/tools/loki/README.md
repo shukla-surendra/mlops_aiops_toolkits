@@ -35,9 +35,14 @@ as a second data source — giving one UI for both metrics and logs.
 Part of the metrics/logs/visualization trio commonly run together on EKS:
 Prometheus (metrics), Loki (logs), Grafana (visualization) — see
 [Prometheus](../prometheus/README.md) for the "LGTM stack" naming context.
+For a direct comparison against the alternative logging architecture
+(Elasticsearch/ELK/EFK) and a full integration-flow diagram, see
+[`docs/observability-on-eks.md`](../../observability-on-eks.md).
 
 ## Change log
 
 - 2026-08-04: Initial documentation — what it is, label-only indexing vs.
   full-text, required shipping agents (Promtail/Alloy/Fluent Bit),
   deployment pattern alongside kube-prometheus-stack.
+- 2026-08-04: Linked the consolidated `observability-on-eks.md` overview
+  and its Loki-vs-ELK/EFK comparison table.

@@ -1,5 +1,10 @@
 # Drift detection: your custom pattern vs. Evidently
 
+A runnable companion notebook builds a small, isolated example of every
+drift type covered below and shows exactly which Evidently metric/preset
+catches each one:
+[`projects/evidently-monitoring-demo/drift_types_with_evidently.ipynb`](../../../projects/evidently-monitoring-demo/drift_types_with_evidently.ipynb).
+
 ## Your mental model, restated
 
 The pattern described: at training time you capture a **model benchmark**
@@ -188,9 +193,16 @@ Overlaying Evidently onto the pipeline as described:
 
 The runnable version of steps 3–4 (minus the ground-truth join, since it
 uses synthetic labels already present) is in
-[`projects/evidently-monitoring-demo/`](../../../projects/evidently-monitoring-demo/);
+[`projects/evidently-monitoring-demo/evidently_xgboost_monitoring.ipynb`](../../../projects/evidently-monitoring-demo/evidently_xgboost_monitoring.ipynb);
 the same structure with real Delta tables and a 4-hour schedule is in
 [`examples/databricks_xgboost_batch_monitoring.py`](examples/databricks_xgboost_batch_monitoring.py).
+For each individual drift type from the taxonomy above, isolated and
+demonstrated on its own,
+[`projects/evidently-monitoring-demo/drift_types_with_evidently.ipynb`](../../../projects/evidently-monitoring-demo/drift_types_with_evidently.ipynb)
+builds a minimal example per type — including a deliberate demonstration
+of concept drift going completely undetected by covariate-only monitoring
+while model accuracy collapses, the sharpest illustration of why step 3
+alone isn't sufficient.
 
 ## Change log
 
@@ -201,3 +213,11 @@ the same structure with real Delta tables and a 4-hour schedule is in
 - 2026-08-04: Added the widely accepted drift taxonomy — data/label/
   concept/prediction drift (what changes) and sudden/gradual/incremental/
   recurring drift (how it unfolds over time) — with examples for each.
+- 2026-08-04: Added and executed a companion notebook,
+  `projects/evidently-monitoring-demo/drift_types_with_evidently.ipynb`,
+  building one minimal runnable example per drift type from the taxonomy
+  and showing which Evidently metric/preset catches each — including a
+  verified demonstration that `DataDriftPreset` stays completely quiet
+  (0 drifted columns) under a concept-drift scenario where accuracy
+  collapses from 0.997 to 0.497, proving the "invisible to covariate
+  monitoring" claim with real numbers rather than just asserting it.

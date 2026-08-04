@@ -45,10 +45,14 @@ are commonly deployed together on EKS as the metrics/logs/visualization
 trio. Grafana Labs refers to this combination (plus Tempo for traces, and
 Mimir as a scalable Prometheus-compatible backend) as the **"LGTM" stack** —
 Loki, Grafana, Tempo, Mimir/Prometheus — covering metrics, logs, and traces
-in one Grafana UI.
+in one Grafana UI. See
+[`docs/observability-on-eks.md`](../../observability-on-eks.md) for the
+full landscape (including ELK/EFK, tracing, and alerting) with an
+integration-flow diagram.
 
 ## Change log
 
 - 2026-08-04: Initial documentation — what it is, EKS metrics sources
   (node-exporter, kube-state-metrics), kube-prometheus-stack deployment,
   AMP/CloudWatch alternatives, LGTM stack context.
+- 2026-08-04: Linked the consolidated `observability-on-eks.md` overview.

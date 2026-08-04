@@ -97,6 +97,16 @@ Evidently-only territory.
 drift/monitoring content that gets tracked. See
 [MLflow](../mlflow/README.md) for the other side of this relationship.
 
+## Relationship with Feast
+
+[Feast](../feast/README.md) stores and serves feature *values*; it has no
+drift detection of its own. In practice Feast is often the thing supplying
+both sides of an Evidently comparison — `reference_data` via a historical
+retrieval against the training-time entity set, `current_data` via the
+latest materialized online values or a fresh historical pull — with
+Evidently doing the actual comparison. See Feast's docs for the other side
+of this relationship.
+
 ## Alternatives
 
 | Tool | Angle |
@@ -238,3 +248,13 @@ have to build by hand in a plain Python setup.
   implementation and Evidently's split between label-free
   covariate/prediction drift and label-dependent performance drift, with a
   mapping table and a concrete step-by-step adoption walkthrough.
+- 2026-08-04: Added and executed a second demo notebook,
+  `projects/evidently-monitoring-demo/drift_types_with_evidently.ipynb` —
+  one isolated, runnable example per drift type from the taxonomy in
+  `drift-detection-concepts.md`, verified end-to-end including a real
+  demonstration of `DataDriftPreset` staying silent under concept drift
+  while accuracy collapses.
+- 2026-08-04: Documented relationship with Feast — Feast supplies feature
+  values (including both sides of a reference/current comparison);
+  Evidently has no feature-storage/serving role and Feast has no drift
+  detection of its own.

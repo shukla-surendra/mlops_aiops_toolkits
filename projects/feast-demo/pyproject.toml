@@ -1,0 +1,12 @@
+[project]
+name = "feast-demo"
+version = "0.1.0"
+description = "Runnable Feast feature store demo — define, materialize, and retrieve features for training and serving"
+requires-python = ">=3.11"
+dependencies = [
+    "feast",
+    "pandas",
+    "scikit-learn",
+    "jupyter",
+    "ipykernel",
+]
