@@ -45,19 +45,33 @@
 //   natural, known-ahead-of-time order to solve them in (as Fibonacci
 //   does: you always need everything from 0 up to n).
 //
-// Further optimization (not done here, left as a natural next step once
-// this is comfortable): the loop only ever looks at the last two table
+// Further optimization: the loop only ever looks at the last two table
 // entries, `table[i-1]` and `table[i-2]` - the rest of the table is dead
 // weight. Replacing the full Vec with two rolling variables gets this
-// down to O(1) space instead of O(n), while keeping O(n) time.
+// down to O(1) space instead of O(n), while keeping O(n) time. That
+// version is deliberately kept as a SEPARATE file,
+// 003_nth_fibonacci_loop.rs, rather than replacing this one - see that
+// file for why "tabulation" and "just loop with two variables" are worth
+// distinguishing even though both are iterative.
 
 fn fib(n: u64) -> u64 {
-    todo!(
-        "handle n == 0 separately (table[1] would be out of bounds for a \
-        size-1 table); otherwise build a table (Vec<u64>) of size n + 1, \
-        set table[0] = 0 and table[1] = 1 as base cases, then loop i from \
-        2 to n filling table[i] = table[i-1] + table[i-2]; return table[n]"
-    )
+    if n == 0 {
+        return 0; // table[1] would be out of bounds for a size-1 table
+    }
+
+    // The table: table[i] will hold fib(i), for every i from 0 to n.
+    let mut table = vec![0u64; (n + 1) as usize];
+    table[0] = 0; // base case
+    table[1] = 1; // base case
+
+    // Fill the table in order, smallest subproblem to largest. Each cell
+    // only depends on the two before it, both already filled by the time
+    // we get here.
+    for i in 2..=(n as usize) {
+        table[i] = table[i - 1] + table[i - 2];
+    }
+
+    table[n as usize]
 }
 
 fn main() {

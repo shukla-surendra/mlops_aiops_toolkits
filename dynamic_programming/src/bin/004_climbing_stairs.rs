@@ -29,25 +29,35 @@
 // whenever you spot a "this is just Fibonacci" reduction; don't assume
 // they carry over.)
 //
-// e.g. ways(4): table = [1, 1, _, _, _]
-//   i=2: table[2] = table[1] + table[0] = 1 + 1 = 2
-//   i=3: table[3] = table[2] + table[1] = 2 + 1 = 3
-//   i=4: table[4] = table[3] + table[2] = 3 + 2 = 5
-//   ways(4) = 5, and indeed: 1+1+1+1, 1+1+2, 1+2+1, 2+1+1, 2+2 -> 5 ways.
+// This file: plain brute-force recursion, straight off the recurrence
+// above - no memo, no table. Same "write the recursion first, optimize
+// after" step used for Fibonacci (naive version in
+// ../../recursion/src/bin/008_nth_fibonacci_recursion.rs, before
+// 001_nth_fibonacci_memoization.rs and 002_nth_fibonacci_tabulation.rs
+// optimize it).
 //
-// Complexity: O(n) time, O(n) space with a full table (as written below) -
-// same bottom-up/tabulation approach as
-// 002_nth_fibonacci_tabulation.rs. Same O(1)-space rolling-variables
-// optimization applies here too (the loop only ever reads the last two
-// table entries), left as a follow-up once this version is comfortable.
+// e.g. ways(4) - each call branches into the two allowed moves (1-step,
+// 2-step), same shape as Fibonacci's call tree:
+//   ways(4) = ways(3) + ways(2)
+//           = (ways(2) + ways(1)) + (ways(1) + ways(0))
+//           = ((ways(1) + ways(0)) + 1) + (1 + 1)
+//           = ((1 + 1) + 1) + (1 + 1) = 5
+// Notice ways(2) and ways(1) each get recomputed from scratch on
+// different branches - that repeated work is exactly what memoization/
+// tabulation eliminate, once this version is correct.
+//
+// Complexity: O(2^n) time - naive tree recursion, identical shape and
+// identical waste to 008_nth_fibonacci_recursion.rs's naive fib (every
+// distinct ways(k) gets recomputed on every branch that needs it).
+// O(n) recursion depth. This is the "brute force" baseline to compare
+// the DP-optimized versions against, not the version you'd want in
+// production for large n.
 
 fn ways(n: u64) -> u64 {
-    todo!(
-        "handle n == 0 separately (table[1] would be out of bounds for a \
-        size-1 table); otherwise build a table (Vec<u64>) of size n + 1, \
-        set table[0] = 1 and table[1] = 1 as base cases, then loop i from \
-        2 to n filling table[i] = table[i-1] + table[i-2]; return table[n]"
-    )
+    if n == 0 || n == 1 {
+        return 1; // base cases
+    }
+    ways(n - 1) + ways(n - 2) // recursive case
 }
 
 fn main() {

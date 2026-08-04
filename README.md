@@ -44,4 +44,6 @@ Further notes live in [`docs/`](docs/):
 - [binary-search-tree-rust-syntax-notes.md](docs/binary-search-tree-rust-syntax-notes.md)
 - [binary-search-tree-readme.md](docs/binary-search-tree-readme.md)
 - [dynamic-programming-rust-syntax-notes.md](docs/dynamic-programming-rust-syntax-notes.md)
+- [dp-problem-solving-framework.md](docs/dp-problem-solving-framework.md)
+- [dynamic-programming-climbing-stairs-explained.md](docs/dynamic-programming-climbing-stairs-explained.md)
 - [measuring-performance.md](docs/measuring-performance.md)
