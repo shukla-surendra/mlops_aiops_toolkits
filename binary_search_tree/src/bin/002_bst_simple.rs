@@ -10,7 +10,7 @@
 //     prints what `contains` finds, so you can read top-to-bottom and see
 //     output directly instead of jumping to a separate test block.
 //
-// See binary_search_tree/RUST_SYNTAX_NOTES.md for a deep dive into
+// See docs/binary-search-tree-rust-syntax-notes.md for a deep dive into
 // generics, Box, and Option/combinator syntax if you want the full
 // picture later - this file intentionally skips over that ceremony.
 

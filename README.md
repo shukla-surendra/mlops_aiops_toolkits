@@ -35,3 +35,13 @@ For standalone `.rs` files that aren't part of a crate:
 ```
 f=dijkstra; rustc $f.rs -o $f.bin && ./$f.bin
 ```
+
+## Docs
+
+Further notes live in [`docs/`](docs/):
+
+- [recursion-rust-syntax-notes.md](docs/recursion-rust-syntax-notes.md)
+- [binary-search-tree-rust-syntax-notes.md](docs/binary-search-tree-rust-syntax-notes.md)
+- [binary-search-tree-readme.md](docs/binary-search-tree-readme.md)
+- [dynamic-programming-rust-syntax-notes.md](docs/dynamic-programming-rust-syntax-notes.md)
+- [measuring-performance.md](docs/measuring-performance.md)

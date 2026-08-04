@@ -1,8 +1,10 @@
-# Rust syntax notes
+# Rust syntax notes - `binary_search_tree` crate
 
 Running notes on Rust language features encountered while solving problems
-in this crate, for reference. (See also `recursion/RUST_SYNTAX_NOTES.md`
-for `match` and `todo!()`.)
+in this crate, for reference. (See also
+[recursion-rust-syntax-notes.md](recursion-rust-syntax-notes.md) for
+`match` and `todo!()`, and
+[dynamic-programming-rust-syntax-notes.md](dynamic-programming-rust-syntax-notes.md).)
 
 ## `001_bst.rs`
 
