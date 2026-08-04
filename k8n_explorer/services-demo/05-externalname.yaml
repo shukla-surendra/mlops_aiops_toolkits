@@ -1,0 +1,11 @@
+# No selector, no Pods, no proxying. Purely a DNS-level alias: anything in the cluster
+# resolving `web-external.default.svc.cluster.local` gets back a CNAME to `externalName`
+# instead. Used to give an in-cluster name to something that lives outside the cluster
+# (a managed database, a legacy host) so client code never has to know it's external.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-external
+spec:
+  type: ExternalName
+  externalName: example.com

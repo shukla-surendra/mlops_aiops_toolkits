@@ -1,0 +1,16 @@
+# Everything ClusterIP does, plus: opens the same high port (30000-32767) on every node's
+# IP. Reachable from outside the cluster at <any-node-ip>:<nodePort> with no cloud provider
+# needed - the mechanism this local cluster actually has for external access.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-nodeport
+spec:
+  type: NodePort
+  selector:
+    app: web-backend
+  ports:
+  - port: 80
+    targetPort: 80
+    # omit nodePort to let Kubernetes auto-assign one from the default range;
+    # pin it only when you need a stable, predictable port.

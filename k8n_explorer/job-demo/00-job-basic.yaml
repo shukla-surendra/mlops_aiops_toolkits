@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pi-calc
+  labels:
+    app: job-demo
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: job-demo
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: pi-calc
+        image: perl:5.34.0
+        command: ["perl", "-Mbignum=bpi", "-wle", "print bpi(2000)"]
