@@ -1,0 +1,5 @@
+site/
+hand_notes/*.md
+__pycache__/
+*.pyc
+product-company-transition-plan_1.md
