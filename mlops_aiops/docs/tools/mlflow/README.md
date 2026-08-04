@@ -15,7 +15,11 @@ Open-source platform for managing the ML lifecycle. Four main pieces:
   model with its dependencies so it can be loaded/served consistently
   regardless of the framework (XGBoost, sklearn, PyTorch, etc.).
 - **Model serving** — can serve a registered model directly as a REST
-  endpoint.
+  endpoint. This path is built for traditional ML models (sklearn,
+  XGBoost, etc.); for LLM inference specifically, [vLLM](../vllm/README.md)
+  (or a hosted API) is the more common serving path — MLflow would still
+  track/version the fine-tuning run that produced the model, just not
+  necessarily serve it at inference time.
 
 On Databricks, MLflow is built in as a **managed service** — tracking and
 the model registry work out of the box against Unity Catalog, with no

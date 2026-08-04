@@ -4,7 +4,7 @@ Lightweight index of tools and technologies discussed in chat for this
 project. Each tool has its own folder under `docs/tools/<tool-slug>/README.md`
 with the full write-up (purpose, alternatives, usage examples, code samples).
 This file just points to them. Maintained automatically by the `tech-log`
-skill (see `.claude/skills/tech-log/SKILL.md`).
+skill (see `../../.claude/skills/tech-log/SKILL.md`, at the repo root).
 
 ## Index
 
@@ -19,4 +19,5 @@ skill (see `.claude/skills/tech-log/SKILL.md`).
 - [Observability on EKS (overview)](observability-on-eks.md) — cross-cutting: Prometheus, Grafana, Loki, ELK/EFK, tracing, alerting, alternatives
 - [OpenTelemetry / Tempo / Jaeger](observability-on-eks.md#traces-the-pillar-people-forget) — observability / monitoring (tracing)
 - [Prometheus](tools/prometheus/README.md) — observability / monitoring (Kubernetes/EKS)
+- [vLLM](tools/vllm/README.md) — LLM inference / serving
 <!-- INDEX_END -->

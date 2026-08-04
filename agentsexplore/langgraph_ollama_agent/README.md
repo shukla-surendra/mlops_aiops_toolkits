@@ -168,6 +168,11 @@ stuck calling tools in a loop without ever producing a final answer).
   `../langgraph_agents_demo.py` ([Chapter 9](../docs/Agentic_Concepts/09-deployment.md)) — swap the
   `SqliteSaver` for a server-friendly checkpointer (e.g. Postgres) if deploying somewhere the local
   file wouldn't be shared across instances.
+- **Move past single-user local dev**: Ollama (via llama.cpp) is built for one developer running
+  one model locally, not concurrent multi-user throughput. Swapping in
+  [**vLLM**](../../mlops_aiops/docs/tools/vllm/README.md) as the model backend once this needs to
+  serve more than one session at a time is mostly a base-URL change — the graph/tool-calling code
+  here doesn't need to change, since both speak an OpenAI-compatible-ish API surface.
 
 ## Troubleshooting
 
