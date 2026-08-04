@@ -201,23 +201,7 @@ demonstrated on its own,
 [`projects/evidently-monitoring-demo/drift_types_with_evidently.ipynb`](../../../projects/evidently-monitoring-demo/drift_types_with_evidently.ipynb)
 builds a minimal example per type — including a deliberate demonstration
 of concept drift going completely undetected by covariate-only monitoring
-while model accuracy collapses, the sharpest illustration of why step 3
-alone isn't sufficient.
-
-## Change log
-
-- 2026-08-04: Initial write-up — contrasted a custom outcome-based drift
-  implementation against Evidently's label-free covariate/prediction drift
-  plus label-dependent performance drift, with a direct mapping table and
-  a concrete adoption walkthrough.
-- 2026-08-04: Added the widely accepted drift taxonomy — data/label/
-  concept/prediction drift (what changes) and sudden/gradual/incremental/
-  recurring drift (how it unfolds over time) — with examples for each.
-- 2026-08-04: Added and executed a companion notebook,
-  `projects/evidently-monitoring-demo/drift_types_with_evidently.ipynb`,
-  building one minimal runnable example per drift type from the taxonomy
-  and showing which Evidently metric/preset catches each — including a
-  verified demonstration that `DataDriftPreset` stays completely quiet
-  (0 drifted columns) under a concept-drift scenario where accuracy
-  collapses from 0.997 to 0.497, proving the "invisible to covariate
-  monitoring" claim with real numbers rather than just asserting it.
+while model accuracy collapses. Verified with real numbers, not just
+asserted: `DataDriftPreset` stays completely quiet (0 drifted columns)
+while accuracy drops from 0.997 to 0.497 — the sharpest illustration of
+why step 3 alone isn't sufficient.

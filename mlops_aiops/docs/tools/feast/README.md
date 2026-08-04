@@ -1,7 +1,6 @@
 # Feast
 
 **Category:** feature store
-**First documented:** 2026-08-04
 
 ## What it is
 
@@ -67,6 +66,26 @@ Not for the core workflow. `FeatureStore` is a Python client — `apply`,
 run in-process against local files (registry) and a local online store
 (SQLite), exactly like the demo notebook in this repo. Nothing to deploy
 to use Feast from a notebook or a batch job.
+
+Verified directly against the `feast-demo` project's `local` provider
+(Feast 0.65.0) rather than assumed — each piece is a plain file or an
+in-process library, no server involved:
+
+- **Registry** (`feature_repo/data/registry.db`) — a flat binary file, not
+  a database at all. It's Feast's serialized metadata (protobuf)
+  describing entities/feature views/services; the client reads/writes it
+  directly.
+- **Online store** (`feature_repo/data/online_store.db`) — a real,
+  literal **SQLite** database (`file` reports `SQLite 3.x database...`).
+  One table per feature view, schema `entity_key BLOB, feature_name TEXT,
+  value BLOB, event_ts, created_ts`, primary key on `(entity_key,
+  feature_name)`, indexed on `entity_key` — a plain key-value point-lookup
+  table, opened directly by the Python client.
+- **Offline store** — `store.config.offline_store.type` resolves to
+  **`dask`**, not plain pandas or DuckDB. `get_historical_features()`'s
+  point-in-time join runs as in-process Dask DataFrame operations over the
+  Parquet `FileSource`, no Dask cluster/scheduler required for this local
+  default.
 
 Two things become servers once you're past local development:
 
@@ -140,9 +159,3 @@ The feature definitions themselves live in
 demonstrates on-demand feature views, push sources, and label views) to
 just `Entity` + `FeatureView` + `FeatureService`, the part of the API most
 real usage actually looks like.
-
-## Change log
-
-- 2026-08-04: Initial documentation — what it is, core concepts, server
-  requirements, alternatives, relationship with MLflow and Evidently, and
-  a fully executed quickstart notebook in `projects/feast-demo/`.

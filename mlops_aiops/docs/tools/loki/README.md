@@ -1,7 +1,6 @@
 # Loki
 
 **Category:** observability / monitoring (Kubernetes/EKS)
-**First documented:** 2026-08-04
 
 ## What it is
 
@@ -38,11 +37,3 @@ Prometheus (metrics), Loki (logs), Grafana (visualization) — see
 For a direct comparison against the alternative logging architecture
 (Elasticsearch/ELK/EFK) and a full integration-flow diagram, see
 [`docs/observability-on-eks.md`](../../observability-on-eks.md).
-
-## Change log
-
-- 2026-08-04: Initial documentation — what it is, label-only indexing vs.
-  full-text, required shipping agents (Promtail/Alloy/Fluent Bit),
-  deployment pattern alongside kube-prometheus-stack.
-- 2026-08-04: Linked the consolidated `observability-on-eks.md` overview
-  and its Loki-vs-ELK/EFK comparison table.

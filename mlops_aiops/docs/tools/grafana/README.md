@@ -1,7 +1,6 @@
 # Grafana
 
 **Category:** observability / monitoring (Kubernetes/EKS)
-**First documented:** 2026-08-04
 
 ## What it is
 
@@ -41,10 +40,3 @@ context (Loki, Grafana, Tempo, Mimir/Prometheus), or
 full landscape with an integration-flow diagram, including how Kibana
 compares as the alternative visualization layer if logs go through
 Elasticsearch instead of Loki.
-
-## Change log
-
-- 2026-08-04: Initial documentation — what it is, role as pure
-  visualization layer, kube-prometheus-stack bundling, AMG/CloudWatch
-  alternatives.
-- 2026-08-04: Linked the consolidated `observability-on-eks.md` overview.

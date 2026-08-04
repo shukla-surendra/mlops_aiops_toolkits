@@ -1,7 +1,6 @@
 # Databricks Lakehouse Monitoring
 
 **Category:** ML monitoring / observability (Databricks-native)
-**First documented:** 2026-08-04
 
 ## What it is
 
@@ -31,8 +30,3 @@ job or report code required.
 - Not mutually exclusive: a common pattern is Lakehouse Monitoring as the
   always-on baseline, with Evidently pulled in for deeper one-off
   investigations.
-
-## Change log
-
-- 2026-08-04: Initial documentation — what it is, InferenceLog profile,
-  Model Serving integration, comparison against Evidently.

@@ -1,7 +1,6 @@
 # Prometheus
 
 **Category:** observability / monitoring (Kubernetes/EKS)
-**First documented:** 2026-08-04
 
 ## What it is
 
@@ -49,10 +48,3 @@ in one Grafana UI. See
 [`docs/observability-on-eks.md`](../../observability-on-eks.md) for the
 full landscape (including ELK/EFK, tracing, and alerting) with an
 integration-flow diagram.
-
-## Change log
-
-- 2026-08-04: Initial documentation — what it is, EKS metrics sources
-  (node-exporter, kube-state-metrics), kube-prometheus-stack deployment,
-  AMP/CloudWatch alternatives, LGTM stack context.
-- 2026-08-04: Linked the consolidated `observability-on-eks.md` overview.

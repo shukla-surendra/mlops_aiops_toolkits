@@ -1,7 +1,6 @@
 # MLflow
 
 **Category:** experiment tracking / model registry / model lifecycle
-**First documented:** 2026-08-04
 
 ## What it is
 
@@ -22,6 +21,13 @@ On Databricks, MLflow is built in as a **managed service** — tracking and
 the model registry work out of the box against Unity Catalog, with no
 separate server to stand up.
 
+**Running it locally**: current MLflow versions put the plain filesystem
+tracking store (`mlflow.set_tracking_uri("file:./mlruns")`) into
+maintenance mode and refuse to use it by default — use a SQLite backend
+instead (`mlflow.set_tracking_uri("sqlite:///mlflow.db")`), MLflow's own
+recommended local store. Verified directly against a real run, not
+assumed from older docs/tutorials.
+
 ## Relationship with Evidently
 
 MLflow and [Evidently](../evidently/README.md) are complementary, not
@@ -41,8 +47,3 @@ competing:
   a sliver of point-in-time model evaluation also covered by Evidently's
   `ClassificationPreset`/`RegressionPreset` — but MLflow has no drift
   detection (reference-vs-current distribution comparison) of its own.
-
-## Change log
-
-- 2026-08-04: Initial documentation — what it is, four main components,
-  Databricks-managed integration, and relationship with Evidently.

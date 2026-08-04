@@ -1,7 +1,6 @@
 # Evidently (Evidently AI)
 
 **Category:** ML monitoring / observability
-**First documented:** 2026-08-04
 
 ## What it is
 
@@ -28,6 +27,34 @@ Note: an Evidently `Report` is a **single point-in-time comparison** of a
 reference vs. a current dataset — it does not accumulate history across runs
 on its own. For a trend view over time, you append each run's metrics to
 your own storage (see the Databricks example below).
+
+A specific gotcha worth knowing up front: `DataDriftPreset`'s dataset-level
+`dataset_drift` flag only flips to `True` once the *share* of individually
+drifted columns crosses a default >50% threshold — a single drifted
+feature out of many will show up correctly in the per-column breakdown
+but leave `dataset_drift` at `False`. That's correct, intentional
+behavior, not a bug; it means per-column results are usually the more
+actionable signal, not the single aggregate boolean. Verified directly:
+see the drift-type notebook linked under "Usage" below.
+
+## Running it locally / in Jupyter
+
+Two environment quirks show up the moment you actually run Evidently
+outside a notebook that already has it configured, both verified against
+a real run rather than assumed:
+
+- **NLTK's import-security guard false-positives on Evidently.** NLTK
+  3.10+ ships a genuine security hardening feature (`nltk/inisec.py`, a
+  CWE-427 mitigation — not a supply-chain compromise) that blocks NLTK's
+  own internal imports whenever the current working directory is on
+  `sys.path`, which Jupyter/uv add by default. Evidently pulls in NLTK
+  transitively (for text/LLM descriptors most usage never touches), so
+  plain `import evidently` false-positives under Jupyter/uv. Fix: set
+  `NLTK_DISABLE_IMPORT_SECURITY=1` (NLTK's own documented escape hatch)
+  in the environment before importing Evidently.
+- **Current Evidently (0.7.x) moved the classic API under
+  `evidently.legacy`** — see the import-path note in "Running it on
+  Databricks" below.
 
 ## Does it need a server?
 
@@ -196,65 +223,3 @@ scaffolding *around* it:
 Databricks doesn't change *what* Evidently computes — it just supplies the
 scheduling, storage, and artifact-tracking scaffolding that you'd otherwise
 have to build by hand in a plain Python setup.
-
-## Change log
-
-- 2026-08-04: Initial documentation — what it is, purpose, alternatives.
-- 2026-08-04: Databricks compatibility notes; comparison against Databricks
-  Lakehouse Monitoring.
-- 2026-08-04: Worked example for a 4-hour scheduled XGBoost batch classifier
-  on Databricks; pandas-only comparison table.
-- 2026-08-04: Documented server requirements — core library is server-free;
-  `evidently ui` (self-hosted) and Evidently Cloud (SaaS) are optional
-  add-ons for persistent dashboards, neither needed for the Databricks
-  example already documented here.
-- 2026-08-04: Documented relationship with MLflow — complementary roles
-  (MLflow tracks/versions/serves, Evidently computes drift/quality/
-  performance content), the native MLflow logging integration already used
-  in the Databricks example, and the minor overlap via `mlflow.evaluate()`.
-- 2026-08-04: Added a standalone runnable Jupyter notebook at
-  `projects/evidently-monitoring-demo/` — same drift+classification
-  monitoring pattern as the Databricks example, using synthetic data and
-  local pandas/MLflow so it runs without Databricks/Spark.
-- 2026-08-04: Set up `projects/evidently-monitoring-demo/` with uv
-  (`pyproject.toml` + `uv.lock`, `uv sync`) and actually executed the
-  notebook end-to-end to verify it runs — replaced `requirements.txt`/pip
-  with uv as the project's env manager. Executing it surfaced three real
-  environment issues, now fixed and documented in the project's README:
-  - NLTK 3.10+ ships a genuine security hardening feature
-    (`nltk/inisec.py`, a CWE-427 mitigation — verified by reading the file,
-    not a supply-chain compromise) that blocks NLTK's own internal imports
-    whenever the current working directory is on `sys.path`, which
-    Jupyter/uv add by default. Evidently pulls in NLTK transitively even
-    though this demo uses no text/LLM descriptors, so plain `import
-    evidently` false-positives. Fix: set `NLTK_DISABLE_IMPORT_SECURITY=1`
-    (NLTK's own documented escape hatch) when running anything that
-    imports evidently under Jupyter/uv.
-  - Confirmed installed version is evidently 0.7.21, where the classic API
-    lives under `evidently.legacy.*` (see the import-path note added above
-    in "Running it on Databricks").
-  - MLflow's plain filesystem store (`./mlruns`) is now in maintenance mode
-    and current MLflow refuses to use it by default — the demo uses
-    `sqlite:///mlflow.db` instead, MLflow's own recommended local backend.
-  - Teaching note baked into the notebook: with only 1 of 8 synthetic
-    features drifted (12.5%), `dataset_drift` stayed `False` even though
-    that one feature was correctly flagged as drifted individually —
-    Evidently's dataset-level flag only flips `True` once the *share* of
-    drifted columns crosses a default >50% threshold. Correct, expected
-    behavior, not a bug — illustrates why per-feature drift still matters
-    when the dataset-level flag stays green.
-- 2026-08-04: Added `drift-detection-concepts.md` — a direct comparison
-  between a custom outcome-based (ground-truth-dependent) drift
-  implementation and Evidently's split between label-free
-  covariate/prediction drift and label-dependent performance drift, with a
-  mapping table and a concrete step-by-step adoption walkthrough.
-- 2026-08-04: Added and executed a second demo notebook,
-  `projects/evidently-monitoring-demo/drift_types_with_evidently.ipynb` —
-  one isolated, runnable example per drift type from the taxonomy in
-  `drift-detection-concepts.md`, verified end-to-end including a real
-  demonstration of `DataDriftPreset` staying silent under concept drift
-  while accuracy collapses.
-- 2026-08-04: Documented relationship with Feast — Feast supplies feature
-  values (including both sides of a reference/current comparison);
-  Evidently has no feature-storage/serving role and Feast has no drift
-  detection of its own.
