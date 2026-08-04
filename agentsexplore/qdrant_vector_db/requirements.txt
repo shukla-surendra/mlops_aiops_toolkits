@@ -1,0 +1,4 @@
+# Pinned to match the qdrant/qdrant:v1.12.4 server in docker-compose.yml -- qdrant-client warns
+# (and may break) if its major.minor drifts more than one minor version from the server.
+qdrant-client>=1.12,<1.13
+python-dotenv>=1.0

@@ -1,0 +1,7 @@
+langgraph>=0.2.0
+bedrock-agentcore
+bedrock-agentcore-starter-toolkit
+mcp
+openai-agents
+uv
+chardet<6

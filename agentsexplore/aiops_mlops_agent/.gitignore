@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+world_state.json
+audit_log.jsonl
+faiss_index/
+events/inbox/*.json
+events/processed/*.json
+events/failed/*.json
+!events/inbox/.gitkeep
+!events/processed/.gitkeep
+!events/failed/.gitkeep

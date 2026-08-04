@@ -1,0 +1,5 @@
+jsonrpcserver>=5.0.0
+jsonrpcclient>=4.0.0
+
+# Only used by with_package/. from_scratch/ imports nothing beyond the standard library
+# (json, socket, socketserver) -- that's the whole point of the comparison.

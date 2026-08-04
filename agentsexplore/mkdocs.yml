@@ -1,0 +1,102 @@
+site_name: Agentic Development Tutorial
+site_description: A beginner-to-advanced guide to agentic concepts, LangGraph, and MCP, built around the runnable examples in this repository.
+docs_dir: docs
+site_dir: site
+
+validation:
+  links:
+    # Some pages intentionally link out to runnable code alongside docs_dir (e.g.
+    # similarity_search/*.py) — those resolve fine on GitHub but aren't part of the built site,
+    # so don't fail --strict builds over them.
+    not_found: info
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Agentic Concepts:
+      - "0. Agentic Concepts": Agentic_Concepts/00-agentic-concepts.md
+      - "1. Getting Started": Agentic_Concepts/01-getting-started.md
+      - "2. Core Concepts": Agentic_Concepts/02-core-concepts.md
+      - "3. Conditional Routing": Agentic_Concepts/03-conditional-routing.md
+      - "4. Tools & Agents": Agentic_Concepts/04-tools-and-agents.md
+      - "5. Memory & Persistence": Agentic_Concepts/05-memory-and-persistence.md
+      - "6. Multi-Agent Systems": Agentic_Concepts/06-multi-agent-systems.md
+      - "7. Streaming": Agentic_Concepts/07-streaming.md
+      - "8. Advanced Patterns": Agentic_Concepts/08-advanced-patterns.md
+      - "9. Deployment": Agentic_Concepts/09-deployment.md
+      - "10. Best Practices": Agentic_Concepts/10-best-practices.md
+      - "11. Model Context Protocol (MCP)": Agentic_Concepts/11-mcp-agentic-capabilities.md
+      - "11b. MCP From Scratch (Companion Project)": mcp_from_scratch.md
+      - "12. Real-World Example": Agentic_Concepts/12-real-world-example.md
+      - "Appendix: Trusted Tools Landscape": Agentic_Concepts/13-trusted-tools-landscape.md
+      - "Appendix: Autonomy Levels and Approval Patterns": Agentic_Concepts/14-autonomy-and-approval-patterns.md
+      - "Appendix: JSON-RPC 2.0, Plain English": Agentic_Concepts/15-jsonrpc-explained.md
+      - "Appendix: MCP Protocol Recommendations, Plain English": Agentic_Concepts/16-mcp-protocol-recommendations.md
+  - RAG Knowledge Base:
+      - Overview: RAG_Knowledge_Base_Starter/index.md
+      - "0. Mathematics Foundations": RAG_Knowledge_Base_Starter/Mathematics_Foundations_for_Similarity_Search.md
+      - "1. Embeddings": RAG_Knowledge_Base_Starter/01_Embeddings.md
+      - "2. Why Embedding Models Are Needed": RAG_Knowledge_Base_Starter/02_Why_Embedding_Models_Are_Needed.md
+      - "3. Similarity Search": RAG_Knowledge_Base_Starter/03_Similarity_Search.md
+      - "3b. Similarity Search, In Depth": RAG_Knowledge_Base_Starter/Similarity_Search_Explanation.md
+      - "4. Vector Databases": RAG_Knowledge_Base_Starter/04_Vector_Databases.md
+      - "5. HNSW": RAG_Knowledge_Base_Starter/05_HNSW.md
+      - "6. RAG Architecture": RAG_Knowledge_Base_Starter/06_RAG_Architecture.md
+      - "7. Vector Search: Tools and Technology": RAG_Knowledge_Base_Starter/07_Vector_Search_Tools_and_Technology.md
+      - "8. Interview Questions (100, with Answers)": RAG_Knowledge_Base_Starter/08_Interview_Questions.md
+  - Similarity Search Methods:
+      - Overview: Similarity_Search_Methods/index.md
+      - "1. Vector-Based Methods for Similarity Search": Similarity_Search_Methods/01_Vector_Based_Methods_for_Similarity_Search.md
+      - "2. Tree-Based Methods": Similarity_Search_Methods/02_Tree_Based_Methods.md
+      - "3. Hashing-Based Methods": Similarity_Search_Methods/03_Hashing_Based_Methods.md
+      - "4. Graph-Based Methods": Similarity_Search_Methods/04_Graph_Based_Methods.md
+      - "5. Quantization and Compression": Similarity_Search_Methods/05_Quantization_and_Compression.md
+      - "6. Choosing an Algorithm and Benchmarking It": Similarity_Search_Methods/06_Choosing_and_Benchmarking.md
+      - "7. Tools, Libraries, and Interview Questions": Similarity_Search_Methods/07_Tools_Libraries_and_Interview_Questions.md
+      - "8. Databricks Vector Search": Similarity_Search_Methods/08_Databricks_Vector_Search.md
+      - "9. Additional Methods, Re-Ranking, and Taxonomy": Similarity_Search_Methods/09_Additional_Methods_Reranking_and_Taxonomy.md
+      - "10. FAISS Index Types": Similarity_Search_Methods/10_FAISS_Index_Types.md

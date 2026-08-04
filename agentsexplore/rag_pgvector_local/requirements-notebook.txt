@@ -1,0 +1,8 @@
+# Optional -- only needed for interactive exploration via `make lab` / explore.ipynb.
+# Not required to run ingest.py / search.py / rag.py.
+jupyterlab>=4.2
+ipykernel>=6.29
+pandas>=2.2
+numpy>=1.26
+matplotlib>=3.9
+scikit-learn>=1.5

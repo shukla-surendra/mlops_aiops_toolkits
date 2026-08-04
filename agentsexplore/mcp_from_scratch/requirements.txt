@@ -1,0 +1,8 @@
+# Deliberately empty. Everything in this project is Python standard library only
+# (json, sys, subprocess) -- that's the point: MCP's core mechanics don't require the `mcp`
+# package, or any package at all. Compare with ../bedrock_agentcore_demo/requirements.txt, which
+# needs `mcp` for ../bedrock_agentcore_demo/tasks_mcp_server.py's FastMCP-based server.
+#
+# The Jupyter notebook demo (make notebook) needs its own optional dependency -- see
+# requirements-notebook.txt -- kept separate so this file stays proof that the protocol itself
+# needs nothing.

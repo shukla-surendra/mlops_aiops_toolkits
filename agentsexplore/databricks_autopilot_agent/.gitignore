@@ -1,0 +1,5 @@
+pipeline_state.json
+audit_log.jsonl
+events/inbox/*.json
+events/processed/*.json
+events/failed/*.json

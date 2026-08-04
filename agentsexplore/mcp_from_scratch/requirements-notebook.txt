@@ -1,0 +1,4 @@
+# Optional -- only needed for `make notebook`. Kept separate from requirements.txt (which stays
+# empty on purpose, see the comment there) so exploring the from-scratch protocol implementation
+# itself never requires installing anything.
+jupyter

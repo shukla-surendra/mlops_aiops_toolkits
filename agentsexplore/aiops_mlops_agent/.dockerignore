@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.git/
+world_state.json
+audit_log.jsonl
+faiss_index/
+agent_sessions.sqlite
+events/inbox/*.json
+events/processed/*.json
+events/failed/*.json
