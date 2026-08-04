@@ -9,7 +9,7 @@ history in this repo now, not a reference to an external one).
 
 | Folder | What's in it |
 |---|---|
-| **`mlops_aiops/`** | This repo's own content: `docs/` (tool write-ups — Evidently, MLflow, Feast, Prometheus/Grafana/Loki, ELK/EFK, CloudWatch, observability on EKS) and `projects/` (runnable, uv-managed demo notebooks for the tools documented in `docs/`). Also holds `.claude/` — the Claude Code skill (`tech-log`) that keeps `docs/` updated as tools get discussed. |
+| **`mlops_aiops/`** | This repo's own content: `docs/` (tool write-ups — Evidently, MLflow, Feast, vLLM, Prometheus/Grafana/Loki, ELK/EFK, CloudWatch, observability on EKS) and `projects/` (runnable, uv-managed demo notebooks for the tools documented in `docs/`). |
 | **`cloud-practice/`** | AWS/cloud practice notes and Terraform — VPC, EBS/EFS, SageMaker, Bedrock, SQS, and a full Terraform reference. |
 | **`k8n_explorer/`** | Kubernetes practice — pod/node affinity, service types, Jobs/CronJobs, Helm charts, a Kubeflow pipeline sample, a KServe inference example, and a Grafana/Loki log-viewer demo. Has its own MkDocs site. |
 | **`genai_lab/`** | Agentic AI / LLM tooling practice — MCP (from scratch and official SDKs), FastMCP auth patterns, LangGraph + Ollama, vector DBs (FAISS, Qdrant, pgvector), RAG, and Bedrock AgentCore. Has its own MkDocs site. |
@@ -23,3 +23,20 @@ Makefile/MkDocs config — merging them in with `git subtree` preserved that
 structure and their full commit history rather than flattening everything
 into one undifferentiated tree. `mlops_aiops/` is where this repo's own
 work happens going forward.
+
+## Claude Code skills
+
+All skills — whether written for this repo or inherited from a merged
+folder — live in one place at the repo root, `.claude/skills/`:
+
+| Skill | Scope | What it does |
+|---|---|---|
+| `tech-log` | Whole repo | Passively documents tools/technologies discussed in chat into `mlops_aiops/docs/tools/` |
+| `articulate-it` | `engineering_notebook/` content | Adds/refreshes the "Articulate It" interview-framing section on that repo's tutorial docs |
+| `system-design-interview` | `engineering_notebook/` content | Runs a live mock system design interview using that repo's tutorials as the answer key |
+
+The latter two still reference `engineering_notebook/`-specific paths
+(`system_design/`, `dsa_prep/`, its own MkDocs config) — those path
+references were updated with the explicit `engineering_notebook/` prefix
+when the files physically moved out of that folder, so they still resolve
+correctly regardless of where the skill is invoked from.

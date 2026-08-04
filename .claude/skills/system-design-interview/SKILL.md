@@ -1,6 +1,6 @@
 ---
 name: system-design-interview
-description: Run a live mock system design interview at senior, staff, or principal bar, using this repo's case studies (system_design/, system_design_practice/, system_design/12_tricky_scenarios/, system_design/prerequisite_concepts/) as the question bank and answer key. Covers full green-field design interviews, incident-debugging scenarios, and a lighter-weight rapid-fire "concept check" quiz on first-principles fundamentals. Use when the user asks to practice, be quizzed, be interviewed, or run/act as interviewer for a system design question or fundamentals — "mock interview", "quiz me", "interview me on system design", "practice a design question", "run a scenario debugging interview", "grill me on fundamentals", "principal-level mock interview". Do not use this for passively explaining a design — that's just reading the tutorial.
+description: Run a live mock system design interview at senior, staff, or principal bar, using this repo's case studies (engineering_notebook/system_design/, engineering_notebook/system_design_practice/, engineering_notebook/system_design/12_tricky_scenarios/, engineering_notebook/system_design/prerequisite_concepts/) as the question bank and answer key. Covers full green-field design interviews, incident-debugging scenarios, and a lighter-weight rapid-fire "concept check" quiz on first-principles fundamentals. Use when the user asks to practice, be quizzed, be interviewed, or run/act as interviewer for a system design question or fundamentals — "mock interview", "quiz me", "interview me on system design", "practice a design question", "run a scenario debugging interview", "grill me on fundamentals", "principal-level mock interview". Do not use this for passively explaining a design — that's just reading the tutorial.
 ---
 
 # System Design Mock Interview — Senior / Staff / Principal Bar
@@ -16,9 +16,9 @@ simulated interview, and gives feedback per-question by design.)
 ## Step 0 — Setup (breaks character briefly, this part only)
 
 Ask, or infer from what the user already said:
-1. **Mode**: green-field design (pick from `system_design/*/tutorial.md` or
-   `system_design_practice/*/tutorial.md`), incident/debugging (pick from
-   `system_design/12_tricky_scenarios/*.md`), **concept-check** (a rapid-fire fundamentals
+1. **Mode**: green-field design (pick from `engineering_notebook/system_design/*/tutorial.md` or
+   `engineering_notebook/system_design_practice/*/tutorial.md`), incident/debugging (pick from
+   `engineering_notebook/system_design/12_tricky_scenarios/*.md`), **concept-check** (a rapid-fire fundamentals
    quiz — see its own section below, a distinct flow from the design/debugging modes), or
    a custom question the user brings that isn't in the repo at all.
 2. **Which question** — let them name a topic ("ride-hailing dispatch," "GPU cost spike,"
@@ -55,7 +55,7 @@ against the rubric in Step 5 and your own system design judgment.
 
 A different, lighter exercise from a full design interview: rapid-fire questions on
 first-principles fundamentals (percentiles, CAP theorem, CPU vs. GPU, sharding vs.
-replication, etc.), drawn from `system_design/prerequisite_concepts/0N_*.md`. Good for
+replication, etc.), drawn from `engineering_notebook/system_design/prerequisite_concepts/0N_*.md`. Good for
 warming up before a full mock interview, or drilling a specific weak spot.
 
 1. **Pick a source doc** (or let the user name a concept — "quiz me on GPU memory" maps to
@@ -138,7 +138,7 @@ Switch explicitly out of interviewer mode ("Alright, stepping out of interviewer
 here's how that went"). Structure the debrief as:
 
 1. **Scorecard against the staff-vs-senior axes** (from
-   `system_design_practice/00_staff_level_signal/tutorial.md` — Read it now if you haven't,
+   `engineering_notebook/system_design_practice/00_staff_level_signal/tutorial.md` — Read it now if you haven't,
    for the full nuance beyond this summary):
 
    | Axis | Senior signal | Staff signal | What they actually did |
@@ -149,7 +149,7 @@ here's how that went"). Structure the debrief as:
    | Trade-offs | States a trade-off when asked | Surfaces it proactively, in organizational terms | ... |
 
 2. **If the bar is Principal, extend the scorecard with three more rows** — drawn from the
-   later sections of `system_design_practice/00_staff_level_signal/tutorial.md`
+   later sections of `engineering_notebook/system_design_practice/00_staff_level_signal/tutorial.md`
    ("Influence Without Authority," "Build vs. Buy as Organizational Strategy," and
    "Multi-Year Technical Strategy" — re-read those sections now if it's been a while, the
    summary below is not a substitute for their nuance):

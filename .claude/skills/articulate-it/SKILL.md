@@ -1,6 +1,6 @@
 ---
 name: articulate-it
-description: Add or refresh the "Articulate It: Interview Framing & Vocabulary" closing section on tutorial/problem/concept-primer docs in this repo (system_design/, system_design/prerequisite_concepts/, system_design_practice/, dsa_prep/). Also covers how to author a new first-principles concept-primer doc (the prerequisite_concepts/ "Part N" pattern) from scratch. Use whenever a new tutorial, case-study, scenario, concept-primer, or problem.md/PATTERN.md doc is created or substantially rewritten in this repo, when asked to explain something "from first principles" for this repo, or when the user asks to "add articulate it", "add the interview framing section", or "do the same thing" to more docs.
+description: Add or refresh the "Articulate It: Interview Framing & Vocabulary" closing section on tutorial/problem/concept-primer docs in this repo (engineering_notebook/system_design/, engineering_notebook/system_design/prerequisite_concepts/, engineering_notebook/system_design_practice/, engineering_notebook/dsa_prep/). Also covers how to author a new first-principles concept-primer doc (the prerequisite_concepts/ "Part N" pattern) from scratch. Use whenever a new tutorial, case-study, scenario, concept-primer, or problem.md/PATTERN.md doc is created or substantially rewritten in this repo, when asked to explain something "from first principles" for this repo, or when the user asks to "add articulate it", "add the interview framing section", or "do the same thing" to more docs.
 ---
 
 # Articulate It: Interview Framing & Vocabulary
@@ -13,8 +13,8 @@ loud. This skill adds that section to a doc that doesn't have it yet.
 
 ## When to use this
 
-- A new file is added under `system_design/` (including `prerequisite_concepts/`),
-  `system_design_practice/`, or `dsa_prep/` (a `tutorial.md`, a scenario doc, a deep-dive doc,
+- A new file is added under `engineering_notebook/system_design/` (including `prerequisite_concepts/`),
+  `engineering_notebook/system_design_practice/`, or `engineering_notebook/dsa_prep/` (a `tutorial.md`, a scenario doc, a deep-dive doc,
   a concept-primer part, a `problem.md`, or a `PATTERN.md`).
 - An existing doc in one of those trees is substantially rewritten (the section should be
   refreshed to match the new content — use `--replace`, see below).
@@ -51,7 +51,7 @@ consistent across ~150 files:
 
 ## Three content modes — pick based on which tree the doc is in
 
-**A. `system_design/` and `system_design_practice/` (architecture tutorials, deep-dives,
+**A. `engineering_notebook/system_design/` and `engineering_notebook/system_design_practice/` (architecture tutorials, deep-dives,
 scenario/incident docs).** Three framings should be genuine alternative *angles* on
 explaining the doc's core idea to an interviewer — typically some mix of: trade-off-first,
 narrative/incident-first, business-impact-first, numbers-first, systems-first, or
@@ -62,7 +62,7 @@ expressive phrases (general fluent-English constructions for stating a trade-off
 introducing a caveat, or making a claim precisely) — roughly 4-6 items total split across
 both. Section length: proportional to the doc, typically 25-45 lines for a full tutorial.
 
-**B. `dsa_prep/` (LeetCode-style `problem.md` and `PATTERN.md` files).** This is a
+**B. `engineering_notebook/dsa_prep/` (LeetCode-style `problem.md` and `PATTERN.md` files).** This is a
 *coding*-interview context, not system design — framings are about narrating your
 approach out loud on a whiteboard/live-coding round: typically a brute-force-first framing
 (name the naive solution and complexity before optimizing), an invariant/correctness
@@ -76,7 +76,7 @@ files get a slightly richer version — framings about recognizing/teaching/gene
 *pattern itself*, not one instance of it (~4-5 vocab items, matching PATTERN.md's own
 ~70-80 line length).
 
-**C. `system_design/prerequisite_concepts/` (first-principles concept primers — "Part N"
+**C. `engineering_notebook/system_design/prerequisite_concepts/` (first-principles concept primers — "Part N"
 docs).** This mode is different in kind from A and B: it covers not just the closing
 section but **the whole doc's authoring pattern**, because this tree teaches foundational
 concepts (percentiles, CAP theorem, CPU vs. GPU, etc.) that every other doc in the repo
@@ -97,8 +97,8 @@ belongs in this repo, not just when appending a closing section to an existing f
   tutorials/tricky-scenarios elsewhere in the repo that assume the concept — this is what
   keeps the primer from being a disconnected glossary. The whole repo is one MkDocs site
   (`docs_dir: .` in `mkdocs.yml`), so use plain relative links everywhere, including when
-  crossing from `system_design_foundation/` into `system_design_practice/` or any other
-  top-level folder (e.g. `../../system_design_practice/02_design_twitter_feed/tutorial.md`
+  crossing from `system_design_foundation/` into `engineering_notebook/system_design_practice/` or any other
+  top-level folder (e.g. `../../engineering_notebook/system_design_practice/02_design_twitter_feed/tutorial.md`
   from a file two levels deep) — never a hardcoded `127.0.0.1:PORT` URL; those broke
   repeatedly under refactors and were removed.
 - State numeric claims (hardware specs, cloud pricing, bandwidth figures) as **illustrative
@@ -112,12 +112,12 @@ belongs in this repo, not just when appending a closing section to an existing f
 - **Wire it in fully, every time**: update the *next-to-last* part's nav-footer "Next" link
   and the *following* doc's (`00_interview_framework/tutorial.md`, if this is the last
   part) nav-footer "Previous" link to keep the Part 1→2→3...→N→Interview Framework chain
-  intact; add the new part to `mkdocs-system-design.yml`'s `nav:` list under
+  intact; add the new part to `engineering_notebook/mkdocs-system-design.yml`'s `nav:` list under
   "Prerequisite Concepts"; update the part count and file list in
-  `system_design/README.md`'s "Read This First" section; and if the concept has a
+  `engineering_notebook/system_design/README.md`'s "Read This First" section; and if the concept has a
   real-world tie-in elsewhere in the repo (e.g. a GPU-cost tricky scenario), add a
   cross-link from that doc back to the new part. Run
-  `mkdocs build -f mkdocs-system-design.yml --strict -d /tmp/<throwaway-dir>` afterward and
+  `mkdocs build -f engineering_notebook/mkdocs-system-design.yml --strict -d /tmp/<throwaway-dir>` afterward and
   check for `contains a link` warnings — mkdocs slugifies headings by lowercasing, turning
   spaces into single dashes, and stripping punctuation like `/` and `&` (not turning them
   into a second dash), which is the most common way a hand-written anchor link breaks; grep
@@ -162,9 +162,9 @@ foundational concept instead of a system.
 ```
 
 For a mode-A worked example, read any already-finished doc, e.g.
-`system_design/01_fundamentals/tutorial.md` or
-`system_design_practice/02_design_twitter_feed/tutorial.md` — both end with a full section in
-this style. For mode C, read `system_design/prerequisite_concepts/04_cpu_vs_gpu.md` in
+`engineering_notebook/system_design/01_fundamentals/tutorial.md` or
+`engineering_notebook/system_design_practice/02_design_twitter_feed/tutorial.md` — both end with a full section in
+this style. For mode C, read `engineering_notebook/system_design/prerequisite_concepts/04_cpu_vs_gpu.md` in
 full — it demonstrates the problem→mechanism→practical-impact structure, a worked example
 with real numbers, heavy cross-referencing, and the closing section together.
 

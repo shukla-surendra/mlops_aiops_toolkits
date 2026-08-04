@@ -15,7 +15,7 @@ builder (technical shorthand + expressive English phrases). Pure index files (`R
 
 When creating a new doc in `system_design/`, `system_design_practice/`, or `dsa_prep/`, or
 substantially rewriting an existing one, use the **`articulate-it`** skill
-(`.claude/skills/articulate-it/SKILL.md`) to add/refresh this section — it has the exact
+(`../.claude/skills/articulate-it/SKILL.md`, now at the repo root) to add/refresh this section — it has the exact
 format, worked examples, and an insertion script that handles this repo's footer format
 correctly (the nav footers use non-breaking spaces around `|`, which breaks naive string
 matching).
