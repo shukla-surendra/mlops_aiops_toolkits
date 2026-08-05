@@ -1,6 +1,6 @@
 ---
 name: tech-log
-description: Passively logs tools and technologies as they come up in conversation — anywhere in this monorepo (cloud-practice, k8n_explorer, genai_lab, engineering_fundamentals, mlops_aiops, or elsewhere) — into mlops_aiops/docs/tools/<tool-slug>/README.md, indexed from mlops_aiops/docs/tools-and-technologies.md. One shared glossary for the whole repo, regardless of which subtree prompted the discussion. Trigger proactively — no need to wait for the user to ask — whenever a specific named tool, platform, framework, library, or technology (e.g. "Kubeflow", "MLflow", "Prometheus", "Terraform", "Kafka") is introduced or discussed with any substantive explanation (what it is, what it does, how it compares, how it's used, code examples). Do not trigger on passing mentions with no discussion, or on generic terms ("a database", "the pipeline") with no named product. Also invoke directly when the user asks to see, update, or review the tools log / tech glossary / a specific tool's docs.
+description: Passively logs tools and technologies as they come up in conversation — anywhere in this monorepo (cloud-practice, k8n_explorer, genai_lab, engineering_fundamentals, local_llms, mlops_aiops, or elsewhere) — into mlops_aiops/docs/tools/<tool-slug>/README.md, indexed from mlops_aiops/docs/tools-and-technologies.md. One shared glossary for the whole repo, regardless of which subtree prompted the discussion. Trigger proactively — no need to wait for the user to ask — whenever a specific named tool, platform, framework, library, or technology (e.g. "Kubeflow", "MLflow", "Prometheus", "Terraform", "Kafka") is introduced or discussed with any substantive explanation (what it is, what it does, how it compares, how it's used, code examples). Do not trigger on passing mentions with no discussion, or on generic terms ("a database", "the pipeline") with no named product. Also invoke directly when the user asks to see, update, or review the tools log / tech glossary / a specific tool's docs.
 ---
 
 # Tech Log
@@ -12,8 +12,8 @@ into them — so the conversation doubles as real documentation without the
 user having to ask each time. This is the **one shared tech glossary for
 the whole monorepo** — it doesn't matter whether the discussion started
 while looking at `cloud-practice/`, `k8n_explorer/`, `genai_lab/`,
-`engineering_fundamentals/`, or `mlops_aiops/` itself; everything lands in the
-same place under `mlops_aiops/docs/`.
+`engineering_fundamentals/`, `local_llms/`, or `mlops_aiops/` itself;
+everything lands in the same place under `mlops_aiops/docs/`.
 
 ## Structure
 

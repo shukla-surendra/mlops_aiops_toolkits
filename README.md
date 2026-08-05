@@ -14,15 +14,15 @@ history in this repo now, not a reference to an external one).
 | **`k8n_explorer/`** | Kubernetes practice — pod/node affinity, service types, Jobs/CronJobs, Helm charts, a Kubeflow pipeline sample, a KServe inference example, and a Grafana/Loki log-viewer demo. Has its own MkDocs site. |
 | **`genai_lab/`** | Agentic AI / LLM tooling practice — MCP (from scratch and official SDKs), FastMCP auth patterns, LangGraph + Ollama, vector DBs (FAISS, Qdrant, pgvector), RAG, and Bedrock AgentCore. Has its own MkDocs site. |
 | **`engineering_fundamentals/`** | Interview prep — DSA, system design (foundations + practice), low-level design, security engineering, behavioral. Has its own MkDocs site. |
+| **`local_llms/`** | Local LLM/vision-model experimentation — an Ollama-backed chat UI (`ollama-chatbox`), deepfake-detector tests, Vision Transformer experiments (PyTorch/Flax/JAX), and notebooks (Gemma exploration, OCR comparison). uv-managed Python project (`pyproject.toml`/`uv.lock`). |
 
 ## Why the split
 
-`cloud-practice`, `k8n_explorer`, `genai_lab`, and `engineering_fundamentals`
-were each their own repo, each already self-contained with its own
-Makefile/MkDocs config — merging them in with `git subtree` preserved that
-structure and their full commit history rather than flattening everything
-into one undifferentiated tree. `mlops_aiops/` is where this repo's own
-work happens going forward.
+`cloud-practice`, `k8n_explorer`, `genai_lab`, `engineering_fundamentals`,
+and `local_llms` were each their own repo, each already self-contained —
+merging them in with `git subtree` preserved that structure and their full
+commit history rather than flattening everything into one undifferentiated
+tree. `mlops_aiops/` is where this repo's own work happens going forward.
 
 ## Claude Code skills
 
