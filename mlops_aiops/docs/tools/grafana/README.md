@@ -11,9 +11,9 @@ they return.
 ## What it's used for on EKS
 
 Queries [Prometheus](../prometheus/README.md) for metrics and
-[Loki](../loki/README.md) for logs (and often Tempo for traces), giving one
-UI across metrics + logs for an EKS cluster instead of separate tools per
-signal type.
+[Loki](../loki/README.md) for logs (and often [Tempo](../tempo/README.md) for traces),
+giving one UI across metrics + logs + traces for an EKS cluster instead of separate tools
+per signal type.
 
 ## Deployment
 
@@ -27,9 +27,10 @@ Loki is usually added as a second data source afterward.
 - **Amazon Managed Grafana (AMG)** — AWS-managed Grafana; can point at
   Amazon Managed Service for Prometheus (AMP) and/or CloudWatch, so you're
   not operating the Grafana server yourself.
-- **CloudWatch dashboards / Container Insights** — AWS-native alternative
-  if you want to avoid running a separate visualization layer entirely, at
-  the cost of flexibility/portability compared to Grafana.
+- **[CloudWatch](../cloudwatch/README.md) dashboards / Container Insights** —
+  AWS-native alternative if you want to avoid running a separate
+  visualization layer entirely, at the cost of flexibility/portability
+  compared to Grafana.
 
 ## Related
 
@@ -39,4 +40,4 @@ context (Loki, Grafana, Tempo, Mimir/Prometheus), or
 [`docs/observability-on-eks.md`](../../observability-on-eks.md) for the
 full landscape with an integration-flow diagram, including how Kibana
 compares as the alternative visualization layer if logs go through
-Elasticsearch instead of Loki.
+[Elasticsearch](../elasticsearch/README.md) instead of Loki.

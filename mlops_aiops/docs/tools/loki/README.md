@@ -7,8 +7,8 @@
 Log aggregation system — described as "[Prometheus](../prometheus/README.md)
 but for logs." It only indexes **labels** (e.g. namespace, pod, container)
 rather than full-text content, which keeps storage/indexing costs much
-lower than full-text log systems (e.g. ELK/OpenSearch). Queried with
-**LogQL**.
+lower than full-text log systems (e.g. [Elasticsearch](../elasticsearch/README.md)/
+OpenSearch). Queried with **LogQL**.
 
 ## What it's used for on EKS
 
@@ -35,5 +35,6 @@ Part of the metrics/logs/visualization trio commonly run together on EKS:
 Prometheus (metrics), Loki (logs), Grafana (visualization) — see
 [Prometheus](../prometheus/README.md) for the "LGTM stack" naming context.
 For a direct comparison against the alternative logging architecture
-(Elasticsearch/ELK/EFK) and a full integration-flow diagram, see
+([Elasticsearch](../elasticsearch/README.md)/ELK/EFK) and a full
+integration-flow diagram, see
 [`docs/observability-on-eks.md`](../../observability-on-eks.md).

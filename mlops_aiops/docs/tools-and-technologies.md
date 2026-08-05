@@ -9,17 +9,24 @@ skill (see `../../.claude/skills/tech-log/SKILL.md`, at the repo root).
 ## Index
 
 <!-- INDEX_START -->
+- [Amazon CloudWatch](tools/cloudwatch/README.md) — observability / monitoring (AWS-native)
 - [Databricks Lakehouse Monitoring](tools/databricks-lakehouse-monitoring/README.md) — ML monitoring / observability (Databricks-native)
-- [ELK / EFK Stack (Elasticsearch, Logstash/Fluentd, Kibana)](observability-on-eks.md#logs-the-fork-in-the-road--loki-vs-elkefk) — observability / monitoring (logs)
+- [Datadog](tools/datadog/README.md) — observability / monitoring (commercial, all-in-one)
+- [Elasticsearch (ELK / EFK Stack)](tools/elasticsearch/README.md) — observability / monitoring (logs), search
 - [Evidently (Evidently AI)](tools/evidently/README.md) — ML monitoring / observability
 - [Feast](tools/feast/README.md) — feature store
 - [Grafana](tools/grafana/README.md) — observability / monitoring (Kubernetes/EKS)
+- [Jaeger](tools/jaeger/README.md) — observability / monitoring (tracing)
 - [Loki](tools/loki/README.md) — observability / monitoring (Kubernetes/EKS)
 - [MLflow](tools/mlflow/README.md) — experiment tracking / model registry / model lifecycle
 - [ML & GenAI Lifecycle and Governance](ml-genai-lifecycle-and-governance.md) — cross-cutting: lifecycle stages, data/model governance, SR 11-7, EU AI Act, GDPR Art. 22
 - [MLOps, AIOps, LLMOps (definitions & origins)](mlops-aiops-llmops.md) — cross-cutting: what each discipline is, who defines it, where they overlap
+- [New Relic](tools/new-relic/README.md) — observability / monitoring (commercial, all-in-one)
 - [Observability on EKS (overview)](observability-on-eks.md) — cross-cutting: Prometheus, Grafana, Loki, ELK/EFK, tracing, alerting, alternatives
-- [OpenTelemetry / Tempo / Jaeger](observability-on-eks.md#traces-the-pillar-people-forget) — observability / monitoring (tracing)
+- [Observability Terminology (telemetry, tracing, cardinality)](observability-terminology.md) — cross-cutting: term definitions, origins, analogies, CloudWatch vocabulary mapping
+- [OpenTelemetry](tools/opentelemetry/README.md) — observability / monitoring (tracing, instrumentation standard)
 - [Prometheus](tools/prometheus/README.md) — observability / monitoring (Kubernetes/EKS)
+- [Splunk](tools/splunk/README.md) — observability / monitoring (commercial, logs/SIEM roots)
+- [Tempo](tools/tempo/README.md) — observability / monitoring (tracing)
 - [vLLM](tools/vllm/README.md) — LLM inference / serving
 <!-- INDEX_END -->

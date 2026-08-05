@@ -33,18 +33,19 @@ point for EKS observability.
   API-compatible metrics store. You still run a scraper agent on EKS (e.g.
   the ADOT collector) to ship metrics into it; you're not running/operating
   the Prometheus server yourself.
-- **CloudWatch Container Insights** — AWS-native metrics (and logs) for EKS
-  in one product, no extra stack to run, but less flexible/portable than
-  self-hosting Prometheus and query semantics differ from PromQL.
+- **[CloudWatch](../cloudwatch/README.md) Container Insights** — AWS-native
+  metrics (and logs) for EKS in one product, no extra stack to run, but
+  less flexible/portable than self-hosting Prometheus and query semantics
+  differ from PromQL.
 
 ## Related
 
 Prometheus, [Loki](../loki/README.md), and [Grafana](../grafana/README.md)
 are commonly deployed together on EKS as the metrics/logs/visualization
-trio. Grafana Labs refers to this combination (plus Tempo for traces, and
-Mimir as a scalable Prometheus-compatible backend) as the **"LGTM" stack** —
-Loki, Grafana, Tempo, Mimir/Prometheus — covering metrics, logs, and traces
-in one Grafana UI. See
+trio. Grafana Labs refers to this combination (plus [Tempo](../tempo/README.md)
+for traces, and Mimir as a scalable Prometheus-compatible backend) as the
+**"LGTM" stack** — Loki, Grafana, Tempo, Mimir/Prometheus — covering metrics,
+logs, and traces in one Grafana UI. See
 [`docs/observability-on-eks.md`](../../observability-on-eks.md) for the
 full landscape (including ELK/EFK, tracing, and alerting) with an
 integration-flow diagram.

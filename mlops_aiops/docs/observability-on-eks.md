@@ -2,11 +2,12 @@
 
 One consolidated map of the observability landscape for a workload running
 on EKS — what each tool actually does, how they connect, and what the
-realistic alternatives are. Per-tool deep dives already exist for
-[Prometheus](tools/prometheus/README.md), [Grafana](tools/grafana/README.md),
-and [Loki](tools/loki/README.md); this doc is the "how it all fits
-together" layer above them, plus the tools (ELK/EFK, tracing, alerting)
-that haven't been documented individually yet.
+realistic alternatives are. Per-tool deep dives already exist for every
+tool named below under `tools/`; this doc is the "how it all fits
+together" architecture layer above them. For the *vocabulary* underneath
+this — what "telemetry," "observability," "span," and "cardinality"
+actually mean, with the terms' real origins — see
+[`observability-terminology.md`](observability-terminology.md).
 
 ## The three pillars, in one paragraph each
 
@@ -149,7 +150,7 @@ all.
 Both solve "collect container logs from every pod and let me search
 them," but with opposite philosophies:
 
-| | **Loki + Grafana** | **ELK / EFK** (Elasticsearch + Fluentd/Logstash + Kibana) |
+| | **[Loki](tools/loki/README.md) + Grafana** | **ELK / EFK** ([Elasticsearch](tools/elasticsearch/README.md) + Fluentd/Logstash + Kibana) |
 |---|---|---|
 | Indexing | Labels only (namespace, pod, container) — log *content* isn't indexed | Full-text index of every field in every log line |
 | Query language | LogQL (label-filter first, then grep-like line filter) | Elasticsearch Query DSL / KQL — can search any field, any word, instantly |
@@ -178,12 +179,13 @@ occurred somewhere; only a **trace** tells you it was specifically the
 payments service's call to the fraud-check service that added 800ms. For
 an EKS setup:
 
-- Instrument application code with the **OpenTelemetry SDK** (the vendor-
-  neutral standard now that most tracing formats have converged on it).
+- Instrument application code with the **[OpenTelemetry](tools/opentelemetry/README.md)
+  SDK** (the vendor-neutral standard now that most tracing formats have converged on it).
 - Run an **OTel Collector** (as a Deployment or sidecar) to receive spans
   and export them onward.
-- Store/query traces in **Tempo** (pairs naturally with Grafana, same
-  team) or **Jaeger** (older, still widely used, its own UI).
+- Store/query traces in **[Tempo](tools/tempo/README.md)** (pairs naturally with Grafana,
+  same team) or **[Jaeger](tools/jaeger/README.md)** (older, still widely used, its own
+  UI).
 
 This is the pillar most teams add last, after metrics and logs are
 already in place — reasonable, but worth knowing it's a real gap until
@@ -204,7 +206,7 @@ questions on their own.
 
 ## CloudWatch vs. the self-hosted stack
 
-CloudWatch deserves its own comparison rather than one line in a table,
+[CloudWatch](tools/cloudwatch/README.md) deserves its own comparison rather than one line in a table,
 because it changes the trade-off from the previous section in a specific
 way: **AWS owns the storage durability question entirely.** There's no
 PVC to size, no S3 bucket to wire up, no ILM policy to configure — you
@@ -306,7 +308,7 @@ query power CloudWatch doesn't match.
 | **Amazon Managed Grafana (AMG)** | Self-hosted Grafana | Points at AMP/CloudWatch; no Grafana server to operate |
 | **Amazon OpenSearch Service** | Self-hosted Elasticsearch | Managed fork of Elasticsearch; same full-text logs use case, AWS operates the cluster |
 | **CloudWatch** (Container Insights, Logs, Metrics, X-Ray) | Prometheus + Loki/ELK + Tempo/Jaeger, entirely | See the dedicated comparison above — least setup, least portable, AWS owns storage durability |
-| **Datadog / New Relic / Dynatrace** | The entire stack above | Commercial, all-in-one (metrics+logs+traces+APM), fastest to stand up, ongoing SaaS cost scales with volume |
+| **[Datadog](tools/datadog/README.md) / [New Relic](tools/new-relic/README.md) / Dynatrace** | The entire stack above | Commercial, all-in-one (metrics+logs+traces+APM), fastest to stand up, ongoing SaaS cost scales with volume |
 | **Honeycomb** | Metrics+traces, observability-2.0 style | Built around high-cardinality event data rather than the metrics/logs/traces split above; different mental model, worth knowing exists |
 
 ## Putting together a concrete stack for EKS
@@ -333,3 +335,10 @@ SaaS cost is acceptable relative to engineering time saved.
 - [Prometheus](tools/prometheus/README.md) — full write-up
 - [Grafana](tools/grafana/README.md) — full write-up
 - [Loki](tools/loki/README.md) — full write-up
+- [Elasticsearch (ELK/EFK)](tools/elasticsearch/README.md) — full write-up
+- [OpenTelemetry](tools/opentelemetry/README.md), [Tempo](tools/tempo/README.md),
+  [Jaeger](tools/jaeger/README.md) — full write-ups for the tracing pillar
+- [Amazon CloudWatch](tools/cloudwatch/README.md) — full write-up
+- [Datadog](tools/datadog/README.md), [Splunk](tools/splunk/README.md),
+  [New Relic](tools/new-relic/README.md) — full write-ups for the commercial platforms
+  mentioned above
