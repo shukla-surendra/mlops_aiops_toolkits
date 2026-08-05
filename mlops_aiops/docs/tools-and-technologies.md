@@ -16,6 +16,8 @@ skill (see `../../.claude/skills/tech-log/SKILL.md`, at the repo root).
 - [Grafana](tools/grafana/README.md) — observability / monitoring (Kubernetes/EKS)
 - [Loki](tools/loki/README.md) — observability / monitoring (Kubernetes/EKS)
 - [MLflow](tools/mlflow/README.md) — experiment tracking / model registry / model lifecycle
+- [ML & GenAI Lifecycle and Governance](ml-genai-lifecycle-and-governance.md) — cross-cutting: lifecycle stages, data/model governance, SR 11-7, EU AI Act, GDPR Art. 22
+- [MLOps, AIOps, LLMOps (definitions & origins)](mlops-aiops-llmops.md) — cross-cutting: what each discipline is, who defines it, where they overlap
 - [Observability on EKS (overview)](observability-on-eks.md) — cross-cutting: Prometheus, Grafana, Loki, ELK/EFK, tracing, alerting, alternatives
 - [OpenTelemetry / Tempo / Jaeger](observability-on-eks.md#traces-the-pillar-people-forget) — observability / monitoring (tracing)
 - [Prometheus](tools/prometheus/README.md) — observability / monitoring (Kubernetes/EKS)

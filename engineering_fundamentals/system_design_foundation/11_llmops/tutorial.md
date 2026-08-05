@@ -5,7 +5,10 @@ covers the retrieval and inference-serving mechanics; [5. Observability &
 Drift](../05_observability_drift/tutorial.md) covers how you measure an LLM system once
 it's live. This tutorial covers the layer in between: how you *change* an LLM system
 safely — prompts, fine-tunes, evals, and guardrails as engineered, versioned,
-gated artifacts, not ad-hoc string edits pushed straight to prod.
+gated artifacts, not ad-hoc string edits pushed straight to prod. For where "LLMOps" as a
+term actually comes from, who defines it, and how it differs from MLOps and AIOps rather
+than the practice mechanics covered here, see
+[MLOps, AIOps, LLMOps: definitions, origins, and where they diverge](../../../mlops_aiops/docs/mlops-aiops-llmops.md).
 
 ## Core Concepts
 
