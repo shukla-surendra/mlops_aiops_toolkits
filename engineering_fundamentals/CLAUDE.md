@@ -1,4 +1,4 @@
-# Engineering Notebook
+# Engineering Fundamentals
 
 An interview-prep notebook: `system_design/` (ML system design tutorials, deep-dives, and
 debugging scenarios) and `system_design_practice/` (general distributed-systems design
@@ -14,16 +14,20 @@ builder (technical shorthand + expressive English phrases). Pure index files (`R
 `TOP_LIST.md`) intentionally don't have one.
 
 When creating a new doc in `system_design/`, `system_design_practice/`, or `dsa_prep/`, or
-substantially rewriting an existing one, use the **`articulate-it`** skill
-(`../.claude/skills/articulate-it/SKILL.md`, now at the repo root) to add/refresh this section — it has the exact
-format, worked examples, and an insertion script that handles this repo's footer format
-correctly (the nav footers use non-breaking spaces around `|`, which breaks naive string
-matching).
+substantially rewriting an existing one, use the **`engineering-fundamentals`** skill
+(`../.claude/skills/engineering-fundamentals/SKILL.md`, at the repo root, Mode 1) to
+add/refresh this section — it has the exact format, worked examples, and an insertion
+script that handles this repo's footer format correctly (the nav footers use non-breaking
+spaces around `|`, which breaks naive string matching).
 
 ## Skills
 
-- **`articulate-it`** — adds/refreshes the section above on a doc.
-- **`system-design-interview`** — runs a live mock system design interview (green-field
+The **`engineering-fundamentals`** skill (repo root, `.claude/skills/`) covers this repo
+in two modes:
+
+- **Mode 1 ("articulate it")** — adds/refreshes the section above on a doc, and covers
+  authoring a new first-principles concept-primer doc from scratch.
+- **Mode 2 ("mock interview")** — runs a live mock system design interview (green-field
   design, or incident-debugging from `12_tricky_scenarios/`) at staff/principal bar,
   using this repo's tutorials as the hidden answer key, then debriefs against the
   senior-vs-staff rubric from `system_design_practice/00_staff_level_signal/tutorial.md`.

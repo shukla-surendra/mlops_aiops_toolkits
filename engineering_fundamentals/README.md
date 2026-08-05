@@ -1,4 +1,4 @@
-# engineering_notebook
+# engineering_fundamentals
 
 Personal notes on algorithms, ML/LLM systems, distributed-systems design, low-level
 design, and security engineering — one MkDocs site (`mkdocs.yml`, `docs_dir: .`), with
