@@ -144,6 +144,11 @@ That one fact resolves many confusions: why `ip addr` never shows the public IP;
 ### 3e. Where the AZ boundary lives
 An AZ = one or more physical datacenters with independent power/cooling/network. A VPC spans all AZs in a region; a **subnet lives in exactly one AZ**. Cross-AZ traffic rides the substrate between datacenters (single-digit ms, and it's **billed**). The overlay hides physical topology, but **substrate distance is real** → cross-AZ latency + data-transfer cost. The fiction is perfect for *correctness*; physics still bills you.
 
+> This scope model — VPC = region, subnet = AZ — is AWS-specific, not universal across
+> clouds. GCP's VPC is *global* with *regional* (not zonal) subnets; Azure's VNet is
+> regional like AWS's, but its subnets aren't AZ-pinned at all. See
+> [cross-cloud-comparison.md](cross-cloud-comparison.md) once this model is solid.
+
 ---
 
 ## Distributed-systems concepts in play (preview of section-17 depth)

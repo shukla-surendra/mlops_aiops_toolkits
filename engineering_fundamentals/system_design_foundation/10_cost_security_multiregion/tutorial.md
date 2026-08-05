@@ -107,6 +107,11 @@ flowchart TB
 
 ## Deep-Dive: Designing Cost Attribution for a Shared ML Platform
 
+> This section attributes cost once it's incurred. For *why* the same bytes cost $0 in one
+> path and real money in another — the mechanics behind cross-region/cross-AZ transfer
+> charges this multi-region architecture is actually paying for — see
+> [Deep-Dive: Network / Data-Transfer Costs on AWS, GCP, and Azure](network_data_transfer_costs_deep_dive.md).
+
 A concrete, interview-friendly deep-dive that combines cost and multi-tenancy:
 
 1. **Every request is tagged at ingress** with the requesting team/model identity

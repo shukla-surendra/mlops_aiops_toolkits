@@ -11,6 +11,12 @@ The full deep-dive on Amazon VPC, from first principles to production. Read in t
 5. **[best-practices.md](best-practices.md)** — *CIDR/subnet/multi-account design · real production architectures · cost optimization · monitoring* (CloudWatch, Config, CloudTrail, GuardDuty).
 6. **[troubleshooting.md](troubleshooting.md)** — *The connectivity chain · Reachability Analyzer · Flow Log queries · the dozen common failures and their fixes.*
 7. **[interview.md](interview.md)** — *Junior → principal Q&A, scenarios, incident drills.*
+8. **[cross-cloud-comparison.md](cross-cloud-comparison.md)** — *Where GCP and Azure
+   diverge from the AWS model* (GCP VPC is global with regional subnets; Azure VNet is
+   regional but subnets aren't AZ-pinned) · Cloud NAT / Azure NAT Gateway / Private Service
+   Connect / Private Endpoint as the equivalents of IGW/NAT GW/VPC Endpoints · peering
+   non-transitivity verified as universal across all three. Read after Module 2 — assumes
+   the AWS routing model from `networking.md`.
 
 ## Quick reference
 - **[VPC cheatsheet](../../cheatsheets/vpc.md)** — one-page recall.

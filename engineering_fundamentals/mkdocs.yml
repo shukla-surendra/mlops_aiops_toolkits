@@ -226,6 +226,7 @@ nav:
           - 10. Cost, Security & Multi-Region Governance:
               - Tutorial: system_design_foundation/10_cost_security_multiregion/tutorial.md
               - "Deep-Dive: Data Governance in Practice": system_design_foundation/10_cost_security_multiregion/data_governance_deep_dive.md
+              - "Deep-Dive: Network / Data-Transfer Costs (AWS/GCP/Azure)": system_design_foundation/10_cost_security_multiregion/network_data_transfer_costs_deep_dive.md
           - 11. LLMOps (Prompting, Fine-Tuning, Evals & Guardrails): system_design_foundation/11_llmops/tutorial.md
       - Tricky MLOps Scenarios:
           - Overview: system_design_foundation/12_tricky_scenarios/README.md
