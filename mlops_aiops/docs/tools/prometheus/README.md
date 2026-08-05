@@ -42,9 +42,9 @@ point for EKS observability.
 
 Prometheus, [Loki](../loki/README.md), and [Grafana](../grafana/README.md)
 are commonly deployed together on EKS as the metrics/logs/visualization
-trio. Grafana Labs refers to this combination (plus [Tempo](../tempo/README.md)
-for traces, and Mimir as a scalable Prometheus-compatible backend) as the
-**"LGTM" stack** — Loki, Grafana, Tempo, Mimir/Prometheus — covering metrics,
+trio. Grafana Labs' [LGTM stack](../lgtm-stack/README.md) (plus
+[Tempo](../tempo/README.md) for traces and [Mimir](../mimir/README.md) as the
+scalable, Prometheus-`remote_write`-compatible long-term backend) covers metrics,
 logs, and traces in one Grafana UI. See
 [`docs/observability-on-eks.md`](../../observability-on-eks.md) for the
 full landscape (including ELK/EFK, tracing, and alerting) with an

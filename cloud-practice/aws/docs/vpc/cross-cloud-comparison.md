@@ -4,7 +4,11 @@
 > Read those first — this doc assumes the AWS overlay/substrate mental model and asks,
 > concept by concept, whether it transfers to GCP and Azure, or where it genuinely breaks.
 > **Epistemics:** claims tagged **[Documented]** are verified directly against each
-> vendor's own current docs, not inferred.
+> vendor's own current docs, not inferred. For the broader (non-networking) AWS↔Azure
+> picture — Resource Groups, Entra ID, the resource hierarchy, full service mapping — see
+> [aws-to-azure-transition-guide.md](../../../aws-to-azure-transition-guide.md). For how
+> this networking model factors into an actual large-scale migration's hybrid-connectivity
+> bridge, see [aws-to-azure-migration-strategy.md](../../../aws-to-azure-migration-strategy.md).
 
 **Why this matters**: the single biggest mistake moving between clouds is assuming "VPC"
 (AWS), "VPC network" (GCP), and "VNet" (Azure) are the same concept with different names.

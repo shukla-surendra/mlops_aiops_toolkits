@@ -8,7 +8,14 @@ A long-running (multi-month) deep study of AWS at **architecture / internals dep
 
 Open **[PROGRESS.md](PROGRESS.md)** — the master tracker. It always says exactly where we are and what's next. Read it first in any session.
 
-Two tracks: **`aws/`** (active) and **`gcp/`** (planned, taught by contrast later).
+Two tracks: **`aws/`** (active) and **`gcp/`** (planned, taught by contrast later). Already
+have Azure experience or need to bridge to it now? See
+**[aws-to-azure-transition-guide.md](aws-to-azure-transition-guide.md)** — a standalone
+service-mapping + mental-model doc, not part of the gated curriculum. Planning an actual
+large-scale migration? See
+**[aws-to-azure-migration-strategy.md](aws-to-azure-migration-strategy.md)** — a
+Principal-Engineer-level migration plan (Gartner's 5 Rs → AWS's 7 Rs → wave planning →
+worked timeline) for a 200-service AWS→Azure migration.
 
 ## Current focus
 

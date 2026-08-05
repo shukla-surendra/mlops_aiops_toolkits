@@ -7,8 +7,9 @@
 Grafana Labs' distributed tracing backend — stores and queries traces received from an
 [OpenTelemetry](../opentelemetry/README.md) Collector (or Jaeger/Zipkin protocols
 directly). Pairs naturally with [Grafana](../grafana/README.md) — same team, same UI as
-[Prometheus](../prometheus/README.md) (metrics) and [Loki](../loki/README.md) (logs),
-which is exactly what "the LGTM stack" (Loki, Grafana, Tempo, Mimir/Prometheus) refers to.
+[Prometheus](../prometheus/README.md)/[Mimir](../mimir/README.md) (metrics) and
+[Loki](../loki/README.md) (logs), which is exactly what the
+[LGTM stack](../lgtm-stack/README.md) (Loki, Grafana, Tempo, Mimir) refers to.
 
 ## What it's used for on EKS
 
@@ -18,7 +19,7 @@ dashboard straight to its full trace" as the actual workflow this enables.
 
 **Durability**: like Loki, Tempo is designed around **S3/object storage** as its trace
 block store from the start — not an afterthought, the same design philosophy Loki uses for
-logs.
+logs. Locally, that's typically [MinIO](../minio/README.md) standing in for S3.
 
 ## Alternatives
 
@@ -32,6 +33,7 @@ logs.
 - [OpenTelemetry](../opentelemetry/README.md) — the instrumentation/collection layer
   feeding Tempo.
 - [Grafana](../grafana/README.md), [Prometheus](../prometheus/README.md),
-  [Loki](../loki/README.md) — the rest of the "LGTM stack."
+  [Loki](../loki/README.md), [Mimir](../mimir/README.md) — the rest of the
+  [LGTM stack](../lgtm-stack/README.md).
 - [`observability-on-eks.md`](../../observability-on-eks.md) — full integration-flow
   diagram.

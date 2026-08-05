@@ -27,13 +27,15 @@ Usually installed via the `loki-stack` Helm chart, or `loki` + a shipping
 agent (`promtail`/`alloy`) as separate charts. Wired into the same
 [Grafana](../grafana/README.md) instance that's already querying
 [Prometheus](../prometheus/README.md) (e.g. from `kube-prometheus-stack`),
-as a second data source — giving one UI for both metrics and logs.
+as a second data source — giving one UI for both metrics and logs. Loki, too, stores
+chunks in S3-compatible object storage — [MinIO](../minio/README.md) is the common
+self-hosted stand-in for local/CI setups.
 
 ## Related
 
 Part of the metrics/logs/visualization trio commonly run together on EKS:
-Prometheus (metrics), Loki (logs), Grafana (visualization) — see
-[Prometheus](../prometheus/README.md) for the "LGTM stack" naming context.
+Prometheus (metrics), Loki (logs), Grafana (visualization) — see the
+[LGTM stack](../lgtm-stack/README.md) for the full stack this is part of.
 For a direct comparison against the alternative logging architecture
 ([Elasticsearch](../elasticsearch/README.md)/ELK/EFK) and a full
 integration-flow diagram, see

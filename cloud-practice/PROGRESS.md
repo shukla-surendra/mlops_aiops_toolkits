@@ -8,7 +8,7 @@
 
 ---
 
-**Repo layout:** two cloud tracks — `aws/` (active) and `gcp/` (planned). Each holds `docs/`, `quizzes/`, `terraform/`, `labs/`, etc. Shared docs tooling lives in `scripts/` + `Makefile` at the root (`make docs` renders all Markdown to a themed HTML site; `make check` validates links).
+**Repo layout:** two cloud tracks — `aws/` (active) and `gcp/` (planned). Each holds `docs/`, `quizzes/`, `terraform/`, `labs/`, etc. Shared docs tooling lives in `scripts/` + `Makefile` at the root (`make docs` renders all Markdown to a themed HTML site; `make check` validates links). Also at the root: [`aws-to-azure-transition-guide.md`](aws-to-azure-transition-guide.md) — a standalone (non-gated) service-mapping + mental-model bridge doc for Azure, written ahead of a formal `azure/` track — and [`aws-to-azure-migration-strategy.md`](aws-to-azure-migration-strategy.md), a 200-service migration plan built on top of it.
 
 ## 0. How to resume (read this first every session)
 
