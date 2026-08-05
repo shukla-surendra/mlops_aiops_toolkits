@@ -1,7 +1,10 @@
 # Model Serving Layer: Canary, Shadow & Safe Rollouts
 
 **Weeks 7-8 of Track B.** Anchor: extend a production XGBoost serving setup into a full
-serving-layer design. Name **KServe/Seldon** for rollout safety and autoscaling.
+serving-layer design. Name **KServe/Seldon** for rollout safety and autoscaling. For a
+worked, real-model version of the *other* half of this problem — which AWS compute target
+to actually deploy onto in the first place, before rollout strategy even applies — see the
+[Hosting DeepSeek-OCR-2 on AWS deep-dive](deepseek_ocr_aws_hosting.md).
 
 ## Core Concepts
 

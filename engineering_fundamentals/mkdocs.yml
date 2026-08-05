@@ -210,7 +210,9 @@ nav:
           - 3. Feature Store & Model Promotion:
               - Tutorial: system_design_foundation/03_feature_store_model_promotion/tutorial.md
               - "Deep-Dive: Is a Feature Store Worth It When Reuse Is Low?": system_design_foundation/03_feature_store_model_promotion/is_a_feature_store_worth_it.md
-          - 4. Model Serving & Deployment: system_design_foundation/04_model_serving_deployment/tutorial.md
+          - 4. Model Serving & Deployment:
+              - Tutorial: system_design_foundation/04_model_serving_deployment/tutorial.md
+              - "Deep-Dive: Hosting DeepSeek-OCR-2 on AWS": system_design_foundation/04_model_serving_deployment/deepseek_ocr_aws_hosting.md
           - 5. ML/LLM Observability & Drift:
               - Tutorial: system_design_foundation/05_observability_drift/tutorial.md
               - "Deep-Dive: Promotion & Observability as One Closed-Loop System": system_design_foundation/05_observability_drift/closed_loop_promotion_and_monitoring.md
