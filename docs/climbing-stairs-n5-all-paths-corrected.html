@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stair Climbing (n=5) — All Paths, corrected</title>
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --ink: #1F2333;
+    --muted: #6B7385;
+    --border: #E2E5EC;
+    --n1-bg: #DCEBFC;   /* blue, n-1 column */
+    --n1-ink: #1D5FB0;
+    --n2-bg: #DDF2E0;   /* green, n-2 column */
+    --n2-ink: #1E7A3C;
+    --title-bg: #FFF3D9;
+    --title-border: #E7A83B;
+    --key-border: #8E5AC9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16181F;
+      --ink: #E7EAF2;
+      --muted: #97A0B5;
+      --border: #2C3040;
+      --n1-bg: #1C3352;
+      --n1-ink: #7FB3F5;
+      --n2-bg: #1B3A26;
+      --n2-ink: #6FD98D;
+      --title-bg: #3A2F14;
+      --title-border: #C98B2A;
+      --key-border: #A87ADB;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); margin: 0; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .page { max-width: 1000px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .fix-note {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--muted);
+    max-width: 70ch;
+    margin: 0 0 2rem;
+  }
+  .fix-note b { color: var(--ink); }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .title-box {
+    background: var(--title-bg);
+    border: 2px solid var(--title-border);
+    border-radius: 10px;
+    padding: 0.8rem 1.6rem;
+  }
+  .title-box h1 { margin: 0; font-size: 1.5rem; font-weight: 800; }
+
+  .key-box {
+    border: 2px solid var(--key-border);
+    border-radius: 10px;
+    padding: 0.7rem 1.3rem;
+    max-width: 280px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  .key-box .kt { text-align: center; font-weight: 700; margin-bottom: 0.3rem; }
+
+  .subtitle { text-align: center; font-weight: 600; margin: 1.5rem 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 0.6rem 0.5rem;
+    text-align: center;
+  }
+  th.stair { color: var(--n1-ink); font-size: 1.05rem; }
+  th.n2col, td.n2col { background: var(--n2-bg); }
+  th.n1col, td.n1col { background: var(--n1-bg); }
+  th.pathno { color: var(--key-border); }
+  td.dash { color: var(--muted); }
+  .lastmove { font-weight: 600; text-align: left; padding-left: 1rem; }
+  .lastmove.one { color: var(--n1-ink); }
+  .lastmove.two { color: var(--n2-ink); }
+
+  .total {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-weight: 700;
+    color: var(--key-border);
+    border: 2px solid var(--key-border);
+    border-radius: 10px;
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+  }
+  .total-wrap { text-align: center; margin-top: 1.5rem; }
+</style>
+</head>
+<body>
+<div class="page">
+  <a class="back-link" href="climbing-stairs-build-up.html">&larr; back to the build-up doc</a>
+
+  <p class="fix-note">
+    Corrected version of <code>ChatGPT Image Aug 6, 2026, 06_48_20 AM.png</code>. The original had two bugs:
+    (1) the last column (stair 5) was blank in 6 of the 8 rows, even though every path must end there by
+    definition, and (2) several rows placed a &ldquo;2&rdquo; one column too early &mdash; e.g. showing a
+    2-step landing on stair 1, which is impossible (a 2-step from the ground lands on stair 2). Every cell
+    below was rebuilt from the actual 8 move-sequences for n&nbsp;=&nbsp;5, so every row is a real, walkable
+    path and every row ends with a value in the &ldquo;5&rdquo; column.
+  </p>
+
+  <div class="header-row">
+    <div class="title-box"><h1>Stair Climbing (n = 5) &mdash; All Paths</h1></div>
+    <div class="key-box">
+      <div class="kt">Key Idea</div>
+      To reach 5, the last move must come from either 4 (n&minus;1) by 1 step, or 3 (n&minus;2) by 2 steps.
+    </div>
+  </div>
+
+  <p class="subtitle">Cell value = the size of the move that lands you on that stair. &ldquo;&ndash;&rdquo; = stair skipped.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="pathno">Path No.</th>
+        <th class="stair">1</th>
+        <th class="stair">2</th>
+        <th class="stair n2col">3<br><span style="font-size:.75em">(n&minus;2)</span></th>
+        <th class="stair n1col">4<br><span style="font-size:.75em">(n&minus;1)</span></th>
+        <th class="stair">5<br><span style="font-size:.75em">(n)</span></th>
+        <th>Last Move / From</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td><td>1</td><td>1</td><td class="n2col">1</td><td class="n1col">1</td><td>1</td>
+        <td class="lastmove one">From n&minus;1 (4) &rarr; n (5) by 1 step</td>
+      </tr>
+      <tr>
+        <td>2</td><td class="dash">&ndash;</td><td>2</td><td class="n2col">1</td><td class="n1col">1</td><td>1</td>
+        <td class="lastmove one">From n&minus;1 (4) &rarr; n (5) by 1 step</td>
+      </tr>
+      <tr>
+        <td>3</td><td>1</td><td class="dash">&ndash;</td><td class="n2col">2</td><td class="n1col">1</td><td>1</td>
+        <td class="lastmove one">From n&minus;1 (4) &rarr; n (5) by 1 step</td>
+      </tr>
+      <tr>
+        <td>4</td><td>1</td><td>1</td><td class="n2col dash">&ndash;</td><td class="n1col">2</td><td>1</td>
+        <td class="lastmove one">From n&minus;1 (4) &rarr; n (5) by 1 step</td>
+      </tr>
+      <tr>
+        <td>5</td><td class="dash">&ndash;</td><td>2</td><td class="n2col dash">&ndash;</td><td class="n1col">2</td><td>1</td>
+        <td class="lastmove one">From n&minus;1 (4) &rarr; n (5) by 1 step</td>
+      </tr>
+      <tr>
+        <td>6</td><td>1</td><td>1</td><td class="n2col">1</td><td class="n1col dash">&ndash;</td><td>2</td>
+        <td class="lastmove two">From n&minus;2 (3) &rarr; n (5) by 2 steps</td>
+      </tr>
+      <tr>
+        <td>7</td><td class="dash">&ndash;</td><td>2</td><td class="n2col">1</td><td class="n1col dash">&ndash;</td><td>2</td>
+        <td class="lastmove two">From n&minus;2 (3) &rarr; n (5) by 2 steps</td>
+      </tr>
+      <tr>
+        <td>8</td><td>1</td><td class="dash">&ndash;</td><td class="n2col">2</td><td class="n1col dash">&ndash;</td><td>2</td>
+        <td class="lastmove two">From n&minus;2 (3) &rarr; n (5) by 2 steps</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="total-wrap"><span class="total">Total Ways = 8</span></div>
+</div>
+</body>
+</html>
