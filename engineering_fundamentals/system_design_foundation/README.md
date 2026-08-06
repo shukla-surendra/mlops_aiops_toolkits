@@ -11,7 +11,7 @@ original plan — plus a bank of scenario-debugging problems.
 If terms like **p99 latency**, **the nines**, **sharding vs. replication**, or
 **idempotency** aren't things you could explain from first principles yet, start with the
 **[Prerequisite Concepts](prerequisite_concepts/01_performance_and_scale.md)** primer
-(twelve short parts: [Performance & Scale](prerequisite_concepts/01_performance_and_scale.md),
+(fourteen short parts: [Performance & Scale](prerequisite_concepts/01_performance_and_scale.md),
 [Data & Consistency](prerequisite_concepts/02_data_and_consistency.md),
 [Communication & Resilience](prerequisite_concepts/03_communication_and_resilience.md),
 [CPU vs. GPU](prerequisite_concepts/04_cpu_vs_gpu.md),
@@ -22,7 +22,9 @@ If terms like **p99 latency**, **the nines**, **sharding vs. replication**, or
 [The Anatomy of a Request (DNS, BGP, and the Edge)](prerequisite_concepts/09_dns_bgp_and_the_edge.md),
 [The Physics of Persistence (B-Trees vs. LSM-Trees)](prerequisite_concepts/10_physics_of_persistence.md),
 [Taxonomy of Storage — Choosing by First Principles, Not Fashion](prerequisite_concepts/11_taxonomy_of_storage_choice.md),
-[Sharding — The Illusion of Infinite Space, and the Vertical Wall](prerequisite_concepts/12_sharding_and_the_vertical_wall.md))
+[Sharding — The Illusion of Infinite Space, and the Vertical Wall](prerequisite_concepts/12_sharding_and_the_vertical_wall.md),
+[CAP Theorem & PACELC](prerequisite_concepts/13_cap_theorem_and_pacelc.md),
+[Geospatial Indexing — Finding What's Nearby](prerequisite_concepts/14_geospatial_indexing.md))
 before the Interview Framework below. It's the shared vocabulary every tutorial in this
 section — and in the [Distributed Systems Design track](../system_design_practice/README.md) — assumes
 without re-explaining.

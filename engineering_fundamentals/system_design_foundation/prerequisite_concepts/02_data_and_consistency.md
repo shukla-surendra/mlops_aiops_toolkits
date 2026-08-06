@@ -182,6 +182,46 @@ frequently) rather than indexing everything defensively — an over-indexed tabl
 real, continuous write-latency tax for read speed most of its indexes never actually
 deliver.
 
+## Pagination: Walking Through an Indexed Result Set
+
+Indexing solves "find the matching rows fast." A separate, equally common question sits
+right next to it: once a query matches thousands or millions of rows, how does an API hand
+them back a manageable page at a time? Two genuinely different mechanisms answer this, with
+a real cost difference between them.
+
+**Offset/limit pagination** (`LIMIT 20 OFFSET 4000`) is the obvious first approach: ask for
+20 rows starting at row 4,000. It's simple, and it's exactly what breaks down at scale, for
+two separate reasons:
+
+1. **It gets slower with page depth, not just row count.** The database still has to walk
+   past all 4,000 skipped rows to find where the requested page starts — even though those
+   rows are never returned — so page 200 is measurably more expensive than page 2, on the
+   *identical* query, purely because of how far into the result set it sits.
+2. **Page drift under concurrent writes.** If a row is inserted or deleted *before* the
+   current offset while a user is paging through results, every subsequent page shifts by
+   one — a row can be skipped entirely, or shown twice, without the query itself being wrong
+   at all. The offset is a position in a list that keeps changing underneath it.
+
+**Cursor-based (keyset) pagination** fixes both problems by asking a different question
+entirely: instead of "skip N rows," it asks "give me the next 20 rows *after this specific
+key I last saw*" (`WHERE id > $last_seen_id ORDER BY id LIMIT 20`). This is precisely [Part
+10's B-tree guided
+descent](10_physics_of_persistence.md#b-trees-fully-unpacked-optimizing-for-reads-by-paying-on-writes)
+or an LSM-tree's sorted SSTable scan, doing exactly the range-scan work it's already built
+for — the query goes straight to the cursor's position via the index, with **no work
+proportional to how deep into the result set the page is**. Page 2 and page 200 cost the
+same. It also sidesteps page drift: a row inserted somewhere *after* the cursor doesn't
+shift anything the user has already seen, since "after this key" is a stable, absolute
+position, not a relative offset that moves when the underlying data changes.
+
+**The cost cursor-based pagination pays instead**: it can't jump to an arbitrary page number
+("show me page 47 directly") the way offset-based pagination naively can — only "the next
+page after where I currently am." For the overwhelming majority of real UIs (infinite
+scroll, "load more," API clients paging through results), that's not a real limitation,
+since nobody actually needs to jump to page 47 of a search result — which is exactly why
+cursor-based pagination is the default in essentially every large-scale API (GitHub,
+Twitter/X, Stripe) despite offset/limit being the one taught first.
+
 ## CAP Theorem, Briefly
 
 Covered in depth in [Fundamentals](../00_interview_framework/01_fundamentals.md#cap-theorem-consistency-models)
@@ -211,6 +251,110 @@ it" jarring), while full strong consistency is often far more expensive than nec
 Read-your-own-writes is frequently the sweet spot — cheaper to implement than global strong
 consistency, but resolves the specific user-facing confusion eventual consistency alone
 tends to cause.
+
+## Eventual Consistency, Fully Unpacked
+
+The table above states eventual consistency's guarantee in one line; it's worth being
+precise about what that guarantee does and doesn't cover, since it's the weakest useful
+consistency model a replicated system can offer and the easiest to misjudge in practice.
+
+**The guarantee, exactly**: *if no new writes occur to a piece of data, all replicas will
+eventually converge to the same value.* That's a **liveness** guarantee ("this will
+eventually happen"), not a timing guarantee (no bound on how long "eventually" takes) and
+not an ordering guarantee (different clients can observe updates arriving in different
+sequences while convergence is still in progress).
+
+**The mechanism — how convergence actually happens**:
+
+1. **Async replication** — a write is accepted and acknowledged at one replica immediately,
+   then propagated to others in the background ([the same sync-vs-async trade already
+   covered
+   above](#sync-vs-async-replication-the-same-fsync-trade-off-at-cluster-scale)) — this
+   background propagation window is exactly where replica disagreement lives.
+2. **Gossip protocols** — nodes periodically exchange state with random peers, spreading
+   updates around the cluster with no central coordinator needed.
+3. **Read repair / anti-entropy** — a background or read-time process that compares replicas
+   and writes the correct value back to whichever one is stale, closing the convergence gap
+   faster than gossip alone.
+4. **Conflict resolution, for the genuinely hard case**: two replicas each accept a
+   *different* write to the same key while disconnected. Three real strategies exist —
+   **Last-Write-Wins (LWW)**, the simplest: a timestamp decides, the loser is silently
+   discarded, which can quietly lose real data if clocks aren't perfectly synced or both
+   writes were meaningful; **vector clocks**, Dynamo's original approach: detect whether two
+   versions are causally related or truly concurrent, and if genuinely concurrent, hand
+   *both* back to the application to merge, since the database itself can't know which one
+   is "right"; and **CRDTs** (Conflict-free Replicated Data Types), data structures
+   engineered so concurrent updates merge deterministically with no conflict at all (a
+   counter that only ever increments, for example).
+
+**The concrete example this whole series already established**: [Dynamo's shopping
+cart](11_taxonomy_of_storage_choice.md#2005-google-and-amazon-hit-the-wall--nosql-begins-with-key-value-stores)
+— a write (add to cart) succeeds immediately even mid-partition, favoring Availability. A
+read from a *different* replica moments later might not show that item yet. The system only
+promises that, given enough time with no further writes, every replica's view of the cart
+converges — which is exactly why LWW would be the *wrong* conflict-resolution choice for a
+cart specifically (two concurrent adds shouldn't have one silently discarded — vector clocks
+or a CRDT-style set union is what Dynamo actually needs here, not last-write-wins).
+
+**It's tunable, not a fixed ceiling**: Cassandra's `ONE`/`QUORUM`/`ALL` consistency levels
+([Part 13](13_cap_theorem_and_pacelc.md#pacelc-naming-the-trade-off-cap-leaves-out)) move a
+query along the latency-vs-consistency axis at request time — eventual consistency is the
+*default*, weakest setting a system like Cassandra ships with, not the only behavior it's
+capable of producing.
+
+### In Plain English
+
+Imagine texting a friend "let's meet at 6pm instead of 5pm" in a group chat. It doesn't land
+on everyone's phone at the same instant — some friends see it right away, others (bad
+signal, phone in a pocket) see it seconds or minutes later. For a little while, asking
+different friends "what time are we meeting?" gets different answers depending on who you
+ask. But nobody's wrong forever — as long as nobody sends another message changing the plan
+again, every phone eventually shows "6pm."
+
+That's the whole idea. A big app doesn't store your data in one place — it's copied across
+many servers, for speed and so it doesn't go down if one server dies. When something
+changes, it hits *one* server first and confirms back to you immediately — fast. Then it
+quietly spreads to the other servers in the background, the same way the group chat message
+spreads phone to phone. For a brief window, someone hitting a different server might not see
+the change yet. Wait a few seconds, and it's everywhere. **Why build it this way on
+purpose**: making every server check in with every other server before confirming anything
+back to you would make the app feel sluggish — and for a lot of data, being a few seconds
+behind genuinely doesn't hurt anyone, so paying for instant global agreement on every single
+change would be waste, not safety.
+
+### Real-World Examples, Both Directions
+
+**Eventually consistent — a brief lag is normal and nobody gets hurt by it**:
+
+| Example | What's actually happening |
+|---|---|
+| Social media like/view counts | Different viewers can briefly see slightly different counts on the same post before they sync up |
+| DNS propagation | A domain's new IP address takes minutes to hours to reach every resolver worldwide — [already named in the spectrum table above](#the-consistency-spectrum-its-not-just-strong-vs-eventual) |
+| Messaging apps across your own devices | A message sent from your phone can take a moment to appear on a linked laptop/tablet client |
+| Adding an item to an online shopping cart | [Dynamo's textbook case](#eventual-consistency-fully-unpacked) — the add confirms instantly, but a read from a different replica moments later might not show it yet |
+| A new blog post reaching search results | Search engines re-index content across data centers on their own schedule, not instantly on publish |
+| CDN cache after a website update | Different edge locations around the world refresh their cached copy of a changed file at different times |
+
+**Strongly consistent — everyone must see the exact same, latest value immediately, no lag
+tolerated**:
+
+| Example | Why a lag would actually cause harm |
+|---|---|
+| Bank account balance after a transfer | The textbook case already in the spectrum table above — uncertainty about whether money actually moved is unacceptable |
+| Airline/concert seat booking | Two people must never both be told they've booked the same seat |
+| Stock exchange order matching | A stale price shown for even a moment could mean a trade executes at the wrong value |
+| Flash-sale inventory for a scarce item | Overselling more units than physically exist because two servers each thought stock remained |
+| Login/password-change/account-lockout state | Every server checking a login must know *immediately* if a password just changed or an account was just locked — a lag here is a real security hole |
+| Distributed lock / leader election (ZooKeeper, etcd) | Two nodes both believing they're "the leader" from stale data causes real, damaging split-brain behavior |
+
+**The pattern underneath both lists, stated plainly**: eventual consistency is the right
+choice whenever a brief disagreement is invisible or harmless to the people affected by it;
+strong consistency is worth its extra cost whenever that same brief disagreement would mean
+real money, safety, or correctness gets violated. Neither list is "the right one" in
+general — which list a piece of data belongs on is exactly [Part 11's consistency-model
+axis](11_taxonomy_of_storage_choice.md#4-consistency-model--what-does-correct-mean-for-this-data)
+asking its question again: what's the actual, concrete cost if two replicas briefly
+disagree?
 
 ## ACID vs. BASE
 
@@ -257,6 +401,13 @@ between "retry and risk duplication" and "don't retry and risk silently dropping
 Before moving to [Part 3: Communication & Resilience](03_communication_and_resilience.md),
 you should be able to answer these without looking back:
 
+- Why does offset/limit pagination get slower on deeper pages, even though the number of
+  rows actually returned never changes?
+- A row gets deleted from a result set while a user is on page 3 of an offset-paginated
+  list. Why can this cause them to skip a row on page 4, even though nothing about their
+  query was wrong?
+- Why does cursor-based pagination cost the same for page 2 and page 200 — what specific
+  mechanism from Part 10 is doing the work that makes that true?
 - Why does sharding a dataset *without* replicating it leave you with more single points
   of failure, not fewer?
 - Why can't a hash index support a range query, structurally?
@@ -273,6 +424,18 @@ you should be able to answer these without looking back:
 - Why does erasure coding trade more compute/I/O on reconstruction for a much lower storage
   overhead than full replication, and why does that trade-off make sense for cold data but
   not hot, latency-sensitive data?
+- Eventual consistency's guarantee has no time bound. Why is that precisely a *liveness*
+  guarantee rather than a timing guarantee, and what does that distinction mean in practice
+  for a product that needs data to converge within a specific SLA?
+- Two replicas each accept a different concurrent write to the same shopping cart while
+  partitioned. Why would Last-Write-Wins be the wrong conflict-resolution strategy here,
+  specifically — what data does it silently lose that vector clocks or a CRDT wouldn't?
+- Why does "Cassandra is eventually consistent" undersell what Cassandra can actually do —
+  what's the specific mechanism that lets a single deployment move toward strong consistency
+  without switching databases?
+- For a like count and a bank balance, name the concrete, real-world cost of a brief replica
+  disagreement in each case — why does that cost, not the technology, decide which
+  consistency model each one belongs on?
 
 ## Articulate It: Interview Framing & Vocabulary
 
@@ -306,12 +469,33 @@ you should be able to answer these without looking back:
 
 - **full table scan** (n. phrase) — checking every row to find a match, the O(n) baseline
   an index exists specifically to avoid.
+- **offset/limit pagination** (n. phrase) — `LIMIT n OFFSET m`; simple, but cost grows with
+  page depth and is vulnerable to page drift when rows are inserted/deleted mid-scroll.
+- **cursor-based (keyset) pagination** (n. phrase) — "give me the next page after this key I
+  last saw"; constant cost regardless of page depth, and immune to page drift, at the cost
+  of not being able to jump to an arbitrary page number.
 - **read-your-own-writes** (n. phrase) — a consistency guarantee where you always see your
   own recent writes immediately, even if others temporarily see stale data.
 - **soft state** (n. phrase, from BASE) — state that can change over time even without new
   input, as replicas converge toward consistency.
 - **idempotency key** (n. phrase) — a deterministic identifier letting a retried operation
   produce the same result as the original, the mechanism that makes retrying safe.
+- **eventual consistency** (n. phrase) — [fully unpacked
+  above](#eventual-consistency-fully-unpacked): if no new writes occur, all replicas
+  eventually converge — a liveness guarantee with no time bound and no ordering guarantee.
+- **anti-entropy / read repair** (n. phrases) — a background or read-time process comparing
+  replicas and writing the correct value back to whichever is stale, closing the convergence
+  gap faster than gossip propagation alone.
+- **Last-Write-Wins (LWW)** (n. phrase) — the simplest conflict-resolution strategy for
+  concurrent writes to the same key: a timestamp decides, the loser is silently discarded —
+  can quietly lose real data when both concurrent writes were meaningful.
+- **vector clock** (n. phrase) — a mechanism for detecting whether two versions of a value
+  are causally related or genuinely concurrent; when concurrent, hands both back to the
+  application to merge rather than guessing which one is "correct."
+- **CRDT (Conflict-free Replicated Data Type)** (n. phrase, initialism) — a data structure
+  engineered so concurrent updates merge deterministically with no conflict at all, a more
+  elegant alternative to LWW/vector-clock-plus-manual-resolution for specific data shapes
+  (counters, sets).
 - **GFS (Google File System)** (n., proper) — Ghemawat, Gobioff, Leung, SOSP 2003; the
   master/chunkserver, 64 MB chunk, 3x-replication, lease-ordered-write architecture nearly
   every large-scale distributed storage system since (HDFS most directly) copied.

@@ -96,6 +96,37 @@ A related but distinct axis: **who initiates** the transfer of new information.
   entire connection-management design, and the reason that case study is a genuinely
   different problem from a typical request/response API.
 
+### Fan-Out: Push Applied to "One Write, Many Readers"
+
+**Fan-out** is push vs. pull applied to a specific, recurring shape: one write needs to
+reach *many* readers (a social post reaching every follower, a notification reaching every
+subscriber). The push-vs-pull choice here has two named variants, each paying a different
+cost:
+
+- **Fan-out-on-write (push)**: the instant something is posted, the system immediately
+  writes a copy of it into every follower's own feed/inbox. Reads are then trivially fast —
+  "give me my feed" is just "read my own pre-computed feed," one lookup, no fan-out work
+  happens at read time at all. The cost is paid on the write side, and it's paid *once per
+  follower* — posting to an account with 50 million followers means 50 million writes for
+  that one post.
+- **Fan-out-on-read (pull)**: nothing is pre-computed at write time; a feed is assembled on
+  demand by pulling recent posts from everyone a user follows and merging them at read time.
+  Writes stay cheap and constant-cost regardless of follower count, but every single feed
+  read now does real work — fetching and merging from potentially thousands of followed
+  accounts.
+
+**Why this is exactly [Part 12's celebrity/hot-key
+problem](12_sharding_and_the_vertical_wall.md#the-celebrity-problem-the-hot-key-consistent-hashing-cannot-fix),
+recurring at the application layer**: fan-out-on-write turns one write from a
+high-follower-count account into a write storm — the same shape as a hot key overwhelming
+one shard, just spread across many downstream feed writes instead of one overloaded
+partition. Production systems handle this the same way Part 12 already named the trade-off:
+most accounts use fan-out-on-write (cheap reads, and follower counts are small enough that
+the write fan-out is cheap too), while a small number of very-high-follower-count accounts
+fall back to fan-out-on-read for just their own posts — a hybrid, not a single global
+choice. This is the actual mechanism behind the [Twitter feed case
+study's](../../system_design_practice/02_design_twitter_feed/tutorial.md) fan-out deep-dive.
+
 ## Caching and Load Balancing, Briefly
 
 Both covered in full depth in [Fundamentals](../00_interview_framework/01_fundamentals.md) — flagged
@@ -147,17 +178,40 @@ paths, and graceful degradation defines what the user actually sees while all of
 happening. Naming which of these applies to a specific failure mode, together, is what
 turns "this could fail" into an actual design decision.
 
-## Rate Limiting, Briefly
+## Rate Limiting
 
-Covered as a full worked example in [Fundamentals](../00_interview_framework/01_fundamentals.md#worked-example-design-a-rate-limiter)
+The worked algorithms (fixed window, sliding window, **token bucket**) are covered in full
+in [Fundamentals](../00_interview_framework/01_fundamentals.md#worked-example-design-a-rate-limiter)
 and extended to global/multi-region scale in the [staff-level rate limiter case
-study](../../system_design_practice/07_design_rate_limiter_at_scale/tutorial.md) — flagged here for
-completeness: the general purpose of a rate limiter is protecting a system's own
-availability by rejecting or throttling excess load before it degrades service for
-everyone, and it's one of the most common "design a small system" warm-up questions
-precisely because it touches so much of this primer's vocabulary at once (throughput,
-availability, the CAP-theorem trade-off of a distributed counter, and graceful degradation
-under a fail-open-vs-fail-closed decision).
+study](../../system_design_practice/07_design_rate_limiter_at_scale/tutorial.md). The general
+purpose: protecting a system's own availability by rejecting or throttling excess load
+before it degrades service for everyone — one of the most common "design a small system"
+warm-up questions precisely because it touches so much of this primer's vocabulary at once
+(throughput, availability, the CAP-theorem trade-off of a distributed counter, and graceful
+degradation under a fail-open-vs-fail-closed decision).
+
+**One algorithm worth naming here that Fundamentals doesn't cover: the leaky bucket**, since
+it's routinely confused with token bucket despite solving a genuinely different problem.
+
+- **Token bucket** (already covered in Fundamentals): a bucket holds up to *N* tokens, refills
+  at a steady rate, and a request consumes one token to proceed. Critically, **it allows
+  bursts** — if the bucket has been sitting full (no recent requests), a client can fire off
+  up to *N* requests instantly, back-to-back, and still be allowed through.
+- **Leaky bucket**: requests are added to a queue (the "bucket"), and processed out of it at
+  a **strictly constant rate**, regardless of how bursty the requests arriving into it are —
+  like water leaking out of a bucket at a fixed rate no matter how fast it's poured in. If
+  the bucket fills up (too many requests arrive before the queue drains), new requests are
+  rejected. **It never allows a burst through** — the output rate is smoothed to exactly
+  constant, which is the entire point of choosing it.
+
+**The precise distinction, stated as a single sentence**: token bucket bounds the *average*
+rate but permits bursts up to the bucket's capacity; leaky bucket bounds the
+*instantaneous* rate to a constant, smoothing bursts out entirely rather than permitting
+them. Choose token bucket when occasional bursts are fine as long as the average holds
+(most API rate limits); choose leaky bucket when the downstream system genuinely cannot
+tolerate a burst at all, even a brief one (e.g., protecting a fixed-capacity resource like a
+serial hardware interface, or shaping traffic onto a network link with a hard bandwidth
+ceiling).
 
 ## Quick Self-Check
 
@@ -170,6 +224,13 @@ answer:
 - Why is UDP a deliberate choice for some domains rather than simply "the worse protocol"?
 - What's the difference between a circuit breaker and a bulkhead — what specific failure
   does each one prevent that the other doesn't?
+- Why does fan-out-on-write turn a single celebrity post into the exact same shape of
+  problem as Part 12's hot-key/celebrity problem — what's actually overloaded in both cases?
+- Why do most production feed systems use a *hybrid* of fan-out-on-write and fan-out-on-read
+  rather than picking one strategy globally for every account?
+- Token bucket and leaky bucket are both "bucket" metaphors and both used for rate limiting.
+  Explain precisely why they produce different behavior for a bursty client — what does
+  each one actually bound?
 - Why does a load balancer's L7 routing capability (from Fundamentals) depend on
   understanding that HTTP happens *after* the TCP/TLS handshake, not as part of it?
 
@@ -189,6 +250,13 @@ answer:
   together, not individually — a circuit breaker stops hammering a failing dependency, a
   bulkhead stops that failure from starving unrelated request paths, and graceful
   degradation defines what the user actually sees while both are happening."
+- **Hybrid-fan-out framing (good for a feed/notification-system design question):** "I
+  wouldn't pick fan-out-on-write or fan-out-on-read globally — I'd default to
+  fan-out-on-write for the vast majority of accounts, since it keeps reads cheap and most
+  accounts have few enough followers that the write fan-out is cheap too, then fall back to
+  fan-out-on-read specifically for the small number of very-high-follower accounts, where
+  fan-out-on-write would otherwise turn one post into a write storm — the same shape as a
+  hot key overwhelming one shard, just at the application layer."
 
 ### Vocabulary Builder
 
@@ -202,6 +270,14 @@ answer:
   the whole system because nothing else can do its job.
 - **keep-alive** (n. phrase) — reusing an already-established TCP connection for multiple
   requests instead of repeating the handshake every time.
+- **fan-out-on-write / fan-out-on-read** (n. phrases) — pre-computing every follower's feed
+  entry at post time (cheap reads, expensive writes for high-follower accounts) versus
+  assembling a feed at read time by pulling from everyone followed (cheap, constant writes,
+  expensive reads) — most production systems use a hybrid of both.
+- **token bucket / leaky bucket** (n. phrases) — two rate-limiting algorithms that bound
+  different things: token bucket bounds the *average* rate while permitting bursts up to a
+  capacity; leaky bucket bounds the *instantaneous* rate to a constant, smoothing bursts out
+  entirely.
 
 **Expressive phrases — for stating a trade-off fluently instead of listing pros/cons:**
 
