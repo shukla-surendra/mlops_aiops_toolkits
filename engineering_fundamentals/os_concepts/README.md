@@ -9,7 +9,7 @@ it) and reason about a concrete scenario ("what happens if two threads
 increment the same counter without a lock").
 
 Each doc follows the same first-principles structure as
-[`system_design_foundation/prerequisite_concepts/`](../system_design_foundation/prerequisite_concepts/01_performance_and_scale.md):
+[`system_design_foundation/00_prerequisite_concepts/`](../system_design_foundation/00_prerequisite_concepts/01_performance_and_scale.md):
 problem → mechanism → why it matters practically, with a worked example, a
 **Quick Self-Check**, and an **Articulate It** section for how to say it out
 loud in an interview.

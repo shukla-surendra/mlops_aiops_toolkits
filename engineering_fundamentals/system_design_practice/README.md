@@ -20,18 +20,18 @@ picture. This track exists so that ground gets the same depth of treatment.
 If terms like **p99 latency**, **the nines**, **sharding vs. replication**, **CAP
 theorem**, or **idempotency** aren't things you could explain from first principles yet,
 start with the [ML track's Prerequisite Concepts
-primer](../system_design_foundation/prerequisite_concepts/01_performance_and_scale.md) (three
+primer](../system_design_foundation/00_prerequisite_concepts/01_performance_and_scale.md) (three
 short parts covering measurement/scaling, data/consistency, and communication/resilience)
 — it's the shared vocabulary this track assumes too, even though the case studies below
 are ML-independent.
 
-**[0. The Staff-Level Signal](../system_design_foundation/prerequisite_concepts/00_staff_level_signal.md)** — what actually
+**[0. The Staff-Level Signal](../system_design_foundation/00_prerequisite_concepts/00_staff_level_signal.md)** — what actually
 separates a staff-level answer from a senior one in these rounds. It's not "bigger
 numbers" — it's organizational scope, ambiguity handling, and trade-off framing at a
 different altitude. Read this before any case study; it's the lens the rest of this
 section is evaluated through.
 
-**[1. Distributed Systems Foundations](../system_design_foundation/prerequisite_concepts/01_distributed_systems_foundations.md)** —
+**[1. Distributed Systems Foundations](../system_design_foundation/00_prerequisite_concepts/01_distributed_systems_foundations.md)** —
 the underlying mechanics every case study below draws on: consensus (Raft/Paxos),
 distributed transactions (2PC vs. Saga), CRDTs and vector clocks, consistent hashing,
 service mesh, and multi-region active-active replication. Read this second.

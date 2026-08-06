@@ -53,7 +53,7 @@ choice and most candidates get here quickly; the staff-level depth is in what co
   high-level design has two distinct data paths (a slow, thorough batch path building the
   base trie, and a fast, narrow real-time path for trending overlays), mirroring the
   bronze/silver/gold batch-processing pattern from the
-  [ML track's ingestion pipeline tutorial](../../system_design_foundation/02_ingestion_pipeline/tutorial.md),
+  [ML track's ingestion pipeline tutorial](../../system_design_foundation/ml_system_design/02_ingestion_pipeline.md),
   applied here to search-query logs instead of ML training data.
 
 ## Deep-Dive: Sharding a Trie

@@ -5,7 +5,7 @@ one process cannot simply read another's memory. This part covers the mechanisms
 kernel provides so isolated processes can still cooperate deliberately, and closes out the
 [`os_concepts/`](README.md) track by bridging into cross-*machine* communication, covered
 starting in [`system_design_foundation`'s Part
-3](../system_design_foundation/prerequisite_concepts/03_communication_and_resilience.md).
+3](../system_design_foundation/00_prerequisite_concepts/03_communication_and_resilience.md).
 
 ## The Core Design Question: Isolation Was the Point — So How Do You Opt Back In?
 
@@ -45,7 +45,7 @@ after setup" (fast, but you own the safety yourself).
   into distributed systems: everything from here forward in this repo — RPC, message
   queues at the distributed-systems scale, load balancers — is sockets plus a protocol
   layered on top, covered starting in [`system_design_foundation`'s Part
-  3](../system_design_foundation/prerequisite_concepts/03_communication_and_resilience.md).
+  3](../system_design_foundation/00_prerequisite_concepts/03_communication_and_resilience.md).
 - **Signals.** Not a data-transfer mechanism at all — a narrow, asynchronous notification
   ("something happened": `SIGKILL`, `SIGTERM`, `SIGCHLD`) delivered to a process, which can
   install a handler or take the OS's default action (usually terminate). Worth knowing as
@@ -77,7 +77,7 @@ on the same machine and a socket between two processes on different machines use
 *literally the same interface* — `connect()`, `send()`, `recv()`. Everything that makes
 distributed systems hard (partial failure, unbounded latency, no shared clock — the
 material starting in [`system_design_foundation`'s Part
-3](../system_design_foundation/prerequisite_concepts/03_communication_and_resilience.md))
+3](../system_design_foundation/00_prerequisite_concepts/03_communication_and_resilience.md))
 isn't a difference in the *mechanism* of talking to another process — it's what changes
 once that other process is no longer guaranteed to be reachable, alive, or fast, the way a
 same-machine IPC call implicitly assumes it can be.
@@ -130,4 +130,4 @@ same-machine IPC call implicitly assumes it can be.
 
 ---
 
-**Previous:** [Part 5: Context Switching & the Kernel/User Boundary](05_context_switching_and_kernel_boundary.md)  |  **Next:** [System Design Foundation, Part 3: Communication and Resilience](../system_design_foundation/prerequisite_concepts/03_communication_and_resilience.md)
+**Previous:** [Part 5: Context Switching & the Kernel/User Boundary](05_context_switching_and_kernel_boundary.md)  |  **Next:** [System Design Foundation, Part 3: Communication and Resilience](../system_design_foundation/00_prerequisite_concepts/03_communication_and_resilience.md)

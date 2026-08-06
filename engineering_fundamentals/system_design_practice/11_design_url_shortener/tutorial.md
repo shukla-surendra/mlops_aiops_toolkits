@@ -249,7 +249,7 @@ Two regions can then never generate the same key, so concurrent writes in differ
 write path at all. Multi-master becomes trivially safe not because of clever conflict
 resolution but because the partitioning scheme made conflicts impossible. Contrast this with
 the coordination costs in
-[Distributed Systems Foundations](../../system_design_foundation/prerequisite_concepts/01_distributed_systems_foundations.md#consensus-making-multiple-nodes-agree-on-one-truth):
+[Distributed Systems Foundations](../../system_design_foundation/00_prerequisite_concepts/01_distributed_systems_foundations.md#consensus-making-multiple-nodes-agree-on-one-truth):
 the win here is *designing the conflict out of existence* rather than paying to resolve it.
 
 **Custom aliases are the exception, and should be named as one.** A user-chosen alias must

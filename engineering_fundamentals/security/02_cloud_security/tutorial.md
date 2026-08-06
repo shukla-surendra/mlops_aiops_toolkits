@@ -14,9 +14,9 @@ artifacts and identities specifically.
 
 For the adjacent cost/governance/DR angle on cloud ML infrastructure (not the security
 angle this tutorial goes deep on), see
-[system_design's Cost, Security & Multi-Region Governance](../../system_design_foundation/10_cost_security_multiregion/tutorial.md)
+[system_design's Cost, Security & Multi-Region Governance](../../system_design_foundation/ml_system_design/10_cost_security_multiregion.md)
 and its
-[data governance deep-dive](../../system_design_foundation/10_cost_security_multiregion/data_governance_deep_dive.md).
+[data governance deep-dive](../../system_design_foundation/ml_system_design/10_cost_security_multiregion_data_governance_deep_dive.md).
 
 ## Core Concepts
 

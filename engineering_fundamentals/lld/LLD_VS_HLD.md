@@ -260,7 +260,7 @@ Responsibility show up here):
 7. Failure modes and bottlenecks named proactively, before being asked.
 
 *(Full staff-vs-senior altitude framing:
-[`system_design_foundation/prerequisite_concepts/00_staff_level_signal.md`](../system_design_foundation/prerequisite_concepts/00_staff_level_signal.md).)*
+[`system_design_foundation/00_prerequisite_concepts/00_staff_level_signal.md`](../system_design_foundation/00_prerequisite_concepts/00_staff_level_signal.md).)*
 
 ## HLD: The Question Bank
 
@@ -391,5 +391,5 @@ that guessing wrong burns the round.
 
 **See also:** [`OOD_FRAMEWORK.md`](OOD_FRAMEWORK.md) for the full LLD process walkthrough,
 and [`../system_design_practice/README.md`](../system_design_practice/README.md) /
-[`../system_design_foundation/prerequisite_concepts/00_staff_level_signal.md`](../system_design_foundation/prerequisite_concepts/00_staff_level_signal.md)
+[`../system_design_foundation/00_prerequisite_concepts/00_staff_level_signal.md`](../system_design_foundation/00_prerequisite_concepts/00_staff_level_signal.md)
 for the full HLD process and staff-altitude framing.

@@ -28,7 +28,8 @@ in two modes:
 - **Mode 1 ("articulate it")** — adds/refreshes the section above on a doc, and covers
   authoring a new first-principles concept-primer doc from scratch.
 - **Mode 2 ("mock interview")** — runs a live mock system design interview (green-field
-  design, or incident-debugging from `12_tricky_scenarios/`) at staff/principal bar,
+  design, or incident-debugging from `ml_system_design/12_tricky_scenarios_*.md`) at
+  staff/principal bar,
   using this repo's tutorials as the hidden answer key, then debriefs against the
   senior-vs-staff rubric from `system_design_practice/00_staff_level_signal/tutorial.md`.
   Trigger with "mock interview me," "quiz me on system design," or similar.

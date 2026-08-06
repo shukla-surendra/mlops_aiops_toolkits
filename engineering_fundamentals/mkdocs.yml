@@ -3,6 +3,14 @@ site_description: Algorithms & data structures, ML/LLM and distributed systems d
 docs_dir: docs
 site_dir: site
 
+validation:
+  links:
+    # A few pages intentionally link out to mlops_aiops/docs and k8n_explorer content
+    # alongside docs_dir (e.g. tool write-ups, a KServe example) — those resolve fine on
+    # GitHub but aren't part of this site's own docs_dir, so don't fail --strict builds
+    # over them (same pattern genai_lab/mkdocs.yml already uses).
+    not_found: info
+
 theme:
   name: material
   palette:
@@ -188,68 +196,68 @@ nav:
   - System Design Foundation:
       - Overview: system_design_foundation/README.md
       - Prerequisite Concepts:
-          - "1. Performance & Scale": system_design_foundation/prerequisite_concepts/01_performance_and_scale.md
-          - "2. Data & Consistency": system_design_foundation/prerequisite_concepts/02_data_and_consistency.md
-          - "3. Communication & Resilience": system_design_foundation/prerequisite_concepts/03_communication_and_resilience.md
-          - "4. CPU vs. GPU": system_design_foundation/prerequisite_concepts/04_cpu_vs_gpu.md
-          - "5. Choosing a GPU & Code Optimization": system_design_foundation/prerequisite_concepts/05_gpu_selection_and_code_optimization.md
-          - "6. Mechanical Sympathy & the Physics of Latency": system_design_foundation/prerequisite_concepts/06_mechanical_sympathy_and_physics_of_latency.md
-          - "7. Saturation, Amdahl's Law & Hedged Requests": system_design_foundation/prerequisite_concepts/07_saturation_amdahls_law_and_hedged_requests.md
-          - "8. The Cost of Communication": system_design_foundation/prerequisite_concepts/08_cost_of_communication.md
-          - "9. The Anatomy of a Request (DNS, BGP, and the Edge)": system_design_foundation/prerequisite_concepts/09_dns_bgp_and_the_edge.md
-          - "10. The Physics of Persistence (B-Trees vs. LSM-Trees)": system_design_foundation/prerequisite_concepts/10_physics_of_persistence.md
+          - "1. Performance & Scale": system_design_foundation/00_prerequisite_concepts/01_performance_and_scale.md
+          - "2. Data & Consistency": system_design_foundation/00_prerequisite_concepts/02_data_and_consistency.md
+          - "3. Communication & Resilience": system_design_foundation/00_prerequisite_concepts/03_communication_and_resilience.md
+          - "4. CPU vs. GPU": system_design_foundation/00_prerequisite_concepts/04_cpu_vs_gpu.md
+          - "5. Choosing a GPU & Code Optimization": system_design_foundation/00_prerequisite_concepts/05_gpu_selection_and_code_optimization.md
+          - "6. Mechanical Sympathy & the Physics of Latency": system_design_foundation/00_prerequisite_concepts/06_mechanical_sympathy_and_physics_of_latency.md
+          - "7. Saturation, Amdahl's Law & Hedged Requests": system_design_foundation/00_prerequisite_concepts/07_saturation_amdahls_law_and_hedged_requests.md
+          - "8. The Cost of Communication": system_design_foundation/00_prerequisite_concepts/08_cost_of_communication.md
+          - "9. The Anatomy of a Request (DNS, BGP, and the Edge)": system_design_foundation/00_prerequisite_concepts/09_dns_bgp_and_the_edge.md
+          - "10. The Physics of Persistence (B-Trees vs. LSM-Trees)": system_design_foundation/00_prerequisite_concepts/10_physics_of_persistence.md
       - Staff-Level Foundations:
-          - 0. The Staff-Level Signal: system_design_foundation/prerequisite_concepts/00_staff_level_signal.md
-          - 1. Distributed Systems Foundations: system_design_foundation/prerequisite_concepts/01_distributed_systems_foundations.md
+          - 0. The Staff-Level Signal: system_design_foundation/00_prerequisite_concepts/00_staff_level_signal.md
+          - 1. Distributed Systems Foundations: system_design_foundation/00_prerequisite_concepts/01_distributed_systems_foundations.md
       - Tutorials:
-          - 0. Interview Framework: system_design_foundation/00_interview_framework/00_interview_framework.md
-          - 1. Fundamentals & Building Blocks: system_design_foundation/00_interview_framework/01_fundamentals.md
+          - 0. Interview Framework: system_design_foundation/ml_system_design/00_interview_framework.md
+          - 1. Fundamentals & Building Blocks: system_design_foundation/ml_system_design/00_interview_framework_fundamentals.md
           - 2. High-Throughput Ingestion Pipelines:
-              - Tutorial: system_design_foundation/02_ingestion_pipeline/tutorial.md
-              - "Deep-Dive: Lambda vs. EKS for Receipt Processing": system_design_foundation/02_ingestion_pipeline/serverless_vs_eks_receipt_processing.md
+              - Tutorial: system_design_foundation/ml_system_design/02_ingestion_pipeline.md
+              - "Deep-Dive: Lambda vs. EKS for Receipt Processing": system_design_foundation/ml_system_design/02_ingestion_pipeline_serverless_vs_eks_receipt_processing.md
           - 3. Feature Store & Model Promotion:
-              - Tutorial: system_design_foundation/03_feature_store_model_promotion/tutorial.md
-              - "Deep-Dive: Is a Feature Store Worth It When Reuse Is Low?": system_design_foundation/03_feature_store_model_promotion/is_a_feature_store_worth_it.md
+              - Tutorial: system_design_foundation/ml_system_design/03_feature_store_model_promotion.md
+              - "Deep-Dive: Is a Feature Store Worth It When Reuse Is Low?": system_design_foundation/ml_system_design/03_feature_store_model_promotion_is_a_feature_store_worth_it.md
           - 4. Model Serving & Deployment:
-              - Tutorial: system_design_foundation/04_model_serving_deployment/tutorial.md
-              - "Deep-Dive: Hosting DeepSeek-OCR-2 on AWS": system_design_foundation/04_model_serving_deployment/deepseek_ocr_aws_hosting.md
+              - Tutorial: system_design_foundation/ml_system_design/04_model_serving_deployment.md
+              - "Deep-Dive: Hosting DeepSeek-OCR-2 on AWS": system_design_foundation/ml_system_design/04_model_serving_deployment_deepseek_ocr_aws_hosting.md
           - 5. ML/LLM Observability & Drift:
-              - Tutorial: system_design_foundation/05_observability_drift/tutorial.md
-              - "Deep-Dive: Promotion & Observability as One Closed-Loop System": system_design_foundation/05_observability_drift/closed_loop_promotion_and_monitoring.md
-          - 6. RAG + LLM-Serving at Scale: system_design_foundation/06_rag_llm_serving_at_scale/tutorial.md
-          - 7. Distributed Training & Ray/Ray Serve: system_design_foundation/07_distributed_training_serving/tutorial.md
-          - 8. ML Orchestration (Kubeflow/Argo vs Airflow): system_design_foundation/08_ml_orchestration/tutorial.md
+              - Tutorial: system_design_foundation/ml_system_design/05_observability_drift.md
+              - "Deep-Dive: Promotion & Observability as One Closed-Loop System": system_design_foundation/ml_system_design/05_observability_drift_closed_loop_promotion_and_monitoring.md
+          - 6. RAG + LLM-Serving at Scale: system_design_foundation/ml_system_design/06_rag_llm_serving_at_scale.md
+          - 7. Distributed Training & Ray/Ray Serve: system_design_foundation/ml_system_design/07_distributed_training_serving.md
+          - 8. ML Orchestration (Kubeflow/Argo vs Airflow): system_design_foundation/ml_system_design/08_ml_orchestration.md
           - 9. GitOps & CI/CD for ML:
-              - Tutorial: system_design_foundation/09_gitops_ml_cicd/tutorial.md
-              - "Hands-On: ArgoCD": system_design_foundation/09_gitops_ml_cicd/argocd_hands_on.md
-              - "Hands-On: DVC": system_design_foundation/09_gitops_ml_cicd/dvc_hands_on.md
+              - Tutorial: system_design_foundation/ml_system_design/09_gitops_ml_cicd.md
+              - "Hands-On: ArgoCD": system_design_foundation/ml_system_design/09_gitops_ml_cicd_argocd_hands_on.md
+              - "Hands-On: DVC": system_design_foundation/ml_system_design/09_gitops_ml_cicd_dvc_hands_on.md
           - 10. Cost, Security & Multi-Region Governance:
-              - Tutorial: system_design_foundation/10_cost_security_multiregion/tutorial.md
-              - "Deep-Dive: Data Governance in Practice": system_design_foundation/10_cost_security_multiregion/data_governance_deep_dive.md
-              - "Deep-Dive: Network / Data-Transfer Costs (AWS/GCP/Azure)": system_design_foundation/10_cost_security_multiregion/network_data_transfer_costs_deep_dive.md
-          - 11. LLMOps (Prompting, Fine-Tuning, Evals & Guardrails): system_design_foundation/11_llmops/tutorial.md
+              - Tutorial: system_design_foundation/ml_system_design/10_cost_security_multiregion.md
+              - "Deep-Dive: Data Governance in Practice": system_design_foundation/ml_system_design/10_cost_security_multiregion_data_governance_deep_dive.md
+              - "Deep-Dive: Network / Data-Transfer Costs (AWS/GCP/Azure)": system_design_foundation/ml_system_design/10_cost_security_multiregion_network_data_transfer_costs_deep_dive.md
+          - 11. LLMOps (Prompting, Fine-Tuning, Evals & Guardrails): system_design_foundation/ml_system_design/11_llmops.md
       - Tricky MLOps Scenarios:
-          - Overview: system_design_foundation/12_tricky_scenarios/README.md
-          - "1. Regional Feature Staleness": system_design_foundation/12_tricky_scenarios/01_regional_feature_staleness.md
-          - "2. Canary Passed, P1 Two Days Later": system_design_foundation/12_tricky_scenarios/02_canary_passed_p1_later.md
-          - "3. Silent Drift, No Alert": system_design_foundation/12_tricky_scenarios/03_silent_drift_no_alert.md
-          - "4. Overnight GPU Cost Spike": system_design_foundation/12_tricky_scenarios/04_gpu_cost_spike.md
-          - "5. Retrieval Looks Right, Answers Wrong": system_design_foundation/12_tricky_scenarios/05_rag_retrieval_correct_answers_wrong.md
-          - "6. Silently Duplicated Training Data": system_design_foundation/12_tricky_scenarios/06_duplicate_training_data.md
-          - "7. Multi-GPU Training Plateau": system_design_foundation/12_tricky_scenarios/07_distributed_training_plateau.md
-          - "8. Stale Checkpoint After Preemption": system_design_foundation/12_tricky_scenarios/08_stale_checkpoint_resume.md
-          - "9. GitOps Rollout, Wrong Predictions": system_design_foundation/12_tricky_scenarios/09_gitops_rollout_wrong_predictions.md
-          - "10. Reconstructing Model Lineage for an Audit": system_design_foundation/12_tricky_scenarios/10_audit_lineage_reconstruction.md
-          - "11. Serving Cost Doubled After a Routine Upgrade": system_design_foundation/12_tricky_scenarios/11_serving_cost_doubled.md
-          - "12. DR Failover Took 8x Longer Than Planned": system_design_foundation/12_tricky_scenarios/12_dr_failover_slow.md
-          - "13. Eval Passed, Guardrail Bypassed in Production": system_design_foundation/12_tricky_scenarios/13_eval_passed_guardrail_bypassed.md
-          - "14. GPU Sitting Idle 75% of the Time": system_design_foundation/12_tricky_scenarios/14_gpu_underutilized_sequential_pipeline.md
+          - Overview: system_design_foundation/ml_system_design/12_tricky_scenarios_readme.md
+          - "1. Regional Feature Staleness": system_design_foundation/ml_system_design/12_tricky_scenarios_01_regional_feature_staleness.md
+          - "2. Canary Passed, P1 Two Days Later": system_design_foundation/ml_system_design/12_tricky_scenarios_02_canary_passed_p1_later.md
+          - "3. Silent Drift, No Alert": system_design_foundation/ml_system_design/12_tricky_scenarios_03_silent_drift_no_alert.md
+          - "4. Overnight GPU Cost Spike": system_design_foundation/ml_system_design/12_tricky_scenarios_04_gpu_cost_spike.md
+          - "5. Retrieval Looks Right, Answers Wrong": system_design_foundation/ml_system_design/12_tricky_scenarios_05_rag_retrieval_correct_answers_wrong.md
+          - "6. Silently Duplicated Training Data": system_design_foundation/ml_system_design/12_tricky_scenarios_06_duplicate_training_data.md
+          - "7. Multi-GPU Training Plateau": system_design_foundation/ml_system_design/12_tricky_scenarios_07_distributed_training_plateau.md
+          - "8. Stale Checkpoint After Preemption": system_design_foundation/ml_system_design/12_tricky_scenarios_08_stale_checkpoint_resume.md
+          - "9. GitOps Rollout, Wrong Predictions": system_design_foundation/ml_system_design/12_tricky_scenarios_09_gitops_rollout_wrong_predictions.md
+          - "10. Reconstructing Model Lineage for an Audit": system_design_foundation/ml_system_design/12_tricky_scenarios_10_audit_lineage_reconstruction.md
+          - "11. Serving Cost Doubled After a Routine Upgrade": system_design_foundation/ml_system_design/12_tricky_scenarios_11_serving_cost_doubled.md
+          - "12. DR Failover Took 8x Longer Than Planned": system_design_foundation/ml_system_design/12_tricky_scenarios_12_dr_failover_slow.md
+          - "13. Eval Passed, Guardrail Bypassed in Production": system_design_foundation/ml_system_design/12_tricky_scenarios_13_eval_passed_guardrail_bypassed.md
+          - "14. GPU Sitting Idle 75% of the Time": system_design_foundation/ml_system_design/12_tricky_scenarios_14_gpu_underutilized_sequential_pipeline.md
 
   - System Design Practice:
       - Overview: system_design_practice/README.md
       - Foundations:
-          - 0. The Staff-Level Signal: system_design_foundation/prerequisite_concepts/00_staff_level_signal.md
-          - 1. Distributed Systems Foundations: system_design_foundation/prerequisite_concepts/01_distributed_systems_foundations.md
+          - 0. The Staff-Level Signal: system_design_foundation/00_prerequisite_concepts/00_staff_level_signal.md
+          - 1. Distributed Systems Foundations: system_design_foundation/00_prerequisite_concepts/01_distributed_systems_foundations.md
       - Case Studies:
           - "2. Design Twitter/X Feed": system_design_practice/02_design_twitter_feed/tutorial.md
           - "3. Design a Chat System": system_design_practice/03_design_chat_system/tutorial.md

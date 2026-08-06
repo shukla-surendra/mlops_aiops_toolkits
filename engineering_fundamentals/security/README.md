@@ -6,7 +6,7 @@ Security depth for a cloud/MLOps/LLMOps engineer, organized the same way the
 vocabulary and mental models, worked "design a secure X" case studies, and a bank of
 incident-debugging scenarios. Independent of those two tracks, but written to assume the
 same shared vocabulary (p99 latency, sharding, idempotency — see the [Prerequisite
-Concepts primer](../system_design_foundation/prerequisite_concepts/01_performance_and_scale.md)
+Concepts primer](../system_design_foundation/00_prerequisite_concepts/01_performance_and_scale.md)
 if any of that isn't second nature yet).
 
 ## Why Security Gets Its Own Track
@@ -38,7 +38,7 @@ incidents (a leaked cloud credential, an indirect prompt injection that exfiltra
 jailbreak that slipped past a guardrail in production, a poisoned training set) with a
 structured walkthrough of clarifying questions, ranked hypotheses, diagnostic steps, the
 fix, and the systemic lesson — the same format as
-[system_design's Tricky MLOps Scenarios](../system_design_foundation/12_tricky_scenarios/README.md). Every
+[system_design's Tricky MLOps Scenarios](../system_design_foundation/ml_system_design/12_tricky_scenarios_readme.md). Every
 scenario cross-references the tutorial covering its underlying pattern.
 
 ## How to Practice This
