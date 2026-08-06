@@ -11,7 +11,7 @@ original plan — plus a bank of scenario-debugging problems.
 If terms like **p99 latency**, **the nines**, **sharding vs. replication**, or
 **idempotency** aren't things you could explain from first principles yet, start with the
 **[Prerequisite Concepts](prerequisite_concepts/01_performance_and_scale.md)** primer
-(ten short parts: [Performance & Scale](prerequisite_concepts/01_performance_and_scale.md),
+(eleven short parts: [Performance & Scale](prerequisite_concepts/01_performance_and_scale.md),
 [Data & Consistency](prerequisite_concepts/02_data_and_consistency.md),
 [Communication & Resilience](prerequisite_concepts/03_communication_and_resilience.md),
 [CPU vs. GPU](prerequisite_concepts/04_cpu_vs_gpu.md),
@@ -20,7 +20,8 @@ If terms like **p99 latency**, **the nines**, **sharding vs. replication**, or
 [Saturation, Amdahl's Law & Hedged Requests](prerequisite_concepts/07_saturation_amdahls_law_and_hedged_requests.md),
 [The Cost of Communication](prerequisite_concepts/08_cost_of_communication.md),
 [The Anatomy of a Request (DNS, BGP, and the Edge)](prerequisite_concepts/09_dns_bgp_and_the_edge.md),
-[The Physics of Persistence (B-Trees vs. LSM-Trees)](prerequisite_concepts/10_physics_of_persistence.md))
+[The Physics of Persistence (B-Trees vs. LSM-Trees)](prerequisite_concepts/10_physics_of_persistence.md),
+[Taxonomy of Storage — Choosing by First Principles, Not Fashion](prerequisite_concepts/11_taxonomy_of_storage_choice.md))
 before the Interview Framework below. It's the shared vocabulary every tutorial in this
 section — and in the [Distributed Systems Design track](../system_design_practice/README.md) — assumes
 without re-explaining.

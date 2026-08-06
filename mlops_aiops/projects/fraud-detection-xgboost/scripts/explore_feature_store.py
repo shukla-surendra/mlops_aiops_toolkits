@@ -21,7 +21,6 @@ import pandas as pd
 
 from fraud_detection.feast_features import (
     FEATURE_REPO_PATH,
-    IP_VELOCITY_FEATURES,
     IP_VELOCITY_SOURCE_PATH,
     apply_feast_repo,
     get_online_ip_features,

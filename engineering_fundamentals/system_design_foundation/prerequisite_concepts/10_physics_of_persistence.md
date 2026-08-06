@@ -39,7 +39,10 @@ A **B-tree** (the structure behind Postgres and MySQL/InnoDB's default engine, S
 MongoDB's default WiredTiger engine, and most traditional relational databases) is a
 balanced, sorted, n-ary tree of fixed-size **pages** — typically 4-16 KB, deliberately sized
 to match the OS's own page size so a "read one B-tree page" operation is exactly "read one
-disk block," no partial reads or wasted extra I/O.
+disk block," no partial reads or wasted extra I/O. This dominance is why it's informally
+called **the ubiquitous B-tree** — not the only structure that could work, but the strong
+default for the point-lookup/range-query, moderate-write shape almost every OLTP workload
+has, for reasons the next two paragraphs make precise.
 
 ```mermaid
 flowchart TD
@@ -50,12 +53,19 @@ flowchart TD
     B --> B2["Leaf page\nkeys 100-149\n+ row data"]
 ```
 
-**The read path**: start at the root, compare the target key against the page's sorted keys,
-follow the matching child pointer, repeat until a leaf page holds the actual row (or a
-pointer to it). A tree of fan-out *b* holding *n* keys has depth **log_b(n)** — with a
-realistic fan-out in the hundreds (many keys fit in one 4-16 KB page), a billion-row table
-is typically only **3-4 levels deep**, so a lookup costs 3-4 page reads, not 3-4 seeks
-through a huge structure. This is genuinely fast, and — because rows live sorted in place —
+**The read path — a guided descent from root to leaf**: start at the root, compare the
+target key against the page's sorted keys, follow the matching child pointer, repeat until
+a leaf page holds the actual row (or a pointer to it). Call this a **guided descent**
+because each step is *directed*, not exhaustive — one comparison against a node's sorted
+keys picks exactly one of its many children to follow next, no scanning every branch, no
+backtracking. A tree of **fanout** *b* (the number of children each node/page can hold)
+holding *n* keys has depth **log_b(n)** — with a realistic fanout in the hundreds (many
+small key/pointer pairs fit in one 4-16 KB page, which is why these are sometimes called
+**fat nodes**: "fat" relative to a binary tree's thin 2-child node), a billion-row table is
+typically only **3-4 levels deep**, so a lookup costs 3-4 page reads, not 3-4 seeks through
+a huge structure — the fat node is precisely what's trading cheap in-memory comparisons for
+far fewer expensive disk reads. This is genuinely fast, and — because rows live sorted in
+place —
 a **range query** (`WHERE created_at BETWEEN X AND Y`, exactly [Part 2's range-query
 point](02_data_and_consistency.md#indexing-why-databases-dont-scan-everything)) is just
 "find the start, then read the next several leaf pages in sequence," no extra work per row.
@@ -142,13 +152,50 @@ accumulate. Two structures exist specifically to keep this bounded:
   "every Nth key's byte offset" is enough to binary-search *within* a candidate file
   without scanning it linearly.
 - **Compaction itself** is a read-cost mitigation, not just housekeeping: fewer, larger
-  SSTables means fewer files a read has to consult in the first place. This is why
+  SSTables means fewer files a read has to consult in the first place. Mechanically, merging
+  is a **k-way merge** (mergesort-style, since every SSTable is already internally sorted) —
+  read all candidate files sequentially, emit one sorted output stream, dropping any key
+  whose newer version or tombstone supersedes it — never random access. This is why
   compaction *strategy* is a first-class tuning knob — **size-tiered compaction** (merge
-  same-size SSTables together, cheaper to run but lets more stale copies of a key
-  accumulate before merging) versus **leveled compaction** (organize SSTables into levels
-  with bounded per-level overlap, more compaction I/O up front but a tighter bound on how
-  many files a single read has to check) is a direct write-cost-vs-read-cost dial, not an
-  arbitrary implementation detail.
+  same-size SSTables together once N of them accumulate; cheap to run, but lets more stale
+  copies of a key accumulate before merging) versus **leveled compaction** (RocksDB's model:
+  organize SSTables into levels L0, L1, L2… each roughly **10x larger** than the one above
+  it, with bounded key-range overlap *within* a level; more compaction I/O up front, but a
+  read checks far fewer files) is a direct write-cost-vs-read-cost dial, not an arbitrary
+  implementation detail.
+
+#### Bloom Filters, Precisely: The Probabilistic Math
+
+**The structure**: a fixed-size bit array of **m** bits, all starting at 0, plus **k**
+independent hash functions, each mapping any key to one of the m positions.
+
+- **Insert** (once, when a key is written into an SSTable): compute all k hash values of
+  the key, set each of those k bits to 1.
+- **Query** ("might K be in this file?"): compute the same k hash values for K, and check
+  whether *every one* of those k positions is currently 1.
+  - **Any bit is 0** → K was **definitely never inserted** — if it had been, that exact bit
+    would already be 1, and bits are never unset. Zero false negatives, guaranteed by
+    construction, not by luck.
+  - **All bits are 1** → "**maybe present**" — could be a real hit, or a **false positive**:
+    those bits could all have been set to 1 by *other* keys' hashes colliding on the same
+    positions, purely by chance.
+
+**The false-positive rate is a formula, not a guess**: for n inserted keys, an m-bit array,
+and k hash functions, the false-positive probability is approximately
+
+> **p ≈ (1 − e^(−kn/m))^k**
+
+minimized at **k ≈ (m/n) · ln(2)** hash functions for a given bits-per-key budget. In
+practice, roughly **~10 bits per key** with the optimal k gives about a **1% false-positive
+rate** — the literal knob RocksDB and Cassandra expose as "bloom filter bits per key": more
+bits per key buys a lower false-positive rate (fewer wasted SSTable opens) at the cost of
+more memory.
+
+**Why the asymmetry is exactly right for this job**: a false positive costs one wasted file
+open — the engine checks, finds nothing, moves on, correctness untouched. A false negative
+would silently skip a file that actually held the key, corrupting the read. Only one
+direction of error is tolerable here, so the structure is deliberately built to guarantee
+that direction never happens, at the cost of accepting the other.
 
 ## Naming the Trade-off Precisely: Write, Read, and Space Amplification
 
@@ -170,6 +217,16 @@ read + memory(space) at the cost of update; an LSM-tree optimizes update + (part
 memory at the cost of read — there is no configuration of either structure that wins on all
 three simultaneously, which is exactly why "just use whichever is faster" isn't a coherent
 question until a workload is specified.
+
+**Where the name comes from, precisely**: Athanassoulis, Kester, Maas, Stoica, Idreos,
+Ailamaki & Callaghan, *"Designing Access Methods: The RUM Conjecture"* (EDBT 2016). Worth
+being precise that it's a **conjecture**, not a proven theorem — no one has mathematically
+proven a structure minimizing all three simultaneously is impossible; it's an empirical
+pattern every known access method obeys, used as a design heuristic rather than an
+impossibility proof. Bloom filters are this trade-off in miniature: they spend **Memory**
+(the bit array) to reduce **Read** cost, without touching **Update** cost at all — the same
+three-way trade the conjecture names for a whole storage engine, just scoped to one
+structure inside it.
 
 ## Worked Example: The Same Workload, Two Engines
 
@@ -274,6 +331,90 @@ paid once per transaction. This is the same *cost-amortization-via-batching* pat
 already established for network calls, applied here to the disk's durability boundary
 instead.
 
+**fsync frequency is a named, tunable setting, not a fixed property of "having a WAL" —
+verified defaults, not assumed:**
+
+| Engine | Setting | Default | What it actually does |
+|---|---|---|---|
+| MySQL/InnoDB | `innodb_flush_log_at_trx_commit` | `1` | fsync on every commit (the safe default); `0`/`2` fsync once per second instead, trading up to 1s of possible loss for speed |
+| PostgreSQL | `synchronous_commit` | `on` | fsync on every commit; sets to `off` to have the WAL writer flush on a timer (`wal_writer_delay`, default `200ms`) instead |
+| SQLite | `synchronous` pragma | `FULL` | fsync on every commit and before every checkpoint |
+
+**The pattern across all three**: fsync frequency and the crash-loss window are the same
+knob pointed in opposite directions — "every commit" means zero data-loss window at the
+cost of speed; "every N milliseconds" means a data-loss window exactly as wide as N, in
+exchange for not paying a physical flush on every single transaction.
+
+## Checkpointing: Why the WAL Doesn't Grow Forever
+
+Everything above explains why a WAL is cheap to *write*. It doesn't yet explain why the WAL
+doesn't simply grow without bound forever — every engine described above has to answer
+this too, and the answer is the same mechanism across all of them: **checkpointing**.
+
+**The core idea**: periodically (on a timer, a size threshold, or both), the engine takes
+whatever changes are sitting in memory but not yet reflected in the main structure — dirty
+B-tree pages still only in the buffer pool, or a memtable not yet flushed to an SSTable —
+and actually writes them into that main structure for real. Once that flush completes, every
+WAL record *before* that point is no longer needed for crash recovery: replaying the log
+would just reapply changes that are already safely reflected in the durable structure. Those
+older WAL records can be safely deleted or their disk space recycled.
+
+**A common point of confusion worth heading off directly**: checkpointing does not read from
+the WAL to update the main structure. The change was already applied to the in-memory page/
+memtable back at commit time (immediately, not periodically) — a checkpoint just flushes
+that *already-current* in-memory state out to disk. The WAL is only ever read back and
+replayed in one situation: crash recovery, to reconstruct in-memory changes that were
+acknowledged as committed but never made it to a checkpoint before the crash. In normal,
+no-crash operation, the WAL is written to and never read from again.
+
+```mermaid
+flowchart TB
+    Client(["Client sends COMMIT"])
+
+    subgraph MEM["Memory (RAM) — volatile, wiped on crash"]
+        WALBUF["WAL buffer"]
+        PAGE["Buffer pool page / memtable<br/>(updated immediately, not periodically)"]
+    end
+
+    subgraph DISK["Disk — durable, survives crash"]
+        WALFILE["WAL file<br/>(sequential, append-only)"]
+        TABLE["Main table / SSTable<br/>(the real structure)"]
+        OLD["Older WAL records<br/>(safe to delete once checkpointed)"]
+    end
+
+    Client --> WALBUF
+    Client --> PAGE
+    WALBUF -- "fsync (physical flush)" --> WALFILE
+    WALFILE -- "only now: commit acknowledged" --> Ack(["ACK to client"])
+
+    PAGE -. "checkpoint: periodic timer/size,<br/>flushes MEMORY -> disk, never reads WAL" .-> TABLE
+    TABLE -. "makes earlier WAL records unneeded" .-> OLD
+    WALFILE == "ONLY on crash recovery: replay" ==> PAGE
+```
+
+**Reading the diagram**: the solid path (`Client -> WAL buffer -> fsync -> WAL file -> ACK`)
+is what makes every commit durable, and it never touches the main table at all. The dotted
+path (`buffer pool / memtable -> checkpoint -> main table`) is a completely separate,
+periodic process reading from *memory*, not from the WAL. The thick path
+(`WAL file -> replay -> buffer pool / memtable`) only ever fires once, on restart after a
+crash — it is the only arrow in this whole diagram that reads the WAL back.
+
+**This is exactly what's already in this doc without being named as checkpointing**: etcd
+cutting a new WAL segment past 64 MB (from the section below) and Postgres's own periodic
+`CHECKPOINT` operation are both instances of this — old segments/records become eligible
+for removal once nothing in them is needed for recovery anymore. Without this, the WAL would
+be a permanently growing append-only file, which would eventually make crash recovery itself
+slow (replaying years of history) and consume unbounded disk space — checkpointing is what
+bounds both.
+
+**This is also the formally named version of the whole WAL story**: the combination of
+write-ahead logging, periodic checkpointing, and redo/undo recovery on restart is exactly
+what **ARIES** (*Algorithms for Recovery and Isolation Exploiting Semantics* — C. Mohan et
+al., IBM Almaden Research Center, 1992) formalizes as a single, complete algorithm. ARIES is
+still the textbook reference for this — IBM Db2 and Microsoft SQL Server both implement it
+directly, and most other engines' WAL+checkpoint designs are close variations on the same
+idea rather than an independent invention.
+
 **The WAL is orthogonal to B-tree vs. LSM-tree, not tied to either.** Postgres, MySQL/InnoDB,
 and SQLite (all B-tree engines) all have a WAL/redo log. Cassandra, RocksDB, and LevelDB
 (all LSM-tree engines) all have one too — in fact an LSM-tree's WAL is *structurally*
@@ -281,7 +422,46 @@ identical to its SSTables' write pattern (both are append-only sequential files)
 part of why LSM-trees pair so naturally with cheap durability. The lesson: **durability
 (WAL + fsync) and the choice of primary data structure (B-tree vs. LSM-tree) are two
 independent design decisions** — every serious storage engine needs an answer to both,
-and neither answer implies the other.
+and neither answer implies the other. It goes further than storage engines, too — the next
+section covers systems that use the exact same mechanism to protect something that isn't
+row/key data at all.
+
+### WAL Beyond Storage Engines: Protecting a Consensus Log, Not a Data Structure
+
+Every example so far uses a WAL to make a *data structure* (a B-tree's pages, an LSM-tree's
+memtable) durable. Distributed coordination systems apply the identical mechanism to a
+different target entirely: **the replicated consensus log itself**, which is the actual
+source of truth in a Raft- or ZAB-based system, not a cache of one.
+
+- **etcd** (the coordination store behind Kubernetes) has a Go package literally named
+  `wal` — verified directly from etcd's own package docs: it appends Raft log entries and
+  periodic snapshots to segmented, sequential on-disk files, cutting a new segment past
+  64 MB. Etcd's own docs state the payoff explicitly: **the entire Raft state of a member
+  can be recovered from the WAL alone** — the same "log is the source of truth, everything
+  else is a reconstructible cache of it" property this doc already established for
+  B-trees/LSM-trees, just applied to consensus state instead of row data.
+- **Apache ZooKeeper** does the same thing under a different name that turns out to be the
+  same word: verified directly from ZooKeeper's own admin guide, its transaction log class
+  is called `FileTxnLog`, and ZooKeeper's own documentation parenthesizes it explicitly as
+  the **"Transactional Log (WAL)"** — fsynced before any update is acknowledged, with
+  periodic snapshots plus log replay reconstructing full state on recovery, mechanically
+  identical to the checkpoint-plus-WAL-replay pattern Postgres uses.
+
+**Why this matters beyond "yet another example":** it's confirmation that WAL isn't a
+database trick at all — it's the general answer to *any* system's version of the same
+physical problem this doc opened with (cheap sequential durability for something that must
+survive a crash), whether the thing being protected is a B-tree page, an LSM-tree memtable,
+or a consensus algorithm's own log of agreed-upon operations.
+
+**The broadest version of this point already has a name.** Jay Kreps' 2013 essay *"The Log:
+What every software engineer should know about real-time data's unifying abstraction"*
+(LinkedIn Engineering — the essay that laid the conceptual groundwork for Kafka, later
+expanded into the O'Reilly book *I ♥ Logs*) makes exactly this argument at the level of a
+whole system, not just one storage engine: an append-only log can be *the* source of truth
+that every other view of the data (a database's tables, a cache, a search index, another
+service's local copy) is just a derived, reconstructible projection of. A database's WAL,
+etcd's `wal`, and ZooKeeper's `FileTxnLog` are all small, single-node instances of the same
+idea Kafka builds an entire distributed system's data-integration story around.
 
 ## NoSQL: A Data-Model Label, Not a Storage-Engine Choice
 
@@ -411,9 +591,17 @@ isn't mistakenly stretched to cover every storage engine that exists.
 - Group commit batches multiple transactions' WAL fsyncs into one physical flush — the same
   cost-amortization-via-batching idea [Part 8](08_cost_of_communication.md) applies to
   network calls, applied here to disk durability.
+- The WAL doesn't grow forever: checkpointing flushes pending in-memory changes into the
+  main structure for real, after which older WAL records are no longer needed for recovery
+  and get deleted/recycled — WAL + checkpointing + redo/undo recovery together is exactly
+  what the ARIES algorithm (Mohan et al., IBM, 1992) formalizes.
 - The WAL/durability mechanism and the B-tree-vs-LSM-tree choice are independent design
   axes — nearly every serious engine on either side needs both a log and a primary
   structure.
+- WAL isn't storage-engine-specific at all: etcd's `wal` package and ZooKeeper's
+  `FileTxnLog` (its own docs call it "Transactional Log (WAL)") apply the identical
+  sequential-append-plus-fsync-plus-replay mechanism to a consensus log instead of a data
+  structure — the entire Raft/ZAB state is recoverable from that log alone.
 - "NoSQL" names a data model and often a consistency posture (per [Part
   2](02_data_and_consistency.md#acid-vs-base)), not a storage engine — MySQL can run on an
   LSM-tree (MyRocks) and MongoDB defaults to a B-tree (WiredTiger), proving the storage
@@ -438,6 +626,10 @@ isn't mistakenly stretched to cover every storage engine that exists.
 
 - Why does a B-tree's write path cost a random-access disk operation even though the tree
   itself is a well-organized, sorted structure?
+- Why does a B-tree stay only 3-4 levels deep at a billion rows while a binary search tree
+  over the same data would need ~30 — what specific structural choice (node size vs. child
+  count) produces that difference, and what does "guided descent" mean as a description of
+  the traversal itself?
 - What does an LSM-tree give up on the read path in exchange for turning every write into a
   sequential append — and what two structures exist specifically to limit that cost?
 - Name the three amplification costs in the RUM conjecture, and explain why no engine
@@ -449,6 +641,8 @@ isn't mistakenly stretched to cover every storage engine that exists.
   makes the difference?
 - What does "replay the WAL" actually reconstruct after a crash, and why does that mean the
   WAL — not the B-tree or the memtable — is the true source of record?
+- If the WAL is append-only and never edited, what actually stops it from growing forever,
+  and what has to happen before an old WAL record can be safely deleted?
 - Why does MySQL running on RocksDB (MyRocks) prove that "SQL vs. NoSQL" and "B-tree vs.
   LSM-tree" are different, independent axes rather than the same choice under two names?
 - Why does TimescaleDB choosing a B-tree (via Postgres) for a time-series workload not
@@ -456,6 +650,9 @@ isn't mistakenly stretched to cover every storage engine that exists.
 - Name three real systems where an LSM-tree engine (RocksDB, Pebble, or a fork of one) is
   embedded *inside* another system rather than exposed as a standalone database — what do
   all three have in common that made an LSM-tree the right embeddable component?
+- etcd and ZooKeeper both use a WAL, but not to protect a B-tree page or an LSM memtable —
+  what are they actually using it to protect instead, and why does "replay the log"
+  reconstruct that just as completely as it reconstructs a database's row data?
 
 ## Articulate It: Interview Framing & Vocabulary
 
@@ -493,23 +690,54 @@ isn't mistakenly stretched to cover every storage engine that exists.
 
 **Technical shorthand — use these instead of over-explaining the concept every time:**
 
+- **the ubiquitous B-tree** (n. phrase, informal) — the industry-wide default label for
+  B-trees as the on-disk index structure of choice (Postgres, MySQL/InnoDB, SQLite,
+  MongoDB's WiredTiger, most filesystem metadata) — "ubiquitous" because it's the strong
+  default for the point-lookup/range-query, moderate-write workload shape, not because
+  nothing else exists.
+- **fanout** (n.) — the number of children a single B-tree node/page can hold; realistically
+  in the hundreds, since a fixed-size disk page (4-16 KB) fits hundreds of small
+  key/pointer pairs — the reason a B-tree stays only 3-4 levels deep even at billion-row
+  scale.
+- **fat node** (n. phrase, informal) — a B-tree node sized to fill one full disk page and
+  packed with hundreds of keys and child pointers, in contrast to a binary tree's "thin"
+  2-child node — the structural choice trading cheap in-memory comparisons for far fewer
+  expensive disk reads.
+- **guided descent** (n. phrase) — the B-tree search algorithm itself: at each node,
+  comparing the target key against that node's sorted keys picks exactly one child to
+  descend into next, repeated root to leaf — directed by comparison at every level, never a
+  scan or backtrack.
 - **memtable** (n.) — an LSM-tree's in-memory, sorted buffer for recent writes, flushed to
   disk as an SSTable once full.
 - **SSTable (Sorted String Table)** (n. phrase) — an immutable, sorted, on-disk file an
   LSM-tree writes once and only ever reads, merges, or deletes — never edits in place.
-- **compaction** (n.) — the background process that merges multiple SSTables into fewer,
-  larger ones, reclaiming space from overwritten/deleted keys and bounding read
-  amplification.
-- **bloom filter** (n. phrase) — a compact probabilistic structure answering "definitely
-  absent, or maybe present" for a key in a given SSTable, letting reads skip files that
-  can't possibly contain the target key.
-- **write/read/space amplification** (n. phrases) — the three costs of the RUM conjecture; a
-  storage engine trades between them rather than minimizing all three at once.
+- **compaction** (n.) — the background process that k-way-merges multiple sorted SSTables
+  into fewer, larger ones, reclaiming space from overwritten/deleted keys and bounding read
+  amplification; **size-tiered** vs. **leveled** (L0-L6, ~10x growth per level) are the two
+  named strategies, [detailed above](#the-read-path-where-the-lsm-trees-bill-comes-due).
+- **bloom filter** (n. phrase) — [the probabilistic math is worked out
+  above](#bloom-filters-precisely-the-probabilistic-math): a bit array plus k hash
+  functions, `p ≈ (1 − e^(−kn/m))^k` false-positive rate, zero false negatives by
+  construction — answering "definitely absent, or maybe present" for a key in a given
+  SSTable, letting reads skip files that can't possibly contain the target key.
+- **RUM conjecture** (n. phrase, proper) — Athanassoulis et al., EDBT 2016; a storage engine
+  can optimize strongly for at most two of Read, Update, and Memory(space) cost at once —
+  an empirical design heuristic, not a proven impossibility theorem.
+- **write/read/space amplification** (n. phrases) — the three costs the RUM conjecture
+  names; a storage engine trades between them rather than minimizing all three at once.
 - **write-ahead log (WAL)** (n. phrase) — an append-only log of intended changes, written
   and fsynced before (or instead of) the expensive main structure, replayed on crash
   recovery; also called a commit log (Cassandra) or redo log (InnoDB).
 - **group commit** (n. phrase) — batching multiple transactions' WAL fsyncs into a single
   physical flush to amortize `fsync`'s cost across more work.
+- **checkpoint** (n.) — the periodic operation that flushes in-memory changes into the main
+  structure for real, after which older WAL records covering those changes are no longer
+  needed for recovery and can be deleted/recycled — the mechanism that keeps the WAL bounded
+  instead of growing forever.
+- **ARIES** (n., proper) — *Algorithms for Recovery and Isolation Exploiting Semantics*
+  (Mohan et al., IBM, 1992) — the formal academic algorithm combining WAL, checkpointing,
+  and redo/undo recovery into one coherent method; still the textbook reference (Db2, SQL
+  Server both implement it directly).
 - **page cache** (n. phrase) — the OS's in-RAM buffer for disk I/O; a `write()` call lands
   here first, which is exactly the gap `fsync` exists to close.
 - **workload archetype** (n. phrase) — a named shape of access pattern (OLTP, high-write
@@ -536,4 +764,4 @@ isn't mistakenly stretched to cover every storage engine that exists.
 
 ---
 
-**Previous:** [Part 9: The Anatomy of a Request (DNS, BGP, and the Edge)](09_dns_bgp_and_the_edge.md)  |  **Next:** [0. The Interview Framework](../00_interview_framework/00_interview_framework.md)
+**Previous:** [Part 9: The Anatomy of a Request (DNS, BGP, and the Edge)](09_dns_bgp_and_the_edge.md)  |  **Next:** [Part 11: Taxonomy of Storage — Choosing by First Principles, Not Fashion](11_taxonomy_of_storage_choice.md)

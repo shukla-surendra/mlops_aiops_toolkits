@@ -13,6 +13,15 @@ small shared tree of data consistent and available across a cluster of ZooKeeper
 docs). Historically used by many distributed systems for this role, including Kafka
 (pre-KRaft) and Hadoop, and — relevant here — [ClickHouse](../clickhouse/README.md).
 
+**Durability mechanism**: ZooKeeper fsyncs every update to a transaction log before
+acknowledging it, and recovers on restart by replaying that log against the latest snapshot
+— verified directly from ZooKeeper's own admin guide, which names the class `FileTxnLog`
+and explicitly parenthesizes it as the **"Transactional Log (WAL)."** Same write-ahead-log
+mechanism Postgres/MySQL/RocksDB use for a B-tree page or LSM memtable, applied here to a
+consensus log instead — see the deep-dive in
+[`engineering_fundamentals`](../../../../engineering_fundamentals/system_design_foundation/prerequisite_concepts/10_physics_of_persistence.md#wal-beyond-storage-engines-protecting-a-consensus-log-not-a-data-structure)
+for the full mechanism and etcd's equivalent.
+
 **ClickHouse Keeper** is ClickHouse's own C++ reimplementation of the same job: it
 implements the ZooKeeper wire protocol/API, so anything that speaks to ZooKeeper can speak
 to it unchanged, but internally it uses the **RAFT** consensus protocol instead of ZAB, and
