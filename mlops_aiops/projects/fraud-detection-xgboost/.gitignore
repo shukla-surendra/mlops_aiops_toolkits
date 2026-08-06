@@ -1,0 +1,28 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# The dataset -- downloaded at runtime by src/fraud_detection/data.py,
+# never committed. This is the whole point of data.py's cache-locally
+# design: reproducible without needing the file to exist in git.
+data/
+
+# Run artifacts (regenerated each run)
+mlruns/
+mlflow.db
+workspace/
+evidently_report.html
+executed_output.ipynb
+
+# Feast-generated: registry, online store, and the derived IP-velocity
+# source parquet -- all reproducible from data/ via feast_features.py.
+feature_repo/data/*.db
+feature_repo/data/*.parquet
+feature_repo/.feastignore

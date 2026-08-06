@@ -1,0 +1,17 @@
+{{- if .Values.evidentlyServer.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "evidently-stack.evidently-server.fullname" . }}
+  labels:
+    app.kubernetes.io/name: evidently-server
+    {{- include "evidently-stack.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  {{- if .Values.evidentlyServer.persistence.storageClassName }}
+  storageClassName: {{ .Values.evidentlyServer.persistence.storageClassName | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.evidentlyServer.persistence.size }}
+{{- end }}

@@ -1,0 +1,16 @@
+evidently-stack deployed as release "{{ .Release.Name }}" in namespace "{{ .Release.Namespace }}".
+
+Evidently UI:
+  minikube service {{ include "evidently-stack.evidently-server.fullname" . }} -n {{ .Release.Namespace }} --url
+
+JupyterLab (token: {{ .Values.jupyterClient.jupyterToken }}):
+  minikube service {{ include "evidently-stack.jupyter-client.fullname" . }} -n {{ .Release.Namespace }} --url
+
+Open the JupyterLab URL (append ?token={{ .Values.jupyterClient.jupyterToken }}
+if not prompted automatically), run work/evidently_client_demo.ipynb, then
+open the Evidently UI URL to see the uploaded report.
+
+jupyter-client is already configured to reach evidently-server at:
+  http://{{ include "evidently-stack.evidently-server.fullname" . }}:{{ .Values.evidentlyServer.service.port }}
+-- this is computed from the release name, so it's correct automatically as
+long as both pods came from this same `helm install`.

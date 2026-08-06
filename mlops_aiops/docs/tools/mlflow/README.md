@@ -32,6 +32,13 @@ instead (`mlflow.set_tracking_uri("sqlite:///mlflow.db")`), MLflow's own
 recommended local store. Verified directly against a real run, not
 assumed from older docs/tutorials.
 
+**Model registry, end to end**: [`projects/fraud-detection-xgboost/`](../../../projects/fraud-detection-xgboost/README.md)
+actually registers a model (`mlflow.xgboost.log_model(..., registered_model_name=...)`)
+and has a separate `evaluate.py` that loads it back via
+`models:/<name>/latest` — a worked example of "is what's currently
+registered still good?" as a distinct step from "how good was the model I
+just trained?" (`train.py`'s own held-out metrics).
+
 ## Relationship with Evidently
 
 MLflow and [Evidently](../evidently/README.md) are complementary, not

@@ -1,0 +1,72 @@
+# evidently-stack -- one chart, two Deployments: the Evidently monitoring
+# server, and a Jupyter pod that computes a report and pushes it to that
+# server over the network. One chart (not two) because both pods are always
+# installed/removed together for this demo and neither is independently
+# useful without the other -- see ../README.md for the fuller reasoning.
+#
+# Because both live in one release, jupyter-client's EVIDENTLY_SERVER_URL is
+# *not* a value you set here -- it's computed from the evidently-server
+# Service's own templated name (see templates/_helpers.tpl), so it can never
+# drift out of sync the way it could across two separate `helm install`s.
+
+evidentlyServer:
+  image:
+    # No official Evidently image exists (checked their docs/GitHub) -- built
+    # from Dockerfile.evidently-server straight off the PyPI package.
+    # minikube: `minikube image build -t evidently-server:local -f Dockerfile.evidently-server .`
+    # kind:     `docker build -t evidently-server:local -f Dockerfile.evidently-server .`
+    #           `kind load docker-image evidently-server:local`
+    repository: evidently-server
+    tag: local
+    pullPolicy: IfNotPresent
+
+  service:
+    type: NodePort
+    port: 8000
+    nodePort: 30800
+
+  persistence:
+    # Evidently's workspace (projects + snapshots) lives at /workspace.
+    # Without a PVC this falls back to emptyDir -- fine for a quick demo,
+    # but every project/report is lost on pod restart/reschedule.
+    enabled: true
+    size: 1Gi
+    storageClassName: "" # "" uses the cluster's default StorageClass
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+jupyterClient:
+  image:
+    # Built from Dockerfile.jupyter-client, which also bakes the notebook in
+    # notebooks/ into the image at build time.
+    # minikube: `minikube image build -t jupyter-client:local -f Dockerfile.jupyter-client .`
+    # kind:     `docker build -t jupyter-client:local -f Dockerfile.jupyter-client .`
+    #           `kind load docker-image jupyter-client:local`
+    repository: jupyter-client
+    tag: local
+    pullPolicy: IfNotPresent
+
+  service:
+    type: NodePort
+    port: 8888
+    nodePort: 30888
+
+  # Fixed token so the NodePort-exposed JupyterLab UI doesn't require digging
+  # through `kubectl logs` for an auto-generated one. Fine for a local-only
+  # demo; change it (or drop the NodePort) before exposing this anywhere
+  # reachable beyond localhost.
+  jupyterToken: "evidently-demo"
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi

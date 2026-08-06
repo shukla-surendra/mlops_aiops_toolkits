@@ -1,0 +1,6 @@
+apiVersion: v2
+name: evidently-stack
+description: Self-hosted Evidently monitoring server + a Jupyter client pod, both in one chart, for a local kind/minikube cluster
+type: application
+version: 0.1.0
+appVersion: "0.7.21"

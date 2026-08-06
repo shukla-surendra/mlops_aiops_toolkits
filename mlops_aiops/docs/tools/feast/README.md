@@ -159,3 +159,16 @@ The feature definitions themselves live in
 demonstrates on-demand feature views, push sources, and label views) to
 just `Entity` + `FeatureView` + `FeatureService`, the part of the API most
 real usage actually looks like.
+
+**A second, real (not generic-tutorial) usage**:
+[`projects/fraud-detection-xgboost/`](../../../projects/fraud-detection-xgboost/README.md)
+uses Feast for leakage-safe, trailing per-IP "velocity" features (prior
+transaction count/average amount/fraud count) — `ip_address` standing in
+for a recurring entity in a dataset with no persistent customer ID. Trained
+via `get_historical_features()`'s point-in-time join, served via
+`get_online_features()`, and registered as a separate MLflow model so it's
+directly A/B-comparable against the same project's non-Feast baseline. It
+also surfaced a genuine, honestly-reported null result — see that
+project's `FAQ.md` "Tier 2B" for why a row-count-based (not calendar-time)
+train/test split caused the added features to measure as useless despite
+being computed and served correctly.

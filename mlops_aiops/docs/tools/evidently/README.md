@@ -79,6 +79,16 @@ is used or needed** — logging to MLflow plus the `ml_monitoring.drift_history`
 Delta table already solves the trend-over-time problem without adopting
 either of these.
 
+**Running `evidently ui` in Kubernetes**: [`k8n_mlops/evidently_stack/`](../../../../k8n_mlops/README.md)
+is a single Helm chart deploying two Deployments — the server (NodePort
+Service + PVC for the workspace directory) and a Jupyter pod whose notebook
+computes a `Report` locally and pushes the resulting `Snapshot` to the
+server pod over HTTP via `RemoteWorkspace.add_run()`, using the server's
+in-cluster Service DNS name (computed inside the chart, not hand-wired).
+Useful as a from-scratch worked example of `RemoteWorkspace`/`add_run`,
+distinct from the single-process `projects/evidently-monitoring-demo/`
+notebook linked below.
+
 ## Drift detection concepts, vs. a custom implementation
 
 If you've built (or are considering building) a custom drift-detection
@@ -183,6 +193,10 @@ Workflow. Full code: [`examples/databricks_xgboost_batch_monitoring.py`](example
 A standalone, runnable version of this same pattern (synthetic data, local
 pandas/MLflow, no Databricks/Spark required) lives in
 [`projects/evidently-monitoring-demo/`](../../../projects/evidently-monitoring-demo/) as a Jupyter notebook.
+[`projects/fraud-detection-xgboost/`](../../../projects/fraud-detection-xgboost/README.md)
+is the same pattern again but on a real (not synthetic) imbalanced dataset,
+with a chronological (not random) reference/current split and an optional
+push to a self-hosted Evidently server via `RemoteWorkspace`.
 
 Key points:
 

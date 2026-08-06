@@ -1,0 +1,12 @@
+# Base image migrated to quay.io in Oct 2023 -- Docker Hub's copy is stale
+# and no longer updated (verified against the jupyter/docker-stacks repo).
+FROM quay.io/jupyter/scipy-notebook:latest
+
+# pandas/numpy already ship in scipy-notebook; only evidently itself is added.
+RUN pip install --no-cache-dir evidently==0.7.21
+
+# NB_UID/NB_GID/HOME are already set as ENV by the base image -- this is the
+# docker-stacks project's own documented pattern for adding files without
+# permission errors under the non-root `jovyan` user (verified against their
+# recipes docs), not something invented here.
+COPY --chown=${NB_UID}:${NB_GID} notebooks/ "${HOME}/work/"

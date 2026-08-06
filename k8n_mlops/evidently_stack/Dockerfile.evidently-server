@@ -1,0 +1,19 @@
+# No official Evidently server image exists (verified against Evidently's own
+# self-hosting docs and GitHub repo) -- this builds one directly from the
+# published PyPI package. Base matches Evidently's own tested target since
+# v0.7.12 (3.11-slim-bookworm), confirmed from their release notes.
+FROM python:3.11-slim-bookworm
+
+ENV PYTHONUNBUFFERED=1
+
+RUN pip install --no-cache-dir evidently==0.7.21
+
+# The Helm chart mounts a PVC here so projects/snapshots survive pod restarts.
+WORKDIR /workspace
+
+EXPOSE 8000
+
+# --host 0.0.0.0 is required: the CLI's default (127.0.0.1) only listens
+# inside the container's own network namespace and is unreachable from the
+# Service or any other pod. Verified directly from evidently/cli/ui.py.
+CMD ["evidently", "ui", "--host", "0.0.0.0", "--port", "8000", "--workspace", "/workspace"]

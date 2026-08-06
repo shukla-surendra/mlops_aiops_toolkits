@@ -9,9 +9,10 @@ history in this repo now, not a reference to an external one).
 
 | Folder | What's in it |
 |---|---|
-| **`mlops_aiops/`** | This repo's own content: `docs/` (tool write-ups — Evidently, MLflow, Feast, vLLM, Prometheus/Grafana/Loki, ELK/EFK, CloudWatch, observability on EKS) and `projects/` (runnable, uv-managed demo notebooks for the tools documented in `docs/`). |
+| **`mlops_aiops/`** | This repo's own content: `docs/` (tool write-ups — Evidently, MLflow, Feast, vLLM, Prometheus/Grafana/Loki, ELK/EFK, CloudWatch, observability on EKS) and `projects/` (runnable, uv-managed demos and pipelines for the tools documented in `docs/` — including `fraud-detection-xgboost/`, a full ingest→train→evaluate→monitor→serve MLOps pipeline). |
 | **`cloud-practice/`** | AWS/cloud practice notes and Terraform — VPC, EBS/EFS, SageMaker, Bedrock, SQS, and a full Terraform reference. |
 | **`k8n_explorer/`** | Kubernetes practice — pod/node affinity, service types, Jobs/CronJobs, Helm charts, a Kubeflow pipeline sample, a KServe inference example, and a Grafana/Loki log-viewer demo. Has its own MkDocs site. |
+| **`k8n_mlops/`** | MLOps-on-Kubernetes practice — one Helm chart (`evidently_stack/`) deploying a self-hosted Evidently monitoring server and a Jupyter pod that computes reports and pushes them to it, both in the same cluster/release. |
 | **`genai_lab/`** | Agentic AI / LLM tooling practice — MCP (from scratch and official SDKs), FastMCP auth patterns, LangGraph + Ollama, vector DBs (FAISS, Qdrant, pgvector), RAG, and Bedrock AgentCore. Has its own MkDocs site. |
 | **`engineering_fundamentals/`** | Interview prep — DSA, system design (foundations + practice), low-level design, security engineering, behavioral. Has its own MkDocs site. |
 | **`local_llms/`** | Local LLM/vision-model experimentation — an Ollama-backed chat UI (`ollama-chatbox`), deepfake-detector tests, Vision Transformer experiments (PyTorch/Flax/JAX), and notebooks (Gemma exploration, OCR comparison). uv-managed Python project (`pyproject.toml`/`uv.lock`). |

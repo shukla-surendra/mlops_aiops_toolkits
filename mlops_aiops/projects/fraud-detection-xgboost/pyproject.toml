@@ -1,0 +1,27 @@
+[project]
+name = "fraud-detection-xgboost"
+version = "0.1.0"
+description = "End-to-end XGBoost fraud detection MLOps pipeline (ingest -> train -> evaluate -> monitor -> serve)"
+requires-python = ">=3.11"
+dependencies = [
+    "pandas",
+    "numpy",
+    "scikit-learn",
+    "xgboost",
+    "mlflow",
+    "evidently",
+    "feast",
+    "requests",
+    "fastapi",
+    "uvicorn",
+    "pytest",
+    "jupyter",
+    "ipykernel",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"

@@ -1,0 +1,454 @@
+<title>fraud-detection-xgboost — Architecture</title>
+<style>
+  :root {
+    --paper: #eef1ea;
+    --paper-raised: #e4e8de;
+    --ink: #232a3d;
+    --ink-soft: #4c5468;
+    --rule: #c7cdb9;
+    --accent: #a3701c;
+    --accent-soft: #ddc9a0;
+    --critical: #a13d2f;
+    --critical-soft: #e3c9c2;
+
+    --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    --font-body: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #161a14;
+      --paper-raised: #1e231b;
+      --ink: #dbe3d3;
+      --ink-soft: #9fac93;
+      --rule: #3a4433;
+      --accent: #d4a13f;
+      --accent-soft: #4a3c1e;
+      --critical: #d1685a;
+      --critical-soft: #3e2320;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #161a14;
+    --paper-raised: #1e231b;
+    --ink: #dbe3d3;
+    --ink-soft: #9fac93;
+    --rule: #3a4433;
+    --accent: #d4a13f;
+    --accent-soft: #4a3c1e;
+    --critical: #d1685a;
+    --critical-soft: #3e2320;
+  }
+  :root[data-theme="light"] {
+    --paper: #eef1ea;
+    --paper-raised: #e4e8de;
+    --ink: #232a3d;
+    --ink-soft: #4c5468;
+    --rule: #c7cdb9;
+    --accent: #a3701c;
+    --accent-soft: #ddc9a0;
+    --critical: #a13d2f;
+    --critical-soft: #e3c9c2;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+  }
+  body {
+    padding: clamp(24px, 5vw, 72px) clamp(16px, 6vw, 96px) 96px;
+  }
+
+  .masthead {
+    max-width: 900px;
+    margin: 0 auto 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.15;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .thesis {
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: 700px;
+    margin: 0;
+  }
+  .thesis code, p code, li code, td code {
+    font-family: var(--font-mono);
+    font-size: 0.92em;
+    background: var(--paper-raised);
+    border-radius: 3px;
+    padding: 0.1em 0.35em;
+  }
+
+  .ledger-rule {
+    max-width: 900px;
+    margin: 28px auto 32px;
+    border: none;
+    border-top: 1px solid var(--rule);
+  }
+
+  figure {
+    max-width: 1200px;
+    margin: 0 auto 8px;
+  }
+  figure.diagram {
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: clamp(12px, 2vw, 28px);
+    overflow-x: auto;
+  }
+  svg.arch {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
+  figcaption {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin: 14px auto 0;
+    max-width: 1200px;
+    line-height: 1.5;
+  }
+  figcaption .swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 5px;
+    vertical-align: -1px;
+  }
+  .swatch.baseline { background: var(--ink-soft); }
+  .swatch.feast { background: var(--accent); }
+
+  main {
+    max-width: 700px;
+    margin: 48px auto 0;
+  }
+  section { margin-bottom: 44px; }
+  section:last-of-type { margin-bottom: 0; }
+
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 22px;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+  h2 .num {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--accent);
+    margin-right: 10px;
+    letter-spacing: 0.02em;
+  }
+  p { line-height: 1.65; margin: 0 0 14px; font-size: 15.5px; }
+  p:last-child { margin-bottom: 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  th, td {
+    text-align: left;
+    padding: 9px 12px 9px 0;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  th {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+  td:first-child { font-family: var(--font-mono); font-size: 13.5px; white-space: nowrap; }
+
+  .callout {
+    background: var(--paper-raised);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+    padding: 14px 18px;
+    font-size: 14.5px;
+    line-height: 1.6;
+  }
+  .callout.critical { border-left-color: var(--critical); }
+  .callout strong { color: var(--ink); }
+
+  footer {
+    max-width: 700px;
+    margin: 56px auto 0;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 640px) {
+    table, thead, tbody, th, td, tr { display: block; }
+    th { display: none; }
+    td { border-bottom: none; padding: 3px 0; }
+    tr { padding-bottom: 12px; border-bottom: 1px solid var(--rule); margin-bottom: 12px; display: block; }
+    td:first-child { font-size: 13px; color: var(--accent); }
+  }
+</style>
+
+<div class="masthead">
+  <div class="eyebrow">fraud-detection-xgboost — system architecture</div>
+  <h1>Two training lanes, one shared feature store, two serving endpoints.</h1>
+  <p class="thesis">
+    Ingest once, split chronologically, then fork: a baseline model trained
+    on raw features, and a second model augmented with Feast-served
+    IP-reuse features — kept as two separately registered MLflow models so
+    the comparison between them stays honest and reproducible, not two
+    branches of the same script quietly diverging.
+  </p>
+</div>
+
+<hr class="ledger-rule" />
+
+<figure class="diagram">
+  <svg class="arch" viewBox="0 0 1700 760" role="img" aria-label="Architecture diagram: Zenodo feeds data.py, which feeds features.py's chronological split. A baseline lane runs straight to train.py and the fraud-xgboost MLflow model. A Feast lane joins the split data against an offline Parquet store via a point-in-time join, trains train_with_feast.py, and registers fraud-xgboost-feast. Both models are read by evaluate.py and served by serve.py's /predict and /predict_feast endpoints, with /predict_feast also querying a materialized SQLite online store. A separate monitor.py branch compares the same chronological split with Evidently and optionally forwards the report to a remote server.">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="currentColor" />
+      </marker>
+      <marker id="arrowAccent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)" />
+      </marker>
+    </defs>
+
+    <g font-family="ui-monospace, 'SF Mono', 'Cascadia Code', monospace" font-size="12.5">
+
+      <!-- ============ INGESTION SPINE (neutral) ============ -->
+      <g stroke="currentColor" fill="none" stroke-width="1.4">
+        <rect x="20" y="182" width="150" height="52" rx="4" stroke-dasharray="4 3" />
+        <rect x="230" y="182" width="150" height="52" rx="4" />
+        <rect x="440" y="182" width="180" height="52" rx="4" />
+      </g>
+      <g fill="currentColor" text-anchor="middle">
+        <text x="95" y="204" font-weight="600">Zenodo</text>
+        <text x="95" y="220" fill="var(--ink-soft)">record 20030065</text>
+        <text x="305" y="212">data.py</text>
+        <text x="530" y="204" font-weight="600">features.py</text>
+        <text x="530" y="220" fill="var(--ink-soft)">chrono split</text>
+      </g>
+      <g stroke="currentColor" fill="none" stroke-width="1.4" marker-end="url(#arrow)">
+        <line x1="170" y1="208" x2="228" y2="208" />
+        <line x1="380" y1="208" x2="438" y2="208" />
+      </g>
+
+      <!-- ============ BASELINE LANE (neutral, top) ============ -->
+      <g stroke="currentColor" fill="none" stroke-width="1.4">
+        <rect x="700" y="70" width="170" height="52" rx="4" />
+        <rect x="1150" y="60" width="170" height="52" rx="4" />
+        <rect x="1470" y="130" width="190" height="52" rx="4" />
+      </g>
+      <g fill="currentColor" text-anchor="middle">
+        <text x="785" y="92">train.py</text>
+        <text x="785" y="108" fill="var(--ink-soft)">raw features only</text>
+        <text x="1235" y="82">evaluate.py</text>
+        <text x="1235" y="98" fill="var(--ink-soft)">models:/name/latest</text>
+        <text x="1565" y="152" font-weight="600">serve.py</text>
+        <text x="1565" y="168" fill="var(--ink-soft)">/predict</text>
+      </g>
+      <g stroke="currentColor" fill="none" stroke-width="1.4" marker-end="url(#arrow)">
+        <polyline points="530,182 530,96 698,96" />
+        <text x="545" y="150" fill="var(--ink-soft)">train_df / test_df (raw)</text>
+      </g>
+
+      <!-- ============ MLflow hub ============ -->
+      <g stroke="currentColor" fill="none" stroke-width="1.6">
+        <rect x="960" y="290" width="220" height="120" rx="5" />
+      </g>
+      <g fill="currentColor" text-anchor="middle">
+        <text x="1070" y="313" font-weight="600">MLflow</text>
+        <text x="1070" y="330" fill="var(--ink-soft)" font-size="11">tracking + registry</text>
+        <line x1="985" y1="340" x2="1155" y2="340" stroke="var(--rule)" />
+        <text x="1070" y="360" fill="var(--ink-soft)" font-size="11.5">fraud-xgboost</text>
+        <text x="1070" y="378" fill="var(--accent)" font-size="11.5">fraud-xgboost-feast</text>
+      </g>
+
+      <g stroke="currentColor" fill="none" stroke-width="1.4" marker-end="url(#arrow)">
+        <polyline points="870,96 1000,96 1000,288" />
+      </g>
+      <!-- evaluate.py + serve /predict draw from mlflow -->
+      <g stroke="currentColor" fill="none" stroke-width="1.4" marker-end="url(#arrow)">
+        <polyline points="1180,317 1230,317 1230,114" />
+        <polyline points="1180,340 1470,340 1470,166" />
+      </g>
+
+      <!-- ============ FEAST LANE (accent, bottom) ============ -->
+      <g stroke="var(--accent)" fill="none" stroke-width="1.6">
+        <rect x="440" y="330" width="180" height="56" rx="4" />
+        <rect x="700" y="330" width="200" height="70" rx="4" />
+        <rect x="960" y="440" width="220" height="52" rx="4" />
+      </g>
+      <g fill="var(--accent)" text-anchor="middle">
+        <text x="530" y="352" font-weight="600">ip_velocity_stats</text>
+        <text x="530" y="368" font-size="11">.parquet — offline store</text>
+        <text x="800" y="355" font-weight="600">get_historical_features()</text>
+        <text x="800" y="372" font-size="11">point-in-time join</text>
+        <text x="800" y="388" font-size="11" fill="var(--ink-soft)">(training-time)</text>
+        <text x="1070" y="462">train_with_feast.py</text>
+        <text x="1070" y="478" fill="var(--ink-soft)">raw + IP velocity</text>
+      </g>
+      <g stroke="var(--accent)" fill="none" stroke-width="1.4" marker-end="url(#arrowAccent)">
+        <polyline points="530,234 530,328" />
+        <text x="545" y="270" fill="var(--accent)" font-size="11">full history (shift(1)-safe)</text>
+        <polyline points="620,358 698,358" />
+        <polyline points="530,234 660,234 660,345 698,345" />
+        <text x="668" y="300" fill="var(--ink-soft)" font-size="11">train_df / test_df</text>
+        <polyline points="900,382 960,462" />
+      </g>
+      <g stroke="var(--accent)" fill="none" stroke-width="1.4" marker-end="url(#arrowAccent)">
+        <polyline points="1180,466 1010,410" />
+      </g>
+
+      <!-- ============ ONLINE STORE + /predict_feast ============ -->
+      <g stroke="var(--accent)" fill="none" stroke-width="1.6">
+        <rect x="700" y="560" width="170" height="52" rx="4" />
+        <rect x="960" y="560" width="200" height="52" rx="4" />
+        <rect x="1470" y="440" width="190" height="52" rx="4" />
+      </g>
+      <g fill="var(--accent)" text-anchor="middle">
+        <text x="785" y="582">materialize_</text>
+        <text x="785" y="598" font-size="11">incremental()</text>
+        <text x="1060" y="582" font-weight="600">online store</text>
+        <text x="1060" y="598" font-size="11">SQLite — latest value</text>
+        <text x="1565" y="462" font-weight="600">serve.py</text>
+        <text x="1565" y="478">/predict_feast</text>
+      </g>
+      <g stroke="var(--accent)" fill="none" stroke-width="1.4" marker-end="url(#arrowAccent)">
+        <polyline points="530,386 530,586 698,586" />
+        <polyline points="870,586 958,586" />
+        <polyline points="1180,382 1560,382 1560,438" />
+        <polyline points="1160,586 1560,586 1560,494" />
+        <text x="1250" y="602" font-size="11" fill="var(--ink-soft)">get_online_features() — latest value</text>
+      </g>
+
+      <!-- ============ MONITOR BRANCH ============ -->
+      <g stroke="currentColor" fill="none" stroke-width="1.4" stroke-dasharray="0">
+        <rect x="230" y="670" width="170" height="52" rx="4" />
+        <rect x="470" y="670" width="200" height="52" rx="4" />
+        <rect x="740" y="670" width="230" height="52" rx="4" stroke-dasharray="4 3" />
+      </g>
+      <g fill="currentColor" text-anchor="middle">
+        <text x="315" y="692">monitor.py</text>
+        <text x="315" y="708" fill="var(--ink-soft)" font-size="11">drift check</text>
+        <text x="570" y="692">Evidently Report</text>
+        <text x="570" y="708" fill="var(--ink-soft)" font-size="11">evidently_report.html</text>
+        <text x="855" y="692" fill="var(--ink-soft)">remote Evidently server</text>
+        <text x="855" y="708" fill="var(--ink-soft)" font-size="11">optional — see k8n_mlops</text>
+      </g>
+      <g stroke="currentColor" fill="none" stroke-width="1.4" marker-end="url(#arrow)">
+        <polyline points="440,234 315,234 315,668" />
+        <text x="330" y="640" fill="var(--ink-soft)" font-size="11">train_df / test_df (raw)</text>
+        <line x1="400" y1="696" x2="468" y2="696" />
+      </g>
+      <g stroke="currentColor" fill="none" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#arrow)">
+        <line x1="670" y1="696" x2="738" y2="696" />
+      </g>
+      <text x="704" y="686" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">if EVIDENTLY_SERVER_URL set</text>
+
+    </g>
+  </svg>
+</figure>
+<figcaption>
+  <span class="swatch baseline"></span>baseline lane (raw features, <code>fraud-xgboost</code>)
+  &nbsp;&nbsp;
+  <span class="swatch feast"></span>Feast lane (offline point-in-time join for training, online latest-value lookup for serving, <code>fraud-xgboost-feast</code>)
+</figcaption>
+
+<main>
+
+  <section>
+    <h2><span class="num">01</span>What this shows that the README's prose can't</h2>
+    <p>
+      The diagram exists to make one structural fact impossible to miss:
+      this isn't one pipeline with a feature-store flag — it's two complete,
+      parallel lanes from the same split data, converging only at MLflow,
+      and diverging again at serving. The Feast lane itself also splits in
+      two: the point-in-time join that feeds <code>train_with_feast.py</code>
+      and the materialized online store that feeds
+      <code>/predict_feast</code> are different mechanisms answering
+      different questions — "what did this IP look like back then" versus
+      "what does this IP look like right now."
+    </p>
+  </section>
+
+  <section>
+    <h2><span class="num">02</span>Where the two lanes converge and split again</h2>
+    <table>
+      <thead><tr><th>Stage</th><th>Baseline</th><th>Feast-augmented</th></tr></thead>
+      <tbody>
+        <tr><td>Train</td><td><code>train.py</code></td><td><code>train_with_feast.py</code></td></tr>
+        <tr><td>Registered as</td><td><code>fraud-xgboost</code></td><td><code>fraud-xgboost-feast</code></td></tr>
+        <tr><td>Served at</td><td><code>/predict</code></td><td><code>/predict_feast</code></td></tr>
+        <tr><td>Feature source</td><td>raw CSV columns only</td><td>raw columns + 3 IP-velocity features</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2><span class="num">03</span>The finding this architecture surfaced</h2>
+    <div class="callout">
+      <strong>Both registered models scored identically</strong> (PR-AUC
+      0.6758, ROC-AUC 0.8256). Verified cause: the dominant IP-reuse burst
+      landed entirely inside the test split, so the Feast lane's three
+      extra columns were constant zero throughout every training run — the
+      model correctly learned to ignore them. The two-lane structure above
+      is exactly what made this comparison possible to run and diagnose in
+      the first place, rather than guessing whether a feature "helped."
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">04</span>What isn't in this diagram</h2>
+    <p>
+      The optional push from <code>monitor.py</code> to a self-hosted
+      Evidently server (the <code>k8n_mlops/evidently_stack</code> Helm
+      chart) is drawn as a single dashed box on purpose — that system has
+      its own architecture, out of scope here. See <code>README.md</code>'s
+      "Pushing drift reports to a real Evidently server" section if you
+      need that half of the picture too.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  <span>fraud-detection-xgboost</span>
+  <span>mlops_aiops_toolkits monorepo</span>
+</footer>
