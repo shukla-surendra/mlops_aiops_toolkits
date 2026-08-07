@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ways(n) counts paths, not steps</title>
+<style>
+  :root {
+    --bg: #F5F7FA;
+    --ink: #1B2233;
+    --muted: #6B7385;
+    --border: #D8DCE6;
+    --panel-a-bg: #FBF1E1;
+    --panel-b-bg: #E9F5F2;
+    --accent-amber: #B5741F;
+    --accent-teal: #1B7A6C;
+
+    --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12161F;
+      --ink: #E7EAF2;
+      --muted: #9AA2B7;
+      --border: #2A3040;
+      --panel-a-bg: rgba(216, 158, 90, 0.12);
+      --panel-b-bg: rgba(78, 181, 168, 0.12);
+      --accent-amber: #E3A75A;
+      --accent-teal: #54C2B4;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .page {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--muted);
+    margin: 0 0 0.9rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.7rem, 1.3rem + 1.8vw, 2.35rem);
+    line-height: 1.18;
+    text-wrap: balance;
+    margin: 0 0 1.1rem;
+  }
+
+  .sub {
+    font-family: var(--font-body);
+    font-size: 1.08rem;
+    line-height: 1.65;
+    color: var(--ink);
+    max-width: 58ch;
+    margin: 0 0 3rem;
+  }
+
+  .sub strong { color: var(--ink); font-weight: 600; }
+
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.28rem;
+    line-height: 1.3;
+    margin: 0 0 0.75rem;
+  }
+
+  section + section { margin-top: 2.4rem; }
+
+  p {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--ink);
+    max-width: 60ch;
+    margin: 0 0 0.9rem;
+  }
+
+  p.dim { color: var(--muted); }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: rgba(128, 128, 128, 0.16);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+  }
+
+  .figure-section {
+    margin: 3rem 0;
+  }
+
+  .figure-wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    overflow-x: auto;
+    padding: 0.25rem;
+  }
+
+  figure {
+    margin: 0;
+  }
+
+  figure svg {
+    display: block;
+    width: 100%;
+    min-width: 640px;
+    height: auto;
+  }
+
+  figcaption {
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--muted);
+    max-width: 62ch;
+    margin: 1.1rem auto 0;
+    text-align: left;
+  }
+
+  figcaption b { color: var(--ink); font-weight: 600; }
+
+  .quote-block {
+    margin: 3.5rem 0 1rem;
+    padding: 2.2rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .quote-block p {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.15rem, 1rem + 0.8vw, 1.4rem);
+    line-height: 1.5;
+    color: var(--ink);
+    max-width: 46ch;
+    margin: 0 auto;
+    text-wrap: balance;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 2rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .back-link:hover { color: var(--ink); border-color: var(--muted); }
+
+  .stack-trace {
+    font-family: var(--font-mono);
+    font-size: 0.86rem;
+    line-height: 1.85;
+    max-width: 640px;
+    margin: 1.6rem auto 0;
+    padding: 1.4rem 1.6rem;
+    background: color-mix(in srgb, var(--border) 22%, transparent);
+    border-radius: 10px;
+    overflow-x: auto;
+  }
+  .stack-line {
+    padding-left: calc(var(--d, 0) * 1.35em);
+    white-space: pre;
+    color: var(--muted);
+  }
+  .stack-line .fn { color: var(--ink); }
+  .stack-line.ret .fn { font-weight: 700; }
+  .stack-line.ret { color: var(--ink); }
+  .stack-line.base { color: var(--muted); }
+  .stack-line.base .tag {
+    font-size: 0.78em;
+    letter-spacing: 0.03em;
+    opacity: 0.75;
+  }
+  .stack-line.final { color: var(--ink); font-weight: 700; }
+  .stack-line.final .fn { color: var(--accent-amber); }
+
+  .path-groups {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 640px;
+    margin: 1.6rem auto 0;
+  }
+  .path-group h3 {
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 0.6rem;
+  }
+  .path-group ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-mono);
+    font-size: 0.92rem;
+  }
+  .path-group li { padding: 0.15rem 0; color: var(--muted); }
+  .path-group.a li .last { color: var(--accent-amber); font-weight: 700; }
+  .path-group.b li .last { color: var(--accent-teal); font-weight: 700; }
+
+  .table-wrap {
+    max-width: 640px;
+    margin: 1.6rem auto 0;
+    overflow-x: auto;
+  }
+  table.ways-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: 0.92rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .ways-table th, .ways-table td {
+    padding: 0.5rem 0.7rem;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+  }
+  .ways-table th {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 600;
+    text-align: right;
+  }
+  .ways-table td.n { color: var(--muted); }
+  .ways-table td.w { color: var(--ink); font-weight: 700; }
+  .ways-table tr.seed td { color: var(--muted); font-style: italic; }
+</style>
+</head>
+<body>
+<div class="page">
+  <a class="back-link" href="dynamic-programming-climbing-stairs-explained.md">&larr; text version</a>
+  <p class="eyebrow">004_climbing_stairs.rs &middot; reading the recurrence</p>
+  <h1>ways(n) counts finished paths &mdash; not extra steps</h1>
+  <p class="sub">
+    The feeling that we&rsquo;re &ldquo;missing a step&rdquo; from n&minus;1 to n and from n&minus;2 to n is
+    correct &mdash; that hop really happens. It just isn&rsquo;t happening to the two numbers being added.
+    It happens <strong>inside</strong> each path, before the addition ever runs.
+  </p>
+
+  <section>
+    <h2>First, trace it as the actual function calls</h2>
+    <p>
+      This is exactly what <code>ways(4)</code> does when you run it &mdash; nothing simplified, nothing
+      skipped. Amber edges are the <code>n&minus;1</code> branch, teal edges are the <code>n&minus;2</code>
+      branch, and dashed boxes are base cases &mdash; they return <code>1</code> immediately and split no
+      further.
+    </p>
+  </section>
+
+  <div class="figure-section">
+    <div class="figure-wrap">
+      <figure>
+        <svg viewBox="0 0 800 430" role="img" aria-label="Recursion tree for ways(4). The root ways(4) splits into ways(3) and ways(2). ways(3) splits into ways(2) and ways(1). The first ways(2) splits into ways(1) and ways(0). The second ways(2), a child of the root, splits into ways(1) and ways(0). Every ways(1) and ways(0) is a base case returning 1. Summing back up: the inner ways(2) resolves to 2, ways(3) resolves to 3, the outer ways(2) resolves to 2, and the root resolves to 3 plus 2 equals 5.">
+
+          <!-- edges: drawn first so nodes sit on top -->
+          <line x1="452" y1="58" x2="278" y2="122" stroke="var(--accent-amber)" stroke-width="2"/>
+          <line x1="452" y1="58" x2="625" y2="122" stroke="var(--accent-teal)" stroke-width="2"/>
+          <line x1="278" y1="158" x2="195" y2="222" stroke="var(--accent-amber)" stroke-width="2"/>
+          <line x1="278" y1="158" x2="360" y2="222" stroke="var(--accent-teal)" stroke-width="2"/>
+          <line x1="625" y1="158" x2="570" y2="222" stroke="var(--accent-amber)" stroke-width="2"/>
+          <line x1="625" y1="158" x2="680" y2="222" stroke="var(--accent-teal)" stroke-width="2"/>
+          <line x1="195" y1="258" x2="140" y2="322" stroke="var(--accent-amber)" stroke-width="2"/>
+          <line x1="195" y1="258" x2="250" y2="322" stroke="var(--accent-teal)" stroke-width="2"/>
+
+          <!-- edge labels -->
+          <text x="345" y="84" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--accent-amber)">-1</text>
+          <text x="558" y="84" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--accent-teal)">-2</text>
+          <text x="220" y="184" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--accent-amber)">-1</text>
+          <text x="335" y="184" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--accent-teal)">-2</text>
+          <text x="583" y="184" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--accent-amber)">-1</text>
+          <text x="667" y="184" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--accent-teal)">-2</text>
+          <text x="152" y="284" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--accent-amber)">-1</text>
+          <text x="238" y="284" text-anchor="middle" font-family="var(--font-mono)" font-size="9.5" fill="var(--accent-teal)">-2</text>
+
+          <!-- root: ways(4) = 5 -->
+          <rect x="417" y="22" width="70" height="36" rx="7" fill="var(--panel-a-bg)" stroke="var(--ink)" stroke-width="1.25"/>
+          <text x="452" y="36" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--ink)">ways(4)</text>
+          <text x="452" y="50" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--ink)">= 5</text>
+
+          <!-- ways(3) = 3 -->
+          <rect x="243" y="122" width="70" height="36" rx="7" fill="var(--panel-a-bg)" stroke="var(--border)" stroke-width="1.25"/>
+          <text x="278" y="136" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--ink)">ways(3)</text>
+          <text x="278" y="150" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--ink)">= 3</text>
+
+          <!-- ways(2) right, child of root = 2 -->
+          <rect x="590" y="122" width="70" height="36" rx="7" fill="var(--panel-b-bg)" stroke="var(--border)" stroke-width="1.25"/>
+          <text x="625" y="136" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--ink)">ways(2)</text>
+          <text x="625" y="150" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--ink)">= 2</text>
+
+          <!-- ways(2) left, child of ways(3) = 2 -->
+          <rect x="160" y="222" width="70" height="36" rx="7" fill="var(--panel-a-bg)" stroke="var(--border)" stroke-width="1.25"/>
+          <text x="195" y="236" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--ink)">ways(2)</text>
+          <text x="195" y="250" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--ink)">= 2</text>
+
+          <!-- ways(1), child of ways(3) -- base -->
+          <rect x="325" y="222" width="70" height="36" rx="7" fill="none" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3,3"/>
+          <text x="360" y="236" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--muted)">ways(1)</text>
+          <text x="360" y="250" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--muted)">= 1</text>
+
+          <!-- ways(1), child of right ways(2) -- base -->
+          <rect x="535" y="222" width="70" height="36" rx="7" fill="none" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3,3"/>
+          <text x="570" y="236" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--muted)">ways(1)</text>
+          <text x="570" y="250" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--muted)">= 1</text>
+
+          <!-- ways(0), child of right ways(2) -- base -->
+          <rect x="645" y="222" width="70" height="36" rx="7" fill="none" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3,3"/>
+          <text x="680" y="236" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--muted)">ways(0)</text>
+          <text x="680" y="250" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--muted)">= 1</text>
+
+          <!-- ways(1), child of left ways(2) -- base -->
+          <rect x="105" y="322" width="70" height="36" rx="7" fill="none" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3,3"/>
+          <text x="140" y="336" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--muted)">ways(1)</text>
+          <text x="140" y="350" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--muted)">= 1</text>
+
+          <!-- ways(0), child of left ways(2) -- base -->
+          <rect x="215" y="322" width="70" height="36" rx="7" fill="none" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3,3"/>
+          <text x="250" y="336" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--muted)">ways(0)</text>
+          <text x="250" y="350" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--muted)">= 1</text>
+
+          <!-- legend -->
+          <text x="400" y="400" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--muted)">
+            <tspan fill="var(--accent-amber)">&#8212;</tspan> n&minus;1 branch&emsp;&emsp;<tspan fill="var(--accent-teal)">&#8212;</tspan> n&minus;2 branch&emsp;&emsp;&#9634; dashed = base case, stops here
+          </text>
+        </svg>
+        <figcaption>
+          Every node is a real call to <code>ways</code>. Amber edges are the <code>n&minus;1</code> call, teal
+          edges are the <code>n&minus;2</code> call. Follow any branch down and it eventually hits a dashed box
+          &mdash; <code>ways(0)</code> or <code>ways(1)</code> &mdash; which returns <code>1</code> without
+          calling anything else. Then read it bottom&#8209;up: each solid box&rsquo;s value is just its two
+          children&rsquo;s values added together (<code>1+1=2</code>, then <code>2+1=3</code>, then
+          <code>1+1=2</code> again, then <code>3+2=5</code>). Every one of those additions is two plain,
+          already&#8209;finished integers &mdash; the recursion never adds a step to a number, it only ever
+          decides <em>which two smaller questions</em> to ask.
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <section>
+    <h2>Now trace the same thing as real paths</h2>
+    <p>
+      <code>ways(n&minus;1)</code> isn&rsquo;t a distance. It&rsquo;s a completed set: every distinct sequence
+      of 1s and 2s that already sums to n&minus;1. Take <code>ways(3)</code> for n = 4 &mdash; that&rsquo;s the
+      three finished climbs <code>1+1+1</code>, <code>1+2</code>, <code>2+1</code>, each one already standing
+      on step 3.
+    </p>
+    <p class="dim">
+      Tack one more <code>+1</code> onto the end of all three, and every one of them now lands on step 4.
+      You didn&rsquo;t create or delete a path &mdash; you relabelled where three existing paths end. The count
+      stays 3.
+    </p>
+  </section>
+
+  <div class="figure-section">
+    <div class="figure-wrap">
+      <figure>
+        <svg viewBox="0 0 880 350" role="img" aria-label="The five paths that reach step 4, split into a group of three ending with a final +1 hop and a group of two ending with a final +2 hop. In each mini staircase the grey segments are the path already counted by ways(3) or ways(2); the colored bold segment is the one hop appended on top.">
+
+          <!-- Panel A: ends with +1 -->
+          <rect x="20" y="50" width="390" height="210" rx="12" fill="var(--panel-a-bg)" stroke="var(--border)" stroke-width="1"/>
+          <text x="215" y="78" text-anchor="middle" font-family="var(--font-body)" font-size="14" font-weight="700" fill="var(--ink)">last hop = +1 &rarr; ways(3) = 3 paths</text>
+
+          <!-- Panel B: ends with +2 -->
+          <rect x="470" y="50" width="390" height="210" rx="12" fill="var(--panel-b-bg)" stroke="var(--border)" stroke-width="1"/>
+          <text x="665" y="78" text-anchor="middle" font-family="var(--font-body)" font-size="14" font-weight="700" fill="var(--ink)">last hop = +2 &rarr; ways(2) = 2 paths</text>
+
+          <!-- connector -->
+          <text x="440" y="180" text-anchor="middle" font-family="var(--font-body)" font-size="26" font-weight="300" fill="var(--muted)">+</text>
+
+          <!-- ===== A1: 1+1+1+1  (visited 0,1,2,3,4) ===== -->
+          <polyline points="64,190 64,178 82,178 82,166 100,166 100,154 118,154 118,142 136,142" fill="none" stroke="var(--border)" stroke-width="1.5"/>
+          <polyline points="64,190 82,178 100,166 118,154" fill="none" stroke="var(--muted)" stroke-width="1.75"/>
+          <line x1="118" y1="154" x2="136" y2="142" stroke="var(--accent-amber)" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="64" cy="190" r="3" fill="var(--muted)"/>
+          <circle cx="82" cy="178" r="3" fill="var(--muted)"/>
+          <circle cx="100" cy="166" r="3" fill="var(--muted)"/>
+          <circle cx="118" cy="154" r="3" fill="var(--muted)"/>
+          <circle cx="136" cy="142" r="5" fill="var(--accent-amber)" stroke="var(--bg)" stroke-width="2"/>
+          <text x="64" y="204" text-anchor="middle" font-family="var(--font-mono)" font-size="8" fill="var(--muted)">0</text>
+          <text x="136" y="132" text-anchor="middle" font-family="var(--font-mono)" font-size="8" fill="var(--muted)">4</text>
+          <text x="100" y="224" text-anchor="middle" font-family="var(--font-mono)" font-size="12.5" fill="var(--muted)">1+1+1<tspan font-weight="700" fill="var(--accent-amber)">+1</tspan></text>
+
+          <!-- ===== A2: 1+2+1  (visited 0,1,3,4) ===== -->
+          <polyline points="179,190 179,178 197,178 197,166 215,166 215,154 233,154 233,142 251,142" fill="none" stroke="var(--border)" stroke-width="1.5"/>
+          <polyline points="179,190 197,178 233,154" fill="none" stroke="var(--muted)" stroke-width="1.75"/>
+          <line x1="233" y1="154" x2="251" y2="142" stroke="var(--accent-amber)" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="179" cy="190" r="3" fill="var(--muted)"/>
+          <circle cx="197" cy="178" r="3" fill="var(--muted)"/>
+          <circle cx="215" cy="166" r="2.5" fill="var(--bg)" stroke="var(--border)" stroke-width="1.5"/>
+          <circle cx="233" cy="154" r="3" fill="var(--muted)"/>
+          <circle cx="251" cy="142" r="5" fill="var(--accent-amber)" stroke="var(--bg)" stroke-width="2"/>
+          <text x="215" y="224" text-anchor="middle" font-family="var(--font-mono)" font-size="12.5" fill="var(--muted)">1+2<tspan font-weight="700" fill="var(--accent-amber)">+1</tspan></text>
+
+          <!-- ===== A3: 2+1+1  (visited 0,2,3,4) ===== -->
+          <polyline points="294,190 294,178 312,178 312,166 330,166 330,154 348,154 348,142 366,142" fill="none" stroke="var(--border)" stroke-width="1.5"/>
+          <polyline points="294,190 312,166 330,154" fill="none" stroke="var(--muted)" stroke-width="1.75"/>
+          <line x1="330" y1="154" x2="366" y2="142" stroke="var(--accent-amber)" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="294" cy="190" r="3" fill="var(--muted)"/>
+          <circle cx="312" cy="178" r="2.5" fill="var(--bg)" stroke="var(--border)" stroke-width="1.5"/>
+          <circle cx="330" cy="166" r="3" fill="var(--muted)"/>
+          <circle cx="348" cy="154" r="3" fill="var(--muted)"/>
+          <circle cx="366" cy="142" r="5" fill="var(--accent-amber)" stroke="var(--bg)" stroke-width="2"/>
+          <text x="330" y="224" text-anchor="middle" font-family="var(--font-mono)" font-size="12.5" fill="var(--muted)">2+1<tspan font-weight="700" fill="var(--accent-amber)">+1</tspan></text>
+
+          <!-- ===== B1: 1+1+2  (visited 0,1,2,4) ===== -->
+          <polyline points="554,190 554,178 572,178 572,166 590,166 590,154 608,154 608,142 626,142" fill="none" stroke="var(--border)" stroke-width="1.5"/>
+          <polyline points="554,190 572,178 590,166" fill="none" stroke="var(--muted)" stroke-width="1.75"/>
+          <line x1="590" y1="166" x2="626" y2="142" stroke="var(--accent-teal)" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="554" cy="190" r="3" fill="var(--muted)"/>
+          <circle cx="572" cy="178" r="3" fill="var(--muted)"/>
+          <circle cx="590" cy="166" r="3" fill="var(--muted)"/>
+          <circle cx="608" cy="154" r="2.5" fill="var(--bg)" stroke="var(--border)" stroke-width="1.5"/>
+          <circle cx="626" cy="142" r="5" fill="var(--accent-teal)" stroke="var(--bg)" stroke-width="2"/>
+          <text x="590" y="224" text-anchor="middle" font-family="var(--font-mono)" font-size="12.5" fill="var(--muted)">1+1<tspan font-weight="700" fill="var(--accent-teal)">+2</tspan></text>
+
+          <!-- ===== B2: 2+2  (visited 0,2,4) ===== -->
+          <polyline points="704,190 704,178 722,178 722,166 740,166 740,154 758,154 758,142 776,142" fill="none" stroke="var(--border)" stroke-width="1.5"/>
+          <polyline points="704,190 722,178 740,166" fill="none" stroke="var(--muted)" stroke-width="1.75"/>
+          <line x1="740" y1="166" x2="776" y2="142" stroke="var(--accent-teal)" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="704" cy="190" r="3" fill="var(--muted)"/>
+          <circle cx="722" cy="178" r="2.5" fill="var(--bg)" stroke="var(--border)" stroke-width="1.5"/>
+          <circle cx="740" cy="166" r="3" fill="var(--muted)"/>
+          <circle cx="758" cy="154" r="2.5" fill="var(--bg)" stroke="var(--border)" stroke-width="1.5"/>
+          <circle cx="776" cy="142" r="5" fill="var(--accent-teal)" stroke="var(--bg)" stroke-width="2"/>
+          <text x="740" y="224" text-anchor="middle" font-family="var(--font-mono)" font-size="12.5" fill="var(--muted)">2<tspan font-weight="700" fill="var(--accent-teal)">+2</tspan></text>
+
+          <!-- bottom equation -->
+          <text x="440" y="300" text-anchor="middle" font-family="var(--font-mono)" font-size="17" font-weight="700" fill="var(--ink)">ways(4) = ways(3) + ways(2)</text>
+          <text x="440" y="324" text-anchor="middle" font-family="var(--font-mono)" font-size="13" fill="var(--muted)">5 paths&emsp;=&emsp;3 paths&emsp;+&emsp;2 paths</text>
+        </svg>
+        <figcaption>
+          All five paths that reach step 4, grouped by their <b>last</b> hop. In every mini staircase the grey
+          dots and lines are the prefix already counted by <code>ways(3)</code> or <code>ways(2)</code>; the
+          bold colored segment is the one hop appended on top. Gluing the same final hop onto every path in a
+          group only moves where each path lands &mdash; it can&rsquo;t change how many paths are in the group.
+          That&rsquo;s why the group size stays exactly <code>ways(3)</code> or <code>ways(2)</code>, and the
+          two groups (a path can&rsquo;t end in both a 1 and a 2) just get counted side by side.
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <section>
+    <h2>Reading the equation again</h2>
+    <p>
+      A path to step 4 has exactly one last move, and it&rsquo;s either a 1 or a 2 &mdash; never both, never
+      neither. So the five paths split into two groups that share nothing. Group sizes that share nothing just
+      add: <code>5 = 3 + 2</code>.
+    </p>
+    <p class="dim">
+      The <code>+1</code> and <code>+2</code> hops you&rsquo;re looking for aren&rsquo;t missing from the
+      formula &mdash; they&rsquo;re the reason a path belongs to one group instead of the other. They already
+      did their work before <code>ways(n&minus;1) + ways(n&minus;2)</code> ever gets evaluated.
+    </p>
+  </section>
+
+  <section>
+    <h2>A bigger example: n = 5</h2>
+    <p>
+      Same everything, one size up. <code>ways(5) = 8</code>. Here&rsquo;s the full recursion tree &mdash; it&rsquo;s
+      just the n&nbsp;=&nbsp;4 tree with one more layer of &ldquo;ask two smaller questions&rdquo; wrapped around it.
+    </p>
+  </section>
+
+  <div class="figure-section">
+    <div class="figure-wrap">
+      <figure>
+        <svg viewBox="0 0 1025 500" role="img" aria-label="Recursion tree for ways(5), fifteen calls total. Root ways(5) splits into ways(4) and ways(3). ways(4) splits into ways(3) and ways(2), which themselves keep splitting the same way as the n=4 tree. Every branch bottoms out at ways(1) or ways(0), both base cases returning 1. Summing back up the whole tree resolves to 8.">
+
+          <line x1="609" y1="58" x2="344" y2="122" stroke="var(--accent-amber)" stroke-width="2"/>
+          <line x1="609" y1="58" x2="874" y2="122" stroke="var(--accent-teal)" stroke-width="2"/>
+          <line x1="344" y1="158" x2="199" y2="222" stroke="var(--accent-amber)" stroke-width="2"/>
+          <line x1="344" y1="158" x2="488" y2="222" stroke="var(--accent-teal)" stroke-width="2"/>
+          <line x1="874" y1="158" x2="793" y2="222" stroke="var(--accent-amber)" stroke-width="2"/>
+          <line x1="874" y1="158" x2="955" y2="222" stroke="var(--accent-teal)" stroke-width="2"/>
+          <line x1="199" y1="258" x2="118" y2="322" stroke="var(--accent-amber)" stroke-width="2"/>
+          <line x1="199" y1="258" x2="280" y2="322" stroke="var(--accent-teal)" stroke-width="2"/>
+          <line x1="488" y1="258" x2="440" y2="322" stroke="var(--accent-amber)" stroke-width="2"/>
+          <line x1="488" y1="258" x2="535" y2="322" stroke="var(--accent-teal)" stroke-width="2"/>
+          <line x1="793" y1="258" x2="745" y2="322" stroke="var(--accent-amber)" stroke-width="2"/>
+          <line x1="793" y1="258" x2="840" y2="322" stroke="var(--accent-teal)" stroke-width="2"/>
+          <line x1="118" y1="358" x2="70" y2="422" stroke="var(--accent-amber)" stroke-width="2"/>
+          <line x1="118" y1="358" x2="165" y2="422" stroke="var(--accent-teal)" stroke-width="2"/>
+
+          <!-- root: ways(5) = 8 -->
+          <rect x="574" y="22" width="70" height="36" rx="7" fill="var(--panel-a-bg)" stroke="var(--ink)" stroke-width="1.25"/>
+          <text x="609" y="36" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--ink)">ways(5)</text>
+          <text x="609" y="50" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--ink)">= 8</text>
+
+          <!-- ways(4) = 5 -->
+          <rect x="309" y="122" width="70" height="36" rx="7" fill="var(--panel-a-bg)" stroke="var(--border)" stroke-width="1.25"/>
+          <text x="344" y="136" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--ink)">ways(4)</text>
+          <text x="344" y="150" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--ink)">= 5</text>
+
+          <!-- ways(3) right, child of root = 3 -->
+          <rect x="839" y="122" width="70" height="36" rx="7" fill="var(--panel-b-bg)" stroke="var(--border)" stroke-width="1.25"/>
+          <text x="874" y="136" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--ink)">ways(3)</text>
+          <text x="874" y="150" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--ink)">= 3</text>
+
+          <!-- ways(3) under ways(4) = 3 -->
+          <rect x="164" y="222" width="70" height="36" rx="7" fill="var(--panel-a-bg)" stroke="var(--border)" stroke-width="1.25"/>
+          <text x="199" y="236" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--ink)">ways(3)</text>
+          <text x="199" y="250" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--ink)">= 3</text>
+
+          <!-- ways(2) under ways(4) = 2 -->
+          <rect x="453" y="222" width="70" height="36" rx="7" fill="var(--panel-b-bg)" stroke="var(--border)" stroke-width="1.25"/>
+          <text x="488" y="236" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--ink)">ways(2)</text>
+          <text x="488" y="250" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--ink)">= 2</text>
+
+          <!-- ways(2) under right ways(3) = 2 -->
+          <rect x="758" y="222" width="70" height="36" rx="7" fill="var(--panel-a-bg)" stroke="var(--border)" stroke-width="1.25"/>
+          <text x="793" y="236" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--ink)">ways(2)</text>
+          <text x="793" y="250" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--ink)">= 2</text>
+
+          <!-- ways(1) under right ways(3) -- base -->
+          <rect x="920" y="222" width="70" height="36" rx="7" fill="none" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3,3"/>
+          <text x="955" y="236" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--muted)">ways(1)</text>
+          <text x="955" y="250" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--muted)">= 1</text>
+
+          <!-- ways(2) under ways(3)-under-ways(4) = 2 -->
+          <rect x="83" y="322" width="70" height="36" rx="7" fill="var(--panel-a-bg)" stroke="var(--border)" stroke-width="1.25"/>
+          <text x="118" y="336" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--ink)">ways(2)</text>
+          <text x="118" y="350" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--ink)">= 2</text>
+
+          <!-- ways(1) under ways(3)-under-ways(4) -- base -->
+          <rect x="245" y="322" width="70" height="36" rx="7" fill="none" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3,3"/>
+          <text x="280" y="336" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--muted)">ways(1)</text>
+          <text x="280" y="350" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--muted)">= 1</text>
+
+          <!-- ways(1) under ways(2)-under-ways(4) -- base -->
+          <rect x="405" y="322" width="70" height="36" rx="7" fill="none" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3,3"/>
+          <text x="440" y="336" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--muted)">ways(1)</text>
+          <text x="440" y="350" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--muted)">= 1</text>
+
+          <!-- ways(0) under ways(2)-under-ways(4) -- base -->
+          <rect x="500" y="322" width="70" height="36" rx="7" fill="none" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3,3"/>
+          <text x="535" y="336" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--muted)">ways(0)</text>
+          <text x="535" y="350" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--muted)">= 1</text>
+
+          <!-- ways(1) under ways(2)-under-right-ways(3) -- base -->
+          <rect x="710" y="322" width="70" height="36" rx="7" fill="none" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3,3"/>
+          <text x="745" y="336" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--muted)">ways(1)</text>
+          <text x="745" y="350" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--muted)">= 1</text>
+
+          <!-- ways(0) under ways(2)-under-right-ways(3) -- base -->
+          <rect x="805" y="322" width="70" height="36" rx="7" fill="none" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3,3"/>
+          <text x="840" y="336" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--muted)">ways(0)</text>
+          <text x="840" y="350" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--muted)">= 1</text>
+
+          <!-- ways(1) under deepest ways(2) -- base -->
+          <rect x="35" y="422" width="70" height="36" rx="7" fill="none" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3,3"/>
+          <text x="70" y="436" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--muted)">ways(1)</text>
+          <text x="70" y="450" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--muted)">= 1</text>
+
+          <!-- ways(0) under deepest ways(2) -- base -->
+          <rect x="130" y="422" width="70" height="36" rx="7" fill="none" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3,3"/>
+          <text x="165" y="436" text-anchor="middle" font-family="var(--font-mono)" font-size="12" font-weight="700" fill="var(--muted)">ways(0)</text>
+          <text x="165" y="450" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--muted)">= 1</text>
+
+          <!-- legend -->
+          <text x="512" y="480" text-anchor="middle" font-family="var(--font-mono)" font-size="11" fill="var(--muted)">
+            <tspan fill="var(--accent-amber)">&#8212;</tspan> n&minus;1 branch&emsp;&emsp;<tspan fill="var(--accent-teal)">&#8212;</tspan> n&minus;2 branch&emsp;&emsp;&#9634; dashed = base case, stops here
+          </text>
+        </svg>
+        <figcaption>
+          Fifteen calls total, eight of them base cases. Notice the left half (under <code>ways(4)</code>) is
+          bushier than the right half (under <code>ways(3)</code>) &mdash; that&rsquo;s not a drawing accident,
+          it&rsquo;s the tree being honest: <code>ways(4)</code> genuinely has more sub-calls than
+          <code>ways(3)</code>, the same way it did back at the root of the n&nbsp;=&nbsp;4 tree above.
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <section>
+    <h2>The same tree, but watched as it actually runs</h2>
+    <p>
+      A tree diagram shows the finished shape. What the computer actually does is a single sequence of events
+      over time &mdash; and because <code>ways(n&minus;1)</code> is written before <code>ways(n&minus;2)</code>
+      in the code, it runs its <strong>entire</strong> left branch, all the way down and back up, before it
+      even starts on the right one. That&rsquo;s why this is called a <em>stack</em>: each call gets pushed on
+      top, and only pops back off once it has its answer.
+    </p>
+  </section>
+
+  <div class="stack-trace">
+    <div class="stack-line" style="--d:0"><span class="fn">call ways(5)</span></div>
+    <div class="stack-line" style="--d:1"><span class="fn">call ways(4)</span></div>
+    <div class="stack-line" style="--d:2"><span class="fn">call ways(3)</span></div>
+    <div class="stack-line" style="--d:3"><span class="fn">call ways(2)</span></div>
+    <div class="stack-line base" style="--d:4">ways(1) = 1 <span class="tag">[base]</span></div>
+    <div class="stack-line base" style="--d:4">ways(0) = 1 <span class="tag">[base]</span></div>
+    <div class="stack-line ret" style="--d:3"><span class="fn">return</span> ways(2) = 1 + 1 = 2</div>
+    <div class="stack-line base" style="--d:3">ways(1) = 1 <span class="tag">[base]</span></div>
+    <div class="stack-line ret" style="--d:2"><span class="fn">return</span> ways(3) = 2 + 1 = 3</div>
+    <div class="stack-line" style="--d:2"><span class="fn">call ways(2)</span></div>
+    <div class="stack-line base" style="--d:3">ways(1) = 1 <span class="tag">[base]</span></div>
+    <div class="stack-line base" style="--d:3">ways(0) = 1 <span class="tag">[base]</span></div>
+    <div class="stack-line ret" style="--d:2"><span class="fn">return</span> ways(2) = 1 + 1 = 2</div>
+    <div class="stack-line ret" style="--d:1"><span class="fn">return</span> ways(4) = 3 + 2 = 5</div>
+    <div class="stack-line" style="--d:1"><span class="fn">call ways(3)</span></div>
+    <div class="stack-line" style="--d:2"><span class="fn">call ways(2)</span></div>
+    <div class="stack-line base" style="--d:3">ways(1) = 1 <span class="tag">[base]</span></div>
+    <div class="stack-line base" style="--d:3">ways(0) = 1 <span class="tag">[base]</span></div>
+    <div class="stack-line ret" style="--d:2"><span class="fn">return</span> ways(2) = 1 + 1 = 2</div>
+    <div class="stack-line base" style="--d:2">ways(1) = 1 <span class="tag">[base]</span></div>
+    <div class="stack-line ret" style="--d:1"><span class="fn">return</span> ways(3) = 2 + 1 = 3</div>
+    <div class="stack-line final" style="--d:0"><span class="fn">return</span> ways(5) = 5 + 3 = 8</div>
+  </div>
+  <p class="dim" style="max-width:60ch;margin:1.4rem auto 0;text-align:center;">
+    Indentation = how deep the stack is at that moment. Every single addition in this whole trace &mdash;
+    <code>1+1</code>, <code>2+1</code>, <code>1+1</code> again, <code>3+2</code> &mdash; is two numbers that
+    already finished being computed. None of them is a step being tacked on; the step-taking already happened,
+    silently, in the shape of the tree itself.
+  </p>
+
+  <section>
+    <h2>And the paths themselves, for n = 5</h2>
+    <p>
+      Grouped by last hop, exactly like before. Look closely at the part before the bold last hop in each
+      group &mdash; those are precisely the 5 paths and 3 paths from the n&nbsp;=&nbsp;4 figure and the
+      n&nbsp;=&nbsp;3 example at the very top of this file. Nothing new is being invented at n&nbsp;=&nbsp;5;
+      it&rsquo;s the same two finished sets, each with one more hop glued on.
+    </p>
+  </section>
+
+  <div class="path-groups">
+    <div class="path-group a">
+      <h3>ends with +1 &rarr; ways(4) = 5 paths</h3>
+      <ul>
+        <li>1+1+1+1<span class="last">+1</span></li>
+        <li>1+1+2<span class="last">+1</span></li>
+        <li>1+2+1<span class="last">+1</span></li>
+        <li>2+1+1<span class="last">+1</span></li>
+        <li>2+2<span class="last">+1</span></li>
+      </ul>
+    </div>
+    <div class="path-group b">
+      <h3>ends with +2 &rarr; ways(3) = 3 paths</h3>
+      <ul>
+        <li>1+1+1<span class="last">+2</span></li>
+        <li>1+2<span class="last">+2</span></li>
+        <li>2+1<span class="last">+2</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <section>
+    <h2>ways(n) for n = 0 to 15</h2>
+    <p>
+      No tree fits past n&nbsp;=&nbsp;5 without turning into a wall of boxes, but the recurrence doesn&rsquo;t
+      care &mdash; it keeps working the same way forever. Each row is still just the two rows above it, added:
+      <code>610 = 377 + 233</code>, <code>987 = 610 + 377</code>. It&rsquo;s the Fibonacci sequence, one
+      position over.
+    </p>
+  </section>
+
+  <div class="table-wrap">
+    <table class="ways-table">
+      <thead>
+        <tr><th>n</th><th>ways(n)</th><th>ways(n&minus;1)</th><th>+</th><th>ways(n&minus;2)</th></tr>
+      </thead>
+      <tbody>
+        <tr class="seed"><td class="n">0</td><td class="w">1</td><td>&mdash;</td><td></td><td>&mdash;</td></tr>
+        <tr class="seed"><td class="n">1</td><td class="w">1</td><td>&mdash;</td><td></td><td>&mdash;</td></tr>
+        <tr><td class="n">2</td><td class="w">2</td><td>1</td><td>+</td><td>1</td></tr>
+        <tr><td class="n">3</td><td class="w">3</td><td>2</td><td>+</td><td>1</td></tr>
+        <tr><td class="n">4</td><td class="w">5</td><td>3</td><td>+</td><td>2</td></tr>
+        <tr><td class="n">5</td><td class="w">8</td><td>5</td><td>+</td><td>3</td></tr>
+        <tr><td class="n">6</td><td class="w">13</td><td>8</td><td>+</td><td>5</td></tr>
+        <tr><td class="n">7</td><td class="w">21</td><td>13</td><td>+</td><td>8</td></tr>
+        <tr><td class="n">8</td><td class="w">34</td><td>21</td><td>+</td><td>13</td></tr>
+        <tr><td class="n">9</td><td class="w">55</td><td>34</td><td>+</td><td>21</td></tr>
+        <tr><td class="n">10</td><td class="w">89</td><td>55</td><td>+</td><td>34</td></tr>
+        <tr><td class="n">11</td><td class="w">144</td><td>89</td><td>+</td><td>55</td></tr>
+        <tr><td class="n">12</td><td class="w">233</td><td>144</td><td>+</td><td>89</td></tr>
+        <tr><td class="n">13</td><td class="w">377</td><td>233</td><td>+</td><td>144</td></tr>
+        <tr><td class="n">14</td><td class="w">610</td><td>377</td><td>+</td><td>233</td></tr>
+        <tr><td class="n">15</td><td class="w">987</td><td>610</td><td>+</td><td>377</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="quote-block">
+    <p>
+      &ldquo;ways(n&minus;1) + ways(n&minus;2)&rdquo; is a headcount of two non&#8209;overlapping groups of
+      already&#8209;finished paths &mdash; not two distances being added together.
+    </p>
+  </div>
+</div>
+</body>
+</html>
