@@ -230,4 +230,4 @@ offering, already covered in this repo's `cloud-practice` material.
 
 ---
 
-**Previous:** [Part 15: Caching — Trading Freshness for Speed](15_caching.md)  |  **Next:** [0. The Interview Framework](../ml_system_design/00_interview_framework.md)
+**Previous:** [Part 15: Caching — Trading Freshness for Speed](15_caching.md)  |  **Next:** [Part 17: Isolation Levels & Concurrency Control](17_isolation_and_concurrency_control.md)

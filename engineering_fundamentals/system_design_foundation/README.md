@@ -11,7 +11,7 @@ original plan — plus a bank of scenario-debugging problems.
 If terms like **p99 latency**, **the nines**, **sharding vs. replication**, or
 **idempotency** aren't things you could explain from first principles yet, start with the
 **[Prerequisite Concepts](00_prerequisite_concepts/01_performance_and_scale.md)** primer
-(sixteen short parts: [Performance & Scale](00_prerequisite_concepts/01_performance_and_scale.md),
+(twenty short parts: [Performance & Scale](00_prerequisite_concepts/01_performance_and_scale.md),
 [Data & Consistency](00_prerequisite_concepts/02_data_and_consistency.md),
 [Communication & Resilience](00_prerequisite_concepts/03_communication_and_resilience.md),
 [CPU vs. GPU](00_prerequisite_concepts/04_cpu_vs_gpu.md),
@@ -26,7 +26,11 @@ If terms like **p99 latency**, **the nines**, **sharding vs. replication**, or
 [CAP Theorem & PACELC](00_prerequisite_concepts/13_cap_theorem_and_pacelc.md),
 [Geospatial Indexing — Finding What's Nearby](00_prerequisite_concepts/14_geospatial_indexing.md),
 [Caching — Trading Freshness for Speed](00_prerequisite_concepts/15_caching.md),
-[Observability — Metrics, Logs, and Traces](00_prerequisite_concepts/16_observability.md))
+[Observability — Metrics, Logs, and Traces](00_prerequisite_concepts/16_observability.md),
+[Isolation Levels & Concurrency Control](00_prerequisite_concepts/17_isolation_and_concurrency_control.md),
+[Message Queues & Event-Driven Semantics](00_prerequisite_concepts/18_message_queues_and_event_driven_semantics.md),
+[Load Balancing](00_prerequisite_concepts/19_load_balancing.md),
+[Microservices Architecture Patterns](00_prerequisite_concepts/20_microservices_architecture_patterns.md))
 before the Interview Framework below. It's the shared vocabulary every tutorial in this
 section — and in the [Distributed Systems Design track](../system_design_practice/README.md) — assumes
 without re-explaining.
