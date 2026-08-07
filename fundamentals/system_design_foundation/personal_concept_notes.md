@@ -170,6 +170,173 @@ that: you cannot "reconcile" two people who both believe they own the same physi
 way you can reconcile an oversold generic SKU, so that system deliberately reaches for strong
 isolation and reservation TTLs instead of Dynamo-style AP.
 
+## How CP Is Actually Built — Locking, Consensus, and What Else
+
+**My note, verbatim:**
+
+> To build CP we usually use distributed locking, consensus algorithm like Raft, and
+> mention another.
+
+**Verdict: both correct, but they're not two independent items on a list — locking is built
+*on top of* consensus, not a separate mechanism next to it. Naming that relationship is
+worth more than naming a third technique alone.**
+
+- **Consensus (Raft/Paxos)** — correct, and it's the actual foundation. [The Distributed
+  Systems Foundations
+  tutorial](../system_design_practice/01_distributed_systems_foundations/tutorial.md#consensus-making-multiple-nodes-agree-on-one-truth)
+  frames it precisely: multiple nodes agree on one value (who's leader, what's the next log
+  entry) even with crashes and delayed messages — which, worth connecting back to the
+  previous note, is provably impossible to solve *perfectly* in an asynchronous network
+  (the same FLP result already in this file). Consensus algorithms don't defeat FLP, they
+  make a specific, nameable trade-off around it (Raft: majority-quorum commit + randomized-
+  timeout leader election).
+- **Distributed locking — correct, but it's an *application* of consensus, not a second,
+  independent technique.** [The same
+  tutorial](../system_design_practice/01_distributed_systems_foundations/tutorial.md#distributed-locks-zookeeper--etcd)
+  is explicit about this: a lock service (ZooKeeper, etcd) uses Raft or a Paxos-derived
+  protocol (ZAB) *internally* to guarantee only one client holds a lock at a time. So the
+  real mental model isn't "locking and consensus," it's **consensus is the primitive; a
+  distributed lock is one specific thing you build with it** (others: leader election,
+  config that must be agreed on cluster-wide).
+- **The gotcha worth knowing cold, because it's exactly the kind of thing a naive answer
+  misses:** a lock with a lease/TTL can expire while its holder is still "working" — a long
+  GC pause or a partition (the same slow-vs-dead ambiguity from the earlier note) means the
+  client may not even know its lock already expired, and keeps acting as if it still has
+  exclusive access. The fix is a **fencing token** — a monotonically increasing number
+  issued with each lock grant, checked by the downstream resource, which rejects any request
+  carrying an older token than one it's already seen. Without this, "we use a distributed
+  lock" is not actually a correctness guarantee by itself.
+
+**Two more real answers for "mention another," since the note asked for one and there are
+a couple of genuinely distinct options:**
+
+1. **Two-Phase Commit (2PC)** — for when the thing that needs to stay consistent isn't "who
+   holds a lock" but "did this multi-step operation across several services commit
+   atomically." [Same
+   tutorial](../system_design_practice/01_distributed_systems_foundations/tutorial.md#distributed-transactions-2pc-vs-saga):
+   a coordinator asks every participant to prepare, and only commits once *all* confirm —
+   correct, but the coordinator is a blocking single point of failure, which is exactly why
+   it's a CP mechanism (it will hang/block — sacrifice availability — rather than risk a
+   partial commit).
+2. **Synchronous quorum replication** — a write isn't acknowledged to the client until a
+   majority of replicas confirm it, the same majority-overlap guarantee consensus uses,
+   applied directly to data replication instead of to agreeing on a leader/log. This is the
+   mechanism underneath why Spanner/CockroachDB pay a real latency floor even when nothing
+   is failing (already flagged in this file's PACELC gap, above) — a write physically cannot
+   commit faster than the round trip to a quorum of replicas.
+
+**The one-line version worth having ready:** *"CP systems are built from one real primitive
+— consensus — used three ways: directly for leader election/coordination, wrapped as a
+distributed lock service with fencing tokens to stay safe under partition, or applied to
+data replication itself as a synchronous quorum write."*
+
+## AP in the Real World — Social Media
+
+**My note, verbatim:**
+
+> AP side: usually social media.
+
+**Verdict: correct, and it's the cleanest possible application of the decision rule from
+the earlier CP note — worth stating *why*, not just filing it as a fact.**
+
+- **Rephrased using the same rule already established above** ("which failure is more
+  expensive — refusing the request, or being wrong and fixing it later"): a like count that's
+  off by a few, a feed that shows a post to one user a second before another, a follower
+  count that briefly lags — none of that is user-visible harm. Refusing to load the feed, or
+  refusing to let someone post, *because* one datacenter can't currently reach another, is a
+  far worse outcome for a product whose entire value is "always there, always scrolling."
+  This is the exact same reasoning [Part 11 already gives for a like-counter
+  specifically](00_prerequisite_concepts/11_taxonomy_of_storage_choice.md#4-consistency-model--what-does-correct-mean-for-this-data):
+  "a social media like-counter can be wrong for a few seconds with zero user-visible harm —
+  eventual consistency isn't a compromise there, it's the objectively correct choice."
+- **Same shape as the Dynamo/Cassandra AP example already in this file's CAP entry**: huge
+  write volume, near-random keys (every user posting/liking independently), must always
+  accept a write even mid-partition — the identical profile Part 13 gives for why
+  Dynamo/Cassandra choose PA/EL.
+
+**The nuance worth adding, same pattern as the stock-market split earlier — "social media" is
+not one monolithic CAP answer either:**
+
+| Slice of the same platform | CAP choice | Why |
+|---|---|---|
+| Likes, views, feed ranking, follower counts | AP | Wrong-for-a-moment is invisible; unavailable is not |
+| Auth (login, session tokens, password reset) | CP | A stale "you're logged in" or a race on password reset is a real security bug, not a UX nit |
+| Payments / ad billing / creator payouts | CP | Same reasoning as the bank note — a partially-applied charge can't be un-said |
+| Direct messages (per-conversation ordering) | Somewhere between | Doesn't need full linearizability, but two messages in one conversation showing up out of order is a real, noticeable bug — this is what [Part 18's partition-key ordering guarantee](00_prerequisite_concepts/18_message_queues_and_event_driven_semantics.md#ordering-what-a-partition-actually-buys-you) exists for: order *within* a conversation, not globally |
+
+**The one-line version worth having ready:** *"I wouldn't call the whole platform AP — I'd
+say the engagement surface (likes, feeds, counters) is AP because staleness is invisible and
+downtime isn't, while auth and billing on the same platform are CP for the same reason a
+bank is, and messaging sits in between because it needs ordering without needing full
+consistency."*
+
+## CP vs. AP — Short Reference
+
+| | **CP** | **AP** |
+|---|---|---|
+| During a partition | Stops answering (on the minority/unreachable side) | Keeps answering, possibly with stale data |
+| Guarantees | Linearizability — every read is the latest write | Only that you get *a* response, not the latest one |
+| Fails toward | Correctness over uptime | Uptime over freshness |
+| Built with | Consensus (Raft/Paxos), locks + fencing tokens, 2PC, sync quorum writes | Gossip, async replication, vector clocks / last-write-wins, tunable quorum |
+| Real examples | Bank ledgers, trade matching engines, auth/billing, ticket/seat reservations | Social feeds/likes, shopping carts, DNS, most CDNs |
+| Reference systems | ZooKeeper, etcd, Spanner, CockroachDB | Dynamo, Cassandra |
+| PACELC "else" (no partition) | Usually still pays latency for consistency (EC) | Usually optimizes for speed (EL) |
+| Pick when | Being wrong can't be undone (money, a seat, a lock) | Being unavailable is the worse failure (a lost sale, a stale like count) |
+
+## PACELC Decision Tree + The Consistency Spectrum
+
+**Verdict: accurate throughout — no corrections needed on mechanics or examples. One real
+find: "monotonic reads" wasn't in the canonical spectrum table, so I added it there
+directly** ([Part 2](00_prerequisite_concepts/02_data_and_consistency.md#the-consistency-spectrum-its-not-just-strong-vs-eventual)) —
+that's a genuine gap you caught, not just a personal-notes addition.
+
+### PACELC, condensed
+
+- CAP only covers the rare case (partition). PACELC covers the rest: **P**artition → A vs C.
+  **E**lse (normal operation, network healthy) → L vs C. [Part
+  13](00_prerequisite_concepts/13_cap_theorem_and_pacelc.md#pacelc-naming-the-trade-off-cap-leaves-out).
+- The "else" choice is made on *every* request, not just during rare partitions — this is
+  why PACELC classification matters more than CAP classification for daily behavior.
+
+| | Mechanism | Cost |
+|---|---|---|
+| **Sync (C > L)** | Primary waits for replica(s) to confirm before telling the client "success" | Slower, but a replica always has what the client was told was saved |
+| **Async (L > C)** | Primary saves locally, tells client "success" immediately, replicates in background | Fast, but data written between "success" and replication is lost if the primary dies |
+
+- **Dynamo / Cassandra** → PA/EL (available during partition, fast normally).
+- **Spanner, CockroachDB, MongoDB (default)** → PC/EC (consistent both times, pays latency
+  for it always).
+- **PostgreSQL with synchronous replication specifically** → PC/EC, same reasoning — but
+  worth the precision: a single, non-replicated Postgres instance isn't a distributed system
+  at all ([Part 13's own scoping point](00_prerequisite_concepts/13_cap_theorem_and_pacelc.md#cap-theorem-precisely):
+  CAP/PACELC only apply once a second node holding the same data exists), and Postgres with
+  the *default async* replication would actually be PA/EL-shaped instead — the classification
+  depends on the replication mode configured, not on "Postgres" as a name.
+
+### The Consistency Spectrum, condensed
+
+Strongest → weakest, cost decreasing left to right:
+
+**Strong (linearizability)** → **Causal** (effect never seen before its cause) → **Monotonic
+reads** (never see an older value after a newer one — no "time travel") + **Read-your-writes**
+(you always see your own latest write) → **Eventual** (converges given enough time, no
+ordering promise in between).
+
+Full definitions + examples: [Part 2's spectrum
+table](00_prerequisite_concepts/02_data_and_consistency.md#the-consistency-spectrum-its-not-just-strong-vs-eventual) —
+not re-deriving it here since your examples for each (Twitter bio for read-your-writes, the
+question-before-answer example for causal, the score-going-backward example for monotonic
+reads) all matched the canonical ones almost exactly.
+
+### The engineering wisdom line — this is the actual takeaway to keep
+
+**Find the weakest consistency model your business can tolerate, and stop there.** Weaker =
+higher performance, lower cost, better scalability. Every level of consistency stronger than
+what a specific piece of data actually needs is a cost paid for nothing — the same "don't pay
+for consistency you don't need" framing as [Part 11's consistency
+axis](00_prerequisite_concepts/11_taxonomy_of_storage_choice.md#4-consistency-model--what-does-correct-mean-for-this-data)
+and this file's own social-media entry above, generalized into one rule.
+
 ---
 
 *Add new entries above this line, most recent first or last — whichever stays easiest to

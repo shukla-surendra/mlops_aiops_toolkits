@@ -39,8 +39,10 @@ flowchart TB
 ## Deep-Dive: Connection Management at Scale
 
 **The core architectural fact that shapes everything else**: HTTP request/response doesn't
-work for server-initiated pushes — the connection needs to stay open (WebSocket, or a
-long-polling fallback), and **each gateway server can only hold a bounded number of
+work for server-initiated pushes — the connection needs to stay open ([WebSocket, or a
+long-polling
+fallback](../../system_design_foundation/00_prerequisite_concepts/23_realtime_communication_long_polling_websockets_sse.md)),
+and **each gateway server can only hold a bounded number of
 concurrent open connections** (limited by file descriptors and memory per connection, not
 CPU) — this is a fundamentally different scaling axis than a typical stateless API server.
 

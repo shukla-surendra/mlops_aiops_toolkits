@@ -31,7 +31,10 @@ If terms like **p99 latency**, **the nines**, **sharding vs. replication**, or
 [Message Queues & Event-Driven Semantics](00_prerequisite_concepts/18_message_queues_and_event_driven_semantics.md),
 [Load Balancing](00_prerequisite_concepts/19_load_balancing.md),
 [Microservices Architecture Patterns](00_prerequisite_concepts/20_microservices_architecture_patterns.md),
-[The FR/NFR Framework and a Real-Tools Quick Reference](00_prerequisite_concepts/21_fr_nfr_framework_and_architecture_tools.md))
+[The FR/NFR Framework and a Real-Tools Quick Reference](00_prerequisite_concepts/21_fr_nfr_framework_and_architecture_tools.md),
+[Proxies — Forward, Reverse, and Why "Reverse Proxy vs. Load Balancer" Is a Trick Question](00_prerequisite_concepts/22_proxies_forward_and_reverse.md),
+[Long-Polling, WebSockets, and Server-Sent Events](00_prerequisite_concepts/23_realtime_communication_long_polling_websockets_sse.md),
+[Cardinality — One Word, Five Meanings, One Underlying Idea](00_prerequisite_concepts/24_cardinality.md))
 before the Interview Framework below. It's the shared vocabulary every tutorial in this
 section — and in the [Distributed Systems Design track](../system_design_practice/README.md) — assumes
 without re-explaining.

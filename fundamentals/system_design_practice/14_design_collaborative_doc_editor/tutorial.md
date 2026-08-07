@@ -18,6 +18,11 @@ document's own edit history.
 
 ## High-Level Design
 
+Presence/cursor updates and edits both need the server to push to clients unprompted — see
+[Part 23's WebSockets
+treatment](../../system_design_foundation/00_prerequisite_concepts/23_realtime_communication_long_polling_websockets_sse.md)
+for why a persistent connection is required here rather than ordinary request/response.
+
 ```mermaid
 flowchart TB
     ClientA["Client A\n(local edit buffer)"] <-->|WebSocket| DocServer["Document Server\n(owns this doc's live session)"]

@@ -245,4 +245,4 @@ choice in an interview.
 
 ---
 
-**Previous:** [Part 20: Microservices Architecture Patterns](20_microservices_architecture_patterns.md)  |  **Next:** [0. The Interview Framework](../01_ml_system_design/00_interview_framework.md)
+**Previous:** [Part 20: Microservices Architecture Patterns](20_microservices_architecture_patterns.md)  |  **Next:** [Part 22: Proxies — Forward, Reverse, and Why "Reverse Proxy vs. Load Balancer" Is a Trick Question](22_proxies_forward_and_reverse.md)

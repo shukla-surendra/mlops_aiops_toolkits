@@ -176,4 +176,4 @@ prompting you to attach your own production-system specifics → practice questi
 
 ---
 
-**Previous:** [Prerequisite Concepts, Part 21: The FR/NFR Framework and a Real-Tools Quick Reference](../00_prerequisite_concepts/21_fr_nfr_framework_and_architecture_tools.md)  |  **Next:** [1. Fundamentals & Building Blocks](00_interview_framework_fundamentals.md)
+**Previous:** [Prerequisite Concepts, Part 24: Cardinality — One Word, Five Meanings, One Underlying Idea](../00_prerequisite_concepts/24_cardinality.md)  |  **Next:** [1. Fundamentals & Building Blocks](00_interview_framework_fundamentals.md)

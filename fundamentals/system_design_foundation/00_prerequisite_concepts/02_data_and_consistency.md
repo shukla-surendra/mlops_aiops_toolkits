@@ -182,6 +182,43 @@ frequently) rather than indexing everything defensively — an over-indexed tabl
 real, continuous write-latency tax for read speed most of its indexes never actually
 deliver.
 
+### Index Shapes: Same Mechanism, Different Coverage
+
+B-Tree vs. hash is *which structure* an index uses; the shapes below are *which columns and
+how many* — a second, independent axis worth naming precisely, since interview follow-ups on
+indexing usually live here, not in structure choice.
+
+- **Single-column index** (`INDEX (user_id)`) — the default case above: one column, one
+  sorted structure, fast exact/range lookups on that column alone.
+- **Composite (multi-column) index** (`INDEX (user_id, created_at)`) — a single sorted
+  structure keyed on the *combination*, sorted first by the leftmost column, then by the
+  next within each tie. **The left-most-prefix rule is the actual interview trap**: this
+  index serves `WHERE user_id = ? AND created_at > ?` efficiently (it's a prefix of the sort
+  order), but does *nothing* for a query filtering on `created_at` alone — skipping the
+  leftmost column means the sortedness the index provides can't be used at all, the same way
+  a phone book sorted by (last name, first name) is useless for finding everyone named
+  "John."
+- **Unique index** — a normal index with a constraint bolted on: every insert/update is
+  checked against it, and a duplicate is rejected rather than stored. This is the actual
+  mechanism behind an `email` or `username` uniqueness guarantee, and it's precisely the
+  **conditional insert** mechanism [the URL Shortener tutorial's key-generation
+  deep-dive](../../system_design_practice/11_design_url_shortener/tutorial.md#deep-dive-key-generation-an-access-control-decision-not-an-encoding-one)
+  relies on to make random-key collisions safe rather than silent.
+- **Covering index** — an index that stores *every column a specific query needs*, not just
+  the column(s) it's searched on. A query fully answered by the index never touches the
+  underlying table row at all (no second lookup to fetch the rest of the row) — the fastest
+  possible read this repo covers, paid for with a larger index (duplicating column data that
+  already lives in the table) and the same extra write cost every additional index carries.
+
+**The write-cost consequence, stated as a rule**: every index — of any shape — must be
+updated on every write that touches its columns, so "more indexes" is never a free upgrade.
+[Part 11's write-amplification axis](11_taxonomy_of_storage_choice.md#5-write-amplification-what-does-this-workload-do-to-the-storage-engines-write-path)
+is this exact trade-off, restated per-index rather than per-engine: a write-heavy table with
+five indexes pays five update costs on every insert, which is precisely why time-series/log
+ingestion tables (extremely high write volume, rarely queried by arbitrary column) are
+usually indexed minimally or not at all, trading query flexibility for write throughput on
+purpose.
+
 ## Pagination: Walking Through an Indexed Result Set
 
 Indexing solves "find the matching rows fast." A separate, equally common question sits
@@ -242,6 +279,7 @@ rather than either extreme:
 |---|---|---|
 | **Strong consistency** | Every read sees the most recent write, globally, immediately | A bank balance after a transfer |
 | **Read-your-own-writes** | You always see your *own* recent writes, but might see stale data from others' writes | You post a comment and see it immediately, even if a friend's feed hasn't updated yet |
+| **Monotonic reads** | Once you've seen a value, you never see an *older* one afterward, even from a different replica | A game score goes 10 → 12, never 12 → 10 on a later refresh — no "time travel" backward |
 | **Causal consistency** | Writes that are causally related are seen in order by everyone; unrelated writes can appear in any order | A reply to a comment never appears *before* the comment it's replying to |
 | **Eventual consistency** | Given enough time with no new writes, all replicas converge to the same value — no ordering guarantee in between | A DNS record change propagating across resolvers over some minutes |
 

@@ -398,6 +398,54 @@ costs](11_taxonomy_of_storage_choice.md#the-myth-of-schema-less-schema-on-write-
 — **the fix relocates the cost rather than eliminating it**: here, specifically, from write
 throughput onto read complexity.
 
+## Naming the Rest of the Taxonomy: Directory-Based, List, and Round-Robin Partitioning
+
+Attempts 1-3 above are all **formula-based**: given a key, a deterministic function (a
+range boundary, `hash(key) % N`, or the consistent-hashing ring) computes which shard owns
+it, with no lookup required. That's not the only structural option, and it's worth naming
+the others precisely rather than treating "sharding" as a single technique with three
+tuning knobs.
+
+**Directory-based partitioning** replaces the formula with an explicit **lookup service**: a
+small, separately-stored table mapping key → shard, consulted on every request before the
+real query is issued. The mechanism trades a formula's zero-lookup elegance for a genuinely
+different property: **rebalancing becomes a metadata update, not a data-movement
+problem.** Moving a key to a new shard means updating one row in the directory — the
+formula-based approaches above, by contrast, all have to physically move data (or, in
+consistent hashing's case, accept that only ~K/N keys move, still real I/O) whenever shard
+count changes. The costs this trades in return: an extra network hop on every request, and
+the directory service itself becomes a new [SPOF](03_communication_and_resilience.md#resilience-vocabulary)
+unless it's made highly available in its own right — usually by making the directory small
+enough to cache aggressively or replicate fully on every application node, since it's
+metadata (megabytes) rather than the dataset itself (terabytes+). Early large-scale sharding
+designs (Facebook's original user-sharding metadata service is the commonly-cited historical
+example) reached for this specifically because it decouples the physical shard layout from
+the logical key space entirely — the directory can be repointed without the application ever
+knowing a migration happened.
+
+**List partitioning** assigns shards by a predefined, enumerated set of values rather than a
+computed hash or range — "EU-region users → shard A, APAC-region users → shard B." This
+isn't really a *scaling* technique in the load-distribution sense the other approaches are;
+it's a **regulatory/locality** technique, reached for when the assignment rule is fixed by
+something outside the system's control (data-residency law, a compliance boundary) rather
+than by an engineering goal like uniform load.
+
+**Round-robin partitioning** — assigning records to shards purely sequentially, ignoring the
+key entirely — achieves perfect *write* distribution by construction but destroys the one
+property almost every real access pattern needs: **locality**. A range or point query for a
+specific entity's data has no way to know which shard it landed on, since placement carries
+no information about the key at all. It shows up almost exclusively as a teaching contrast
+to the other three, not as a real production default.
+
+**Where vertical partitioning fits**: everything above is **horizontal** partitioning —
+splitting a table's *rows* across machines, the entire subject of this part. Splitting a
+schema's *columns/features* across separately-owned stores instead (a user-profile service
+with its own database, a followers service with its own database) is a structurally
+different axis, already covered as the database-per-service pattern in [Part 20's
+microservices patterns](20_microservices_architecture_patterns.md) — the two are frequently
+combined in practice (each vertically-split service then horizontally shards its own data
+once it outgrows one machine), not competing alternatives to pick one of.
+
 ## The ID Problem: Snowflake vs. UUID
 
 Where the primary key itself comes from feeds directly back into every mechanism already
