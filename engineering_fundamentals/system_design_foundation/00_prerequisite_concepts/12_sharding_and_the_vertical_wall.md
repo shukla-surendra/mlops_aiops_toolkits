@@ -10,6 +10,62 @@ unpack *why* the ceiling exists, what specifically breaks first, or why the ceil
 economically well before it arrives physically. This part does that — the motivation
 underneath sharding, before the mechanics of how to actually shard.
 
+## Partitioning vs. Sharding: The Umbrella Term, and Why the Names Get Used Interchangeably
+
+Before any mechanism, the vocabulary itself is worth getting precise, since "partitioning"
+and "sharding" are used inconsistently across the industry in a way that causes real,
+avoidable confusion.
+
+**The precise relationship**: **partitioning** is the general, umbrella concept — splitting
+a large dataset into smaller, more manageable pieces, for any reason. **Sharding** is one
+specific *kind* of partitioning: partitioning where each piece lives on a **separate
+physical machine**, specifically to achieve horizontal scale. Stated as a single sentence:
+**all sharding is partitioning, but not all partitioning is sharding.**
+
+The distinction that actually matters is *where the pieces live*:
+
+- **Single-machine partitioning** — splitting one table into several physical sub-tables,
+  all still on the *same* database server. This is a storage/query-optimization technique
+  (**partition pruning**: a query filtering on the partition key only scans the relevant
+  sub-table, not the whole thing), not horizontal scale at all. Postgres's native
+  `PARTITION BY RANGE/LIST/HASH` — [already named in this chapter's own worked
+  example](#a-worked-example-sharding-in-postgres-application-level) — is exactly this: real,
+  useful, and entirely orthogonal to any of this chapter's vertical-wall arguments, since the
+  data never leaves one machine.
+- **Multi-machine partitioning = sharding** — each piece lives on a genuinely separate
+  machine, which is what actually buys the capacity, MTTR, and blast-radius wins this entire
+  chapter has been about. This is what "sharding" means everywhere it's used in this doc.
+
+**Why the terms get used interchangeably in practice, despite the precise distinction**:
+most engineers first encounter "partitioning" inside a NoSQL system, where it's *already*
+cross-machine by default — the whole reason those systems exist, per [Part 11's NoSQL
+history](11_taxonomy_of_storage_choice.md#2005-google-and-amazon-hit-the-wall--nosql-begins-with-key-value-stores).
+So "partitioning," for them, has only ever meant sharding. Then the same engineer hits
+Postgres's own native `PARTITION BY`, which is single-machine — and the word suddenly means
+something structurally different, with no warning that it changed meaning at all.
+
+**Real systems, real terminology, and what's actually happening underneath — worth knowing
+by name, since vendor vocabulary doesn't consistently track the precise distinction above**:
+
+| System | Its own term | What's actually underneath |
+|---|---|---|
+| PostgreSQL (native) | "partitioning" | Single-machine only — sub-tables, same server |
+| Citus (Postgres extension) | "shard" (`shard count`, `citus_shards`) | Genuinely cross-machine — the actual sharding this chapter covers |
+| Cassandra | "partition key" | Cross-machine (via [consistent hashing, already covered](#choosing-a-shard-key-attempt-3-consistent-hashing-the-ring)) — sharding in every sense but name |
+| DynamoDB | "partition key" | Cross-machine — same situation as Cassandra, official vocabulary still says "partition" |
+| MongoDB | "shard," "shard key" | Cross-machine — explicit, unambiguous sharding vocabulary |
+| Elasticsearch/OpenSearch | "shard" (primary/replica) | Cross-machine — explicit sharding vocabulary |
+| Kafka | "partition" | Cross-machine (partitions spread across brokers) — sharding in every sense but name |
+
+**The pattern worth internalizing**: Cassandra and DynamoDB — both genuinely distributed,
+cross-machine systems — call it "partitioning." MongoDB and Elasticsearch — equally
+cross-machine — call the identical concept "sharding." There is no industry-wide consistency
+to memorize; the only reliable move is the one this section already gives: ignore which word
+a given system's docs use, and ask directly whether the pieces live on one machine or many.
+That's the real distinction — "partitioning" is simply the word that covers both cases,
+and "sharding" is the name for the specific case that's genuinely cross-machine, which is
+what the rest of this chapter is entirely about.
+
 ## The Illusion: Code Implies Infinite Space
 
 [Part 6 opened with the same lie](06_mechanical_sympathy_and_physics_of_latency.md#hardware-reality-the-abstraction-hides-the-physics-not-the-cost)
@@ -909,6 +965,16 @@ other.
 
 ## Quick Self-Check
 
+- State the precise relationship between "partitioning" and "sharding" in one sentence — why
+  is "all sharding is partitioning, but not all partitioning is sharding" the accurate
+  version, not "they're just two words for the same thing"?
+- Postgres's native `PARTITION BY` and Citus's sharding both operate on a Postgres table.
+  What's the one structural difference between them that actually matters, regardless of
+  which word either one's documentation uses?
+- Cassandra calls it "partitioning," MongoDB calls the equivalent concept "sharding," and
+  both are genuinely cross-machine. Why can't vendor terminology alone tell you whether a
+  system's partitioning is single-machine or multi-machine — what question should you ask
+  instead?
 - Why does code's own syntax (`new Array()`, `INSERT INTO`, `socket.connect()`) give no
   hint at all about the finite resource being consumed underneath it?
 - Name three distinct physical ceilings (besides CPU) that could be the actual bottleneck in
@@ -1079,6 +1145,16 @@ other.
 
 **Technical shorthand — use these instead of over-explaining the concept every time:**
 
+- **partitioning** (n.) — the umbrella term: splitting a dataset into smaller pieces, for any
+  reason, on one machine or many. Sharding is the specific, cross-machine case of this.
+- **sharding** (n.) — partitioning where each piece lives on a separate physical machine,
+  specifically to achieve horizontal scale — the subset of partitioning this entire chapter
+  covers; distinguished from single-machine partitioning by *where the pieces live*, not by
+  which word a given vendor's documentation happens to use.
+- **partition pruning** (n. phrase) — a query planner skipping sub-tables that can't contain
+  matching rows based on the partition key, the actual benefit of single-machine
+  partitioning (Postgres's native `PARTITION BY`) that has nothing to do with horizontal
+  scale at all.
 - **OOM (Out of Memory) / OOM killer** (n. phrases) — RAM exhaustion on a machine; on Linux,
   the kernel's OOM killer abruptly terminates a process to reclaim memory, non-gracefully.
 - **IOPS** (n., initialism) — I/O operations per second, a disk's hard ceiling independent of

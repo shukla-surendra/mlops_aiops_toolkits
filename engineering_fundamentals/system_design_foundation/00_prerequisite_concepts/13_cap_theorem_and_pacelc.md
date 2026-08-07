@@ -174,6 +174,36 @@ already documented: a shopping cart has to accept a write even mid-partition, so
 of the split keeps accepting writes and reconciles divergence later (vector clocks,
 read-repair, last-write-wins) rather than ever refusing a request.
 
+### Why "Partition Tolerance" Is a Genuinely Confusing Name
+
+Worth pausing on the word itself, since the confusion it causes is real and well-documented,
+not a personal gap in understanding it. In everyday English, "fault-tolerant" implies
+*handles the problem gracefully, no real consequence* — the system absorbs the hit and keeps
+working *fine*. "Partition Tolerance" doesn't mean that at all. It only means the system
+doesn't collapse outright the instant a partition happens — it keeps operating *somehow*. It
+says nothing about *how well*, or what gets sacrificed to keep going. That "how" — refuse to
+answer, or answer from possibly-stale data — is the actual C-vs-A trade-off; "tolerance"
+itself is just the bare fact of not falling over completely.
+
+**This is exactly what makes "pick two of three" actively misleading, not just imprecise**:
+it visually suggests three symmetric, independent properties freely combined, like choosing
+2 toppings out of 3. P isn't symmetric with C and A. Meaningfully saying "I don't want
+partition tolerance" would mean the entire system goes offline the instant any cable
+anywhere gets cut — not a real design choice any distributed system makes, since partitions
+are a physical inevitability, not a preference. P isn't a free variable traded against the
+other two; it's closer to a **precondition** — partitions *will* happen, so the only genuine
+choice left is C or A.
+
+**Worth citing precisely, since this is a legitimate, sourced critique, not just a personal
+reading**: Daniel Abadi — the same author behind PACELC, covered below — has specifically
+argued CAP would be stated more honestly as *"in the presence of a network partition, a
+distributed system must choose between consistency and availability,"* dropping "Partition
+Tolerance" as a coequal third axis entirely, since it was never actually a free variable
+traded against the other two. If the term were being coined today, something like
+**"Partition Behavior"** or **"Partition Response"** would name what actually matters — not
+*whether* a system survives a partition (trivially yes, for any reasonable system), but
+*what it does* while surviving it.
+
 ## Why CAP Alone Is Incomplete
 
 CAP describes exactly one moment: what a system does *during* a partition. Real systems
@@ -337,6 +367,10 @@ real-world combination among the systems above.
   the other's?
 - Why is "pick two of three" a misreading of CAP theorem — what's wrong with treating it as
   a permanent, always-on choice rather than a partition-time one?
+- Why does "Partition Tolerance" sound like a stronger guarantee than it actually is — what
+  does the word "tolerance" wrongly imply here, and what does the property actually promise?
+- Explain precisely why "I don't want partition tolerance" isn't a meaningful design choice
+  for a real distributed system, unlike "I don't want strong consistency," which is.
 - A single-node database trivially has both Consistency and Availability. Why does CAP
   theorem simply not apply to it — what's missing from the picture?
 - Explain precisely why CAP's "C" and ACID's "C" are different guarantees, using each one's
@@ -409,6 +443,10 @@ real-world combination among the systems above.
 - **CP / AP** (n., initialisms) — a system's actual partition-time choice: sacrifice
   Availability to preserve Consistency (ZooKeeper, etcd, Spanner), or sacrifice
   Consistency to preserve Availability (Dynamo, Cassandra).
+- **partition tolerance, precisely** (n. phrase) — [unpacked
+  above](#why-partition-tolerance-is-a-genuinely-confusing-name): not "handles a partition
+  gracefully," only "doesn't collapse outright when one occurs" — a precondition every real
+  distributed system has to accept, not a free variable traded against C and A.
 - **PACELC** (n., proper — Daniel Abadi, 2012) — CAP extended with the non-partition case:
   if Partitioned, trade Availability vs. Consistency; Else, trade Latency vs. Consistency.
 - **PA/EL, PC/EC** (n., initialisms) — the two most common PACELC classifications: favor
