@@ -30,7 +30,8 @@ If terms like **p99 latency**, **the nines**, **sharding vs. replication**, or
 [Isolation Levels & Concurrency Control](00_prerequisite_concepts/17_isolation_and_concurrency_control.md),
 [Message Queues & Event-Driven Semantics](00_prerequisite_concepts/18_message_queues_and_event_driven_semantics.md),
 [Load Balancing](00_prerequisite_concepts/19_load_balancing.md),
-[Microservices Architecture Patterns](00_prerequisite_concepts/20_microservices_architecture_patterns.md))
+[Microservices Architecture Patterns](00_prerequisite_concepts/20_microservices_architecture_patterns.md),
+[The FR/NFR Framework and a Real-Tools Quick Reference](00_prerequisite_concepts/21_fr_nfr_framework_and_architecture_tools.md))
 before the Interview Framework below. It's the shared vocabulary every tutorial in this
 section — and in the [Distributed Systems Design track](../system_design_practice/README.md) — assumes
 without re-explaining.

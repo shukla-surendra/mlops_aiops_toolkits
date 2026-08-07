@@ -206,6 +206,7 @@ nav:
           - "8. The Cost of Communication": system_design_foundation/00_prerequisite_concepts/08_cost_of_communication.md
           - "9. The Anatomy of a Request (DNS, BGP, and the Edge)": system_design_foundation/00_prerequisite_concepts/09_dns_bgp_and_the_edge.md
           - "10. The Physics of Persistence (B-Trees vs. LSM-Trees)": system_design_foundation/00_prerequisite_concepts/10_physics_of_persistence.md
+          - "21. The FR/NFR Framework and a Real-Tools Quick Reference": system_design_foundation/00_prerequisite_concepts/21_fr_nfr_framework_and_architecture_tools.md
       - Staff-Level Foundations:
           - 0. The Staff-Level Signal: system_design_practice/00_staff_level_signal/tutorial.md
           - 1. Distributed Systems Foundations: system_design_practice/01_distributed_systems_foundations/tutorial.md

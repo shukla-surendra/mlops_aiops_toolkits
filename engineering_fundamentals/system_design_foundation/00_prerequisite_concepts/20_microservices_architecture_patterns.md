@@ -302,4 +302,4 @@ primary write model being rearchitected as event-sourced at all.
 
 ---
 
-**Previous:** [Part 19: Load Balancing](19_load_balancing.md)  |  **Next:** [0. The Interview Framework](../01_ml_system_design/00_interview_framework.md)
+**Previous:** [Part 19: Load Balancing](19_load_balancing.md)  |  **Next:** [Part 21: The FR/NFR Framework and a Real-Tools Quick Reference](21_fr_nfr_framework_and_architecture_tools.md)

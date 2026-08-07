@@ -23,7 +23,11 @@ start with the [ML track's Prerequisite Concepts
 primer](../system_design_foundation/00_prerequisite_concepts/01_performance_and_scale.md) (three
 short parts covering measurement/scaling, data/consistency, and communication/resilience)
 — it's the shared vocabulary this track assumes too, even though the case studies below
-are ML-independent.
+are ML-independent. Also worth reading before the first case study: [Part 21, The FR/NFR
+Framework and a Real-Tools Quick
+Reference](../system_design_foundation/00_prerequisite_concepts/21_fr_nfr_framework_and_architecture_tools.md)
+— the generic requirements-derivation checklist and technology cheat sheet every case study
+below assumes, applied fresh in each one's own `Requirements` section.
 
 **[0. The Staff-Level Signal](00_staff_level_signal/tutorial.md)** — what actually
 separates a staff-level answer from a senior one in these rounds. It's not "bigger
