@@ -10,7 +10,7 @@ guarantee. This is a different problem from [Part 13's CAP
 theorem](13_cap_theorem_and_pacelc.md), which is about replicas agreeing across a network —
 everything here can happen on a single machine, with a single copy of the data, the moment
 more than one transaction touches it at the same time. It's also different from [Part
-01's 2PC vs. Saga](01_distributed_systems_foundations.md#distributed-transactions-2pc-vs-saga),
+01's 2PC vs. Saga](../../system_design_practice/01_distributed_systems_foundations/tutorial.md#distributed-transactions-2pc-vs-saga),
 which is about one logical operation spanning *multiple* databases — this part is about
 what "one database, several transactions, same instant" actually requires.
 

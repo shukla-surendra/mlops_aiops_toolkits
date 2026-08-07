@@ -25,13 +25,13 @@ short parts covering measurement/scaling, data/consistency, and communication/re
 — it's the shared vocabulary this track assumes too, even though the case studies below
 are ML-independent.
 
-**[0. The Staff-Level Signal](../system_design_foundation/00_prerequisite_concepts/00_staff_level_signal.md)** — what actually
+**[0. The Staff-Level Signal](00_staff_level_signal/tutorial.md)** — what actually
 separates a staff-level answer from a senior one in these rounds. It's not "bigger
 numbers" — it's organizational scope, ambiguity handling, and trade-off framing at a
 different altitude. Read this before any case study; it's the lens the rest of this
 section is evaluated through.
 
-**[1. Distributed Systems Foundations](../system_design_foundation/00_prerequisite_concepts/01_distributed_systems_foundations.md)** —
+**[1. Distributed Systems Foundations](01_distributed_systems_foundations/tutorial.md)** —
 the underlying mechanics every case study below draws on: consensus (Raft/Paxos),
 distributed transactions (2PC vs. Saga), CRDTs and vector clocks, consistent hashing,
 service mesh, and multi-region active-active replication. Read this second.
@@ -50,6 +50,12 @@ service mesh, and multi-region active-active replication. Read this second.
 | 9 | [Web Crawler](09_design_web_crawler/tutorial.md) | URL frontier design, politeness, dedup at scale |
 | 10 | [Search Autocomplete](10_design_search_autocomplete/tutorial.md) | Distributed trie structures, ranking, real-time trending updates |
 | 11 | [URL Shortener](11_design_url_shortener/tutorial.md) | Key generation as access control, revocation vs. edge caching, conflict-free multi-region writes |
+| 12 | [Payment / Order Processing](12_design_payment_order_processing/tutorial.md) | Saga across a third-party payment gateway, idempotency, CQRS for order status |
+| 13 | [Distributed File Storage (Dropbox)](13_design_distributed_file_storage/tutorial.md) | Content-addressed chunking/dedup, replication vs. erasure coding, metadata/blob separation |
+| 14 | [Collaborative Doc Editor (Google Docs)](14_design_collaborative_doc_editor/tutorial.md) | CRDTs vs. Operational Transformation, presence as ephemeral state, event-sourced edit history |
+| 15 | [Ticket / Event Booking (Ticketmaster)](15_design_ticket_booking_system/tutorial.md) | Isolation levels/concurrency control under extreme contention, reservation TTLs, virtual waiting rooms |
+| 16 | [Notification System](16_design_notification_system/tutorial.md) | Priority-isolated fan-out, idempotent delivery, provider failover |
+| 17 | [Ad Click Aggregation](17_design_ad_click_aggregation/tutorial.md) | Exactly-once stream aggregation, watermarks, approximate counting at scale |
 
 Each case study follows the same four-step structure from the staff-signal tutorial:
 clarify → high-level design → deep-dive → trade-offs, with an explicit staff-altitude

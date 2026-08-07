@@ -65,7 +65,7 @@ more than the product name:
 | **Distributed file systems / object storage** | Storing huge files/blobs across many machines | HDFS, Ceph, MinIO, and (internally) Amazon S3 — the practical descendants of [GFS](02_data_and_consistency.md#gfs-2003-the-reference-architecture) |
 | **Distributed caching** | Low-latency shared state across app instances | Redis Cluster, Memcached (client-side sharded), Hazelcast |
 | **Content Delivery Networks (CDN)** | Geographically distributed edge nodes presenting one coherent site | Cloudflare, Akamai, Fastly, CloudFront |
-| **Service mesh** | Cross-cutting concerns (retries, mTLS, routing) between microservices | Istio, Linkerd, Envoy — [already named in the Staff-Level Foundations doc](01_distributed_systems_foundations.md#service-mesh-cross-cutting-concerns-without-cross-cutting-code) |
+| **Service mesh** | Cross-cutting concerns (retries, mTLS, routing) between microservices | Istio, Linkerd, Envoy — [already named in the Staff-Level Foundations doc](../../system_design_practice/01_distributed_systems_foundations/tutorial.md#service-mesh-cross-cutting-concerns-without-cross-cutting-code) |
 | **Distributed search** | Indexing and querying across sharded document collections | Elasticsearch/OpenSearch (clustered), Apache Solr |
 | **Vector databases** | Similarity search across sharded, high-dimensional embeddings | Pinecone, Weaviate, Milvus, Qdrant — [already covered in Part 11](11_taxonomy_of_storage_choice.md#the-newest-arrival-vector-databases-similarity-search-in-high-dimensional-space) |
 | **Blockchain / distributed ledgers** | Consensus among nodes that might be *adversarial*, not just crashed | Bitcoin, Ethereum |

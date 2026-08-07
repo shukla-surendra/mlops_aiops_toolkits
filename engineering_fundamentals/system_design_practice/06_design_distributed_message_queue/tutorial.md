@@ -74,7 +74,7 @@ much higher write throughput than a traditional database-backed queue.
   "committed" once it's been replicated to enough of the ISR (configurable), directly
   trading off durability against write latency.
 - **Leader election on broker failure** uses the same consensus mechanism discussed in the
-  [foundations tutorial](../../system_design_foundation/00_prerequisite_concepts/01_distributed_systems_foundations.md#consensus-making-multiple-nodes-agree-on-one-truth) —
+  [foundations tutorial](../01_distributed_systems_foundations/tutorial.md#consensus-making-multiple-nodes-agree-on-one-truth) —
   modern Kafka uses a Raft-based controller quorum specifically to decide which ISR member
   becomes the new leader when the current leader fails, ensuring no committed message is
   lost in the process (only a replica that was fully caught up is eligible to become

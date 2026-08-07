@@ -46,7 +46,7 @@ global counter for every request?**
   a perfectly accurate global count requires either a single source of truth (a latency
   and availability bottleneck) or synchronous cross-region coordination on every request
   (a consensus-style cost, per the
-  [foundations tutorial](../../system_design_foundation/00_prerequisite_concepts/01_distributed_systems_foundations.md#consensus-making-multiple-nodes-agree-on-one-truth)) —
+  [foundations tutorial](../01_distributed_systems_foundations/tutorial.md#consensus-making-multiple-nodes-agree-on-one-truth)) —
   neither is acceptable at the latency budget a rate limiter needs to operate within
   (it must add negligible overhead to every request it protects).
 
@@ -86,7 +86,7 @@ depends on consistent notions of time across regions:
   another place this design is inherently approximate, not a precision instrument.
 - **NTP-synchronized clocks** are the practical baseline expectation; for anything
   requiring tighter guarantees, logical/vector clocks (per the
-  [foundations tutorial](../../system_design_foundation/00_prerequisite_concepts/01_distributed_systems_foundations.md#crdts-vector-clocks-resolving-conflicts-without-coordination))
+  [foundations tutorial](../01_distributed_systems_foundations/tutorial.md#crdts-vector-clocks-resolving-conflicts-without-coordination))
   establish relative ordering without depending on wall-clock precision at all — worth
   mentioning as the "if we truly needed it" answer, while noting it's usually overkill for
   a rate limiter's actual accuracy requirements.

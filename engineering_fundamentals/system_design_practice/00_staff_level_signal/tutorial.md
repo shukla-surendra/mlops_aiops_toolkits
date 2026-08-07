@@ -63,7 +63,7 @@ A design doc that gets a staff-level decision through review typically has:
    you already considered, wasting a review cycle.
 3. **An explicit "blast radius" / rollback section** — what breaks if this is wrong, how
    it's detected, how it's undone. This is the same failure-mode discipline from the ML
-   track's [interview framework](../ml_system_design/00_interview_framework.md),
+   track's [interview framework](../../system_design_foundation/01_ml_system_design/00_interview_framework.md),
    applied to a written proposal instead of a live design.
 4. **A migration plan if this replaces something existing** — staff-level changes rarely
    ship onto a blank slate; how existing consumers move to the new system, and over what
@@ -170,4 +170,4 @@ technical design.
 
 ---
 
-**Next:** [Distributed Systems Foundations at Staff Depth](01_distributed_systems_foundations.md)
+**Next:** [Distributed Systems Foundations at Staff Depth](../01_distributed_systems_foundations/tutorial.md)

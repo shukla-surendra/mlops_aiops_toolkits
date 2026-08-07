@@ -207,8 +207,8 @@ nav:
           - "9. The Anatomy of a Request (DNS, BGP, and the Edge)": system_design_foundation/00_prerequisite_concepts/09_dns_bgp_and_the_edge.md
           - "10. The Physics of Persistence (B-Trees vs. LSM-Trees)": system_design_foundation/00_prerequisite_concepts/10_physics_of_persistence.md
       - Staff-Level Foundations:
-          - 0. The Staff-Level Signal: system_design_foundation/00_prerequisite_concepts/00_staff_level_signal.md
-          - 1. Distributed Systems Foundations: system_design_foundation/00_prerequisite_concepts/01_distributed_systems_foundations.md
+          - 0. The Staff-Level Signal: system_design_practice/00_staff_level_signal/tutorial.md
+          - 1. Distributed Systems Foundations: system_design_practice/01_distributed_systems_foundations/tutorial.md
       - Tutorials:
           - 0. Interview Framework: system_design_foundation/ml_system_design/00_interview_framework.md
           - 1. Fundamentals & Building Blocks: system_design_foundation/ml_system_design/00_interview_framework_fundamentals.md
@@ -256,8 +256,8 @@ nav:
   - System Design Practice:
       - Overview: system_design_practice/README.md
       - Foundations:
-          - 0. The Staff-Level Signal: system_design_foundation/00_prerequisite_concepts/00_staff_level_signal.md
-          - 1. Distributed Systems Foundations: system_design_foundation/00_prerequisite_concepts/01_distributed_systems_foundations.md
+          - 0. The Staff-Level Signal: system_design_practice/00_staff_level_signal/tutorial.md
+          - 1. Distributed Systems Foundations: system_design_practice/01_distributed_systems_foundations/tutorial.md
       - Case Studies:
           - "2. Design Twitter/X Feed": system_design_practice/02_design_twitter_feed/tutorial.md
           - "3. Design a Chat System": system_design_practice/03_design_chat_system/tutorial.md

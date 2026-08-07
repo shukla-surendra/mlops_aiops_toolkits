@@ -60,7 +60,7 @@ gets large enough that comparing all of it on every request becomes its own bott
 mechanism [Part 12 already built in
 full](12_sharding_and_the_vertical_wall.md#choosing-a-shard-key-attempt-3-consistent-hashing-the-ring)
 and [Part 01's foundations doc named again for this
-context](01_distributed_systems_foundations.md#consistent-hashing-advanced-sharding) — not
+context](../../system_design_practice/01_distributed_systems_foundations/tutorial.md#consistent-hashing-advanced-sharding) — not
 re-derived here, only reused. What's specific to load balancing is *why* you'd trade load
 distribution for this: **session affinity** (the same user keeps hitting the same server
 that holds their in-memory session state) and **cache locality** (the same cache key keeps
@@ -137,7 +137,7 @@ many software load balancers, including what backs Kubernetes' own `Service` loa
 balancing), HAProxy (capable of running as either layer). **L7**: NGINX, Envoy, AWS
 Application Load Balancer (ALB), Kong, Traefik — the same Envoy [already named as the
 service-mesh sidecar in Part
-01](01_distributed_systems_foundations.md#service-mesh-cross-cutting-concerns-without-cross-cutting-code),
+01](../../system_design_practice/01_distributed_systems_foundations/tutorial.md#service-mesh-cross-cutting-concerns-without-cross-cutting-code),
 doing L7 load balancing as one of that sidecar's jobs rather than a separate box. **Global**:
 Google Cloud Load Balancing (a genuinely global anycast L7 balancer, one IP address in front
 of every region), AWS Global Accelerator, Cloudflare Load Balancing. **Client-side load

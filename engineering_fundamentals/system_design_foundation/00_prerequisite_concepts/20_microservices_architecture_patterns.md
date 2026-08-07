@@ -42,8 +42,8 @@ series; naming them together here, as one family, is this part's only job for th
 | Pattern | Problem it solves | Where it's fully covered |
 |---|---|---|
 | **Circuit breaker / bulkhead** | Stop a failing dependency from being hammered, and stop one failing dependency from starving requests to healthy ones | [Part 3's Resilience Vocabulary](03_communication_and_resilience.md#resilience-vocabulary) |
-| **Saga / 2PC** | Keep one logical operation atomic (or safely compensated) across multiple services' independent databases | [Part 01's Distributed Transactions](01_distributed_systems_foundations.md#distributed-transactions-2pc-vs-saga) |
-| **Service mesh / sidecar** | Handle retries, mTLS, and observability as cross-cutting infrastructure instead of duplicated per-service code | [Part 01's Service Mesh](01_distributed_systems_foundations.md#service-mesh-cross-cutting-concerns-without-cross-cutting-code) |
+| **Saga / 2PC** | Keep one logical operation atomic (or safely compensated) across multiple services' independent databases | [Part 01's Distributed Transactions](../../system_design_practice/01_distributed_systems_foundations/tutorial.md#distributed-transactions-2pc-vs-saga) |
+| **Service mesh / sidecar** | Handle retries, mTLS, and observability as cross-cutting infrastructure instead of duplicated per-service code | [Part 01's Service Mesh](../../system_design_practice/01_distributed_systems_foundations/tutorial.md#service-mesh-cross-cutting-concerns-without-cross-cutting-code) |
 | **API gateway** | A single, cheap-to-reject front door for auth, rate limiting, and protocol translation before a request reaches any service | [Part 9's "API Gateway as a Shield"](09_dns_bgp_and_the_edge.md#beyond-caching-the-security-and-routing-layer-at-the-edge) |
 
 ## Service Discovery: How a Service Finds Another Service Whose Address Keeps Changing
@@ -175,7 +175,7 @@ so often described together even though neither requires the other.
 
 **Service discovery**: **Consul** and **etcd** — [etcd already named for consensus and
 distributed locks in Part
-01](01_distributed_systems_foundations.md#distributed-locks-zookeeper-etcd), reused here as a
+01](../../system_design_practice/01_distributed_systems_foundations/tutorial.md#distributed-locks-zookeeper-etcd), reused here as a
 registry backend — plus **Kubernetes' built-in discovery** (CoreDNS for name resolution,
 `kube-proxy` with iptables/IPVS for routing to the resolved backend, [the same IPVS engine
 Part 19 already named for L4 load

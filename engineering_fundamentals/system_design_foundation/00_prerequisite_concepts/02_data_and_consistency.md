@@ -31,7 +31,7 @@ failure instead of one.
 
 Covered in depth in [Fundamentals](../ml_system_design/00_interview_framework_fundamentals.md#sharding-partitioning)
 and extended further in the [distributed systems foundations
-tutorial](01_distributed_systems_foundations.md#consistent-hashing-advanced-sharding)
+tutorial](../../system_design_practice/01_distributed_systems_foundations/tutorial.md#consistent-hashing-advanced-sharding)
 (consistent hashing, virtual nodes) — the short version: split data across machines by
 some key (range-based, hash-based, or directory-based), and watch for **hot shards**
 (uneven access concentrating load on one partition despite even data distribution) as the
