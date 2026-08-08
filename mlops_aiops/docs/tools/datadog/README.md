@@ -32,6 +32,9 @@ observability backend at all.
 
 - **New Relic** — very similar positioning (all-in-one commercial APM/observability); see
   [New Relic](../new-relic/README.md).
+- **Dynatrace** — same all-in-one category, differentiated by Davis AI's deterministic
+  causal topology model versus Watchdog's more statistical anomaly detection; see
+  [Dynatrace](../dynatrace/README.md).
 - **Splunk** — stronger historical roots in log/SIEM use cases specifically; see
   [Splunk](../splunk/README.md).
 - **Self-hosted**: Prometheus + Grafana + Loki/Elasticsearch + Tempo/Jaeger — full control

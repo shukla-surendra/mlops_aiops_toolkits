@@ -8,7 +8,16 @@
 
 ---
 
-**Repo layout:** two cloud tracks — `aws/` (active) and `gcp/` (planned). Each holds `docs/`, `quizzes/`, `terraform/`, `labs/`, etc. Shared docs tooling lives in `scripts/` + `Makefile` at the root (`make docs` renders all Markdown to a themed HTML site; `make check` validates links). Also at the root: [`aws-to-azure-transition-guide.md`](aws-to-azure-transition-guide.md) — a standalone (non-gated) service-mapping + mental-model bridge doc for Azure, written ahead of a formal `azure/` track — and [`aws-to-azure-migration-strategy.md`](aws-to-azure-migration-strategy.md), a 200-service migration plan built on top of it.
+**Repo layout:** three cloud tracks — `aws/` (active), `azure/` (active, kicked off
+2026-08-08), and `gcp/` (planned, now sequenced *after* Azure — see reasoning in the
+Changelog). Each holds `docs/`, `quizzes/`, `terraform/`, `labs/`, etc. Shared docs tooling
+lives in `scripts/` + `Makefile` at the root (`make docs` renders all Markdown to a themed
+HTML site; `make check` validates links). Also at the root:
+[`aws-to-azure-transition-guide.md`](aws-to-azure-transition-guide.md) — a standalone
+(non-gated) service-mapping + mental-model bridge doc for Azure, written *before* the
+`azure/` track existed and still useful as a fast reference — and
+[`aws-to-azure-migration-strategy.md`](aws-to-azure-migration-strategy.md), a 200-service
+migration plan built on top of it.
 
 ## 0. How to resume (read this first every session)
 
@@ -59,7 +68,11 @@ Every service is taught to this depth, distributed across its modules:
 ## 2. Curriculum roadmap (service order)
 
 Order is chosen for dependency + distributed-systems richness. Adjustable anytime.
-**AWS is the primary track; the GCP track (in `gcp/`) starts later and is taught largely by contrast with AWS.**
+**AWS is the primary track. Azure (`azure/`) is the second active track, taught by contrast
+with AWS, sequenced ahead of GCP** — Microsoft is a Phase 1 target company in
+`private_profile` (ready 2026-09-06) while Google is Phase 3 (ready 2026-11-01), so Azure is
+the more time-urgent of the two. **GCP (`gcp/`) now starts after Azure**, still taught by
+contrast with AWS once it begins.
 
 ### AWS track (`aws/`)
 
@@ -78,11 +91,27 @@ Order is chosen for dependency + distributed-systems richness. Adjustable anytim
 | 10 | Lambda | ⬜ Planned | Firecracker microVMs, cold starts. |
 | … | (KMS, SQS/SNS, CloudFront, ECS/EKS, Kinesis, CloudWatch, Step Functions, …) | ⬜ Backlog | Sequenced later. |
 
+### Azure track (`azure/`)
+
+| # | Service | AWS contrast pair | Status | Notes |
+|---|---------|--------------------|--------|-------|
+| 1 | **Virtual Network (VNet)** | VPC | 🟡 M1 delivered, gate OPEN | `azure/docs/vnet/architecture.md` |
+| 2 | Managed Disks | EBS | ⬜ Planned | Built on Blob Storage's Page Blobs (see #5) |
+| 3 | Azure Files | EFS | ⬜ Planned | |
+| 4 | **Microsoft Entra ID + Azure RBAC** | IAM (not yet written on AWS side) | 🟡 M1 delivered, gate OPEN | `azure/docs/entra-id/architecture.md` |
+| 5 | **Blob Storage** | S3 | 🟡 M1 delivered, gate not yet written | `azure/docs/blob-storage/architecture.md` |
+| 6 | Virtual Machines / Hyper-V | EC2 / Nitro | ⬜ Planned | |
+| 7 | Azure DNS | Route 53 | ⬜ Planned | |
+| 7 | Load Balancer / Application Gateway | ELB (ALB/NLB) | ⬜ Planned | |
+| 8 | Azure SQL Database / Cosmos DB | RDS/Aurora / DynamoDB | ⬜ Planned | |
+| 9 | Azure Functions | Lambda | ⬜ Planned | |
+| … | Key Vault, Service Bus/Event Grid, Front Door/CDN, AKS, Azure Monitor | KMS, SQS/SNS, CloudFront, EKS, CloudWatch | ⬜ Backlog | Sequenced later. |
+
 ### GCP track (`gcp/`)
 
 | # | Service | Status | Notes |
 |---|---------|--------|-------|
-| — | Starts after AWS core (networking/IAM/storage/compute) | ⬜ Planned | Taught by contrast: GCP VPC (global) vs AWS VPC, GCP IAM (resource hierarchy) vs AWS IAM, GCS vs S3, GCE vs EC2. See `gcp/README.md`. |
+| — | Starts after AWS **and Azure** core tracks | ⬜ Planned | Taught by contrast: GCP VPC (global) vs AWS VPC, GCP IAM (resource hierarchy) vs AWS IAM, GCS vs S3, GCE vs EC2. See `gcp/README.md`. |
 
 Legend: ⬜ Planned · 🟡 In progress · ✅ Complete
 
@@ -94,7 +123,40 @@ Legend: ⬜ Planned · 🟡 In progress · ✅ Complete
 - **EBS deliverables:** `aws/docs/ebs/` = README + architecture, performance, snapshots-durability, security, best-practices, troubleshooting, interview · `aws/cheatsheets/ebs.md` · `aws/terraform/ebs/` (KMS + gp3/io2 + attach + DLM) · `aws/boto3/ebs/ebs_operations.py` · `aws/labs/ebs/README.md` (8 labs).
 - **EFS deliverables:** `aws/docs/efs/` = README + architecture, performance, security, best-practices, troubleshooting, interview · `aws/cheatsheets/efs.md` · `aws/terraform/efs/` (encrypted FS + per-AZ mount targets + Access Point + TLS policy) · `aws/boto3/efs/efs_operations.py` · `aws/labs/efs/README.md` (8 labs).
 - **Key framing used:** EBS = "network disk impersonating a local disk" (single-AZ, block, Physalia control plane, 2011 outage); EFS = "managed multi-AZ NFS" (mount targets = per-AZ ENIs, Access Points, Elastic throughput). Studied as a pair for the block-vs-file contrast.
-- **Next:** await learner's Q&A on EBS/EFS. Candidates after: return to VPC Q&A, or service #4 (**IAM**) / **S3** (natural next storage). Terraform still not `validate`-d locally (no CLI); boto3 files compile.
+- **Next (AWS):** await learner's Q&A on EBS/EFS. Candidates after: return to VPC Q&A, or service #4 (**IAM**) / **S3** (natural next storage). Terraform still not `validate`-d locally (no CLI); boto3 files compile.
+- **Cloud / Service:** Azure · **VNet (#1) — M1 delivered, gate OPEN.** Kicked off
+  2026-08-08, taught by contrast against the already-complete AWS VPC doc set.
+- **VNet deliverables so far:** `azure/README.md` (track overview + planned service order)
+  · `azure/docs/vnet/architecture.md` (M1 — why VNet exists, two-networks mental model, VFP +
+  SmartNIC internals, NSG dual-attachment, subnet-not-AZ-pinned contrast) ·
+  `azure/quizzes/vnet/module-1-gate.md` (5-question gate).
+- **Key framing used:** VNet ≈ VPC's overlay/substrate model, but enforced via Microsoft's
+  **VFP (Virtual Filtering Platform)** — a programmable match-action pipeline, not a
+  separately-branded Mapping Service — hardware-offloaded via **SmartNIC/FPGA**
+  (Azure's Nitro-equivalent). Two deliberate divergence points flagged for the gate: (1)
+  **NSGs attach at subnet AND/OR NIC level**, both stateful, both must pass — genuinely
+  different from AWS's stateless-NACL/stateful-SG split; (2) **Azure subnets are NOT
+  AZ-pinned** — a VNet is regional like a VPC, but a single subnet can span every AZ in the
+  region, inverting the "one subnet per AZ" AWS default.
+- **2026-08-08, later same session — explicit deviation from "one service at a time":**
+  learner asked to add IAM/storage/data docs while VNet's gate was still open. Flagged the
+  conflict with the learning contract; learner chose to answer the VNet gate live in chat,
+  then instead said "follow plan, and implement" without answering it. Read as: proceed
+  breadth-first, VNet M1 gate stays **deliberately open** (not silently dropped — recorded
+  here). Delivered **Entra ID + Azure RBAC (#4)** M1 (`azure/docs/entra-id/architecture.md`,
+  gate `azure/quizzes/entra-id/module-1-gate.md` — Actions/DataActions split, Managed
+  Identity types, App Registration vs. Service Principal, Conditional Access) and **Blob
+  Storage (#5)** M1 (`azure/docs/blob-storage/architecture.md` — Storage Account as the
+  shared home for Blob/Table/Queue/File, the SOSP 2011 Front-End/Partition/Stream
+  architecture, strong-consistency-vs-S3 history, redundancy-vs-access-tier axes; gate not
+  yet written). **Three Azure gates now open/pending simultaneously** — VNet, Entra ID, and
+  Blob Storage's still-unwritten one. This is tracked debt, not an oversight; clear
+  opportunistically or in a batch when the learner is ready.
+- **Next (Azure):** clear the backlog of open gates (VNet M1, Entra ID M1) whenever the
+  learner is ready — batching all outstanding gates in one sitting is a reasonable option
+  given three are now open at once. Write Blob Storage's M1 gate. Then continue either
+  deeper (VNet M2 — Effective Routes, peering, Private Link) or wider (Azure Files #3,
+  Managed Disks #2 — note the Page Blob connection to Blob Storage already documented).
 
 ### VPC per-module plan
 
@@ -117,6 +179,7 @@ Legend: ⬜ Planned · 🟡 In progress · ✅ Complete
 - **2026-07-12** — Overhauled the docs-site UI (`scripts/build_docs.py`): persistent collapsible left-nav sidebar (grouped by track/service, with live filter + `/` shortcut), breadcrumbs, prev/next pager, reading-progress bar, mobile drawer, no-flash theme boot, and auto-styled [Documented]/[Inferred] badges. Verified: 131 internal HTML links resolve, markdown link-check passes.
 - **2026-07-12** — **Completed the full VPC documentation set** so the learner can study end-to-end: added `internals.md`, `security.md`, `best-practices.md`, `troubleshooting.md`, `interview.md`, a `docs/vpc/README.md` index (study order), and `cheatsheets/vpc.md`. Every doc has an inline Self-check. Learner will review then ask questions.
 - **2026-07-12** — Pivoted to storage (VPC paused). Built **EBS (#2)** and **EFS (#3)** as a pair, each with the **full doc set + hands-on** (learner's choice): 7 EBS docs + 6 EFS docs, two cheatsheets, Terraform modules (`terraform/ebs`, `terraform/efs`), boto3 scripts (`boto3/ebs`, `boto3/efs`), and lab guides (`labs/ebs`, `labs/efs`, 8 labs each). Framing: EBS = network-disk/single-AZ/Physalia; EFS = managed multi-AZ NFS/mount-targets/Access-Points. Links validated; boto3 compiles; site builds.
+- **2026-08-08** — **Started the Azure track (`azure/`)**, full gated rigor matching `aws/` (learner's explicit choice over a lighter standalone-doc option). Re-sequenced the roadmap: Azure now runs *ahead of* the previously-planned GCP track, because Microsoft (Phase 1, ready 2026-09-06) is more time-urgent than Google (Phase 3, ready 2026-11-01) per `private_profile`'s dated plan — GCP still starts after AWS+Azure, unchanged in kind, just pushed later in order. Chose **VNet as Azure service #1**, mirroring VPC's role as AWS service #1, specifically so the module can teach *by contrast* against the already-complete `aws/docs/vpc/` set rather than from zero. Delivered VNet **M1** (`azure/docs/vnet/architecture.md`) — sourced from Microsoft Research's VFP (NSDI 2017) and SmartNIC/Accelerated-Networking (SIGCOMM 2015) papers for the internals, plus Microsoft Learn for the NSG dual-attachment and subnet/AZ behavior — and opened the M1 gate (`azure/quizzes/vnet/module-1-gate.md`, 5 questions). Added `azure/README.md` (track overview, planned 10-service order mirrored against AWS's own order). Updated `gcp/README.md` and root `README.md` to reflect three tracks instead of two.
 
 ---
 
@@ -143,7 +206,13 @@ cloud-practice/
 │   ├── diagrams/<service>/     terraform/<service>/   cloudformation/<service>/
 │   ├── cdk/<service>/          boto3/<service>/        python/<service>/
 │   ├── labs/<service>/         quizzes/<service>/      cheatsheets/   notes/
-└── gcp/                        # ── GCP track (planned) — mirrors aws/ ──
+├── azure/                      # ── Azure track (active) — mirrors aws/, taught by contrast ──
+│   ├── docs/<service>/         # same 7-doc shape as aws/docs/<service>/
+│   ├── terraform/<service>/    # azurerm provider
+│   ├── python/<service>/       # Azure SDK for Python — the azure/ analogue of aws/boto3/
+│   ├── labs/<service>/         quizzes/<service>/      cheatsheets/
+│   └── README.md
+└── gcp/                        # ── GCP track (planned, after AWS + Azure) — mirrors aws/ ──
     └── README.md
 ```
 Folders are created only when a service/module needs them (scaffold-as-we-go).

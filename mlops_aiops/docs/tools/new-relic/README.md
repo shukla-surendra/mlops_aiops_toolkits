@@ -25,6 +25,8 @@ tracing, and an AI-assisted analysis layer on top, similar in overall positionin
   between the two is usually driven by existing vendor relationships, pricing negotiation,
   or specific feature depth (e.g. security monitoring) rather than a fundamental
   architectural difference.
+- **Dynatrace** — same all-in-one category, with a causal-AI (Davis AI) root-cause engine
+  as its main differentiator; see [Dynatrace](../dynatrace/README.md).
 - **Splunk** — stronger SIEM/security-log roots; see [Splunk](../splunk/README.md).
 - **Self-hosted**: Prometheus + Grafana + Loki/Elasticsearch + Tempo/Jaeger.
 

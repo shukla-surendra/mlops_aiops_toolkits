@@ -8,20 +8,20 @@ A long-running (multi-month) deep study of AWS at **architecture / internals dep
 
 Open **[PROGRESS.md](PROGRESS.md)** — the master tracker. It always says exactly where we are and what's next. Read it first in any session.
 
-Two tracks: **`aws/`** (active) and **`gcp/`** (planned, taught by contrast later). Already
-have Azure experience or need to bridge to it now? See
+Three tracks: **`aws/`** (active), **`azure/`** (active, taught by contrast with AWS), and
+**`gcp/`** (planned, starts after AWS+Azure, taught by contrast later). Need a fast
+service-mapping reference instead of the full gated Azure curriculum? See
 **[aws-to-azure-transition-guide.md](aws-to-azure-transition-guide.md)** — a standalone
-service-mapping + mental-model doc, not part of the gated curriculum. Planning an actual
-large-scale migration? See
+doc, not part of the gated curriculum. Planning an actual large-scale migration? See
 **[aws-to-azure-migration-strategy.md](aws-to-azure-migration-strategy.md)** — a
 Principal-Engineer-level migration plan (Gartner's 5 Rs → AWS's 7 Rs → wave planning →
 worked timeline) for a 200-service AWS→Azure migration.
 
 ## Current focus
 
-**AWS · Service #1: VPC / Networking**
-- Module 1 (why VPC exists, the two-networks mental model, internal architecture): **[aws/docs/vpc/architecture.md](aws/docs/vpc/architecture.md)**
-- Module 1 gate (answer to advance): **[aws/quizzes/vpc/module-1-gate.md](aws/quizzes/vpc/module-1-gate.md)**
+**AWS · EBS (#2) + EFS (#3)** — docs complete, awaiting learner Q&A. VPC (#1) paused, docs complete: **[aws/docs/vpc/architecture.md](aws/docs/vpc/architecture.md)**.
+
+**Azure · Service #1: VNet** — M1 delivered, gate open: **[azure/docs/vnet/architecture.md](azure/docs/vnet/architecture.md)** / **[azure/quizzes/vnet/module-1-gate.md](azure/quizzes/vnet/module-1-gate.md)**. See [azure/README.md](azure/README.md) for the planned service order.
 
 ## Docs site
 

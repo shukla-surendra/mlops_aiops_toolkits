@@ -9,7 +9,36 @@ this — what "telemetry," "observability," "span," and "cardinality"
 actually mean, with the terms' real origins — see
 [`observability-terminology.md`](observability-terminology.md).
 
-## The three pillars, in one paragraph each
+## Quick answer: shipping logs, traces, and metrics from an app on EKS
+
+The by-pillar tool for each signal, and the decision that actually
+determines which stack to reach for:
+
+| Pillar | Self-hosted tool | What ships it there | Managed/alternative |
+|---|---|---|---|
+| **Metrics** | [Prometheus](tools/prometheus/README.md) (app exposes `/metrics`, scraped) + `node-exporter` + `kube-state-metrics` | Pull-based scrape, no shipping agent needed | Amazon Managed Service for Prometheus (AMP) |
+| **Logs** | [Loki](tools/loki/README.md) (cheap, label-indexed) or Elasticsearch/OpenSearch (full-text) | Fluent Bit / Promtail / Grafana Alloy DaemonSet, tails container stdout | CloudWatch Logs (via Container Insights add-on) |
+| **Traces** | [Tempo](tools/tempo/README.md) or [Jaeger](tools/jaeger/README.md) | App instrumented with [OpenTelemetry](tools/opentelemetry/README.md) SDK → OTel Collector | AWS X-Ray |
+| **All three, one UI** | [Grafana](tools/grafana/README.md) (Prometheus + Loki + Tempo as data sources) | — | CloudWatch Dashboards, or a commercial all-in-one |
+
+**The one decision that determines the whole stack**: how much of this do
+you want to operate yourself?
+
+- **Self-hosted, portable, cheapest at scale** → `kube-prometheus-stack`
+  (Prometheus+Alertmanager+Grafana+node-exporter+kube-state-metrics) via
+  Helm, add Loki+Fluent Bit for logs, add Tempo+OTel Collector for traces
+  once cross-service latency questions start coming up (traces are usually
+  added last, after metrics/logs are already in place). See
+  [Putting together a concrete stack for EKS](#putting-together-a-concrete-stack-for-eks)
+  below.
+- **Zero setup, AWS-only, least portable** → CloudWatch Observability EKS
+  add-on (Container Insights + Fluent Bit, auto-collects metrics/logs) +
+  X-Ray for traces. See [CloudWatch vs. the self-hosted stack](#cloudwatch-vs-the-self-hosted-stack).
+- **Commercial, fastest to stand up, ongoing SaaS cost** → Datadog / New
+  Relic / Dynatrace — one agent, all three pillars, at a cost that scales
+  with hosts/volume. See [Managed / alternative options](#managed--alternative-options).
+
+
 
 Observability tooling splits into three signal types, and almost every
 tool below exists to collect, store, or visualize exactly one of them:
@@ -308,7 +337,7 @@ query power CloudWatch doesn't match.
 | **Amazon Managed Grafana (AMG)** | Self-hosted Grafana | Points at AMP/CloudWatch; no Grafana server to operate |
 | **Amazon OpenSearch Service** | Self-hosted Elasticsearch | Managed fork of Elasticsearch; same full-text logs use case, AWS operates the cluster |
 | **CloudWatch** (Container Insights, Logs, Metrics, X-Ray) | Prometheus + Loki/ELK + Tempo/Jaeger, entirely | See the dedicated comparison above — least setup, least portable, AWS owns storage durability |
-| **[Datadog](tools/datadog/README.md) / [New Relic](tools/new-relic/README.md) / Dynatrace** | The entire stack above | Commercial, all-in-one (metrics+logs+traces+APM), fastest to stand up, ongoing SaaS cost scales with volume |
+| **[Datadog](tools/datadog/README.md) / [New Relic](tools/new-relic/README.md) / [Dynatrace](tools/dynatrace/README.md)** | The entire stack above | Commercial, all-in-one (metrics+logs+traces+APM), fastest to stand up, ongoing SaaS cost scales with volume |
 | **Honeycomb** | Metrics+traces, observability-2.0 style | Built around high-cardinality event data rather than the metrics/logs/traces split above; different mental model, worth knowing exists |
 
 ## Putting together a concrete stack for EKS

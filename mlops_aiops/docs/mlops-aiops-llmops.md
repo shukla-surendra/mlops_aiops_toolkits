@@ -94,10 +94,11 @@ automated or human-assisted root-cause analysis, sometimes automated remediation
 **Tools already documented in this repo**: the entire
 [`observability-on-eks.md`](observability-on-eks.md) stack — Prometheus, Grafana, Loki,
 ELK/EFK, CloudWatch — is the **telemetry substrate** AIOps sits on top of, not an AIOps
-platform itself. Commercial AIOps-branded platforms (Splunk ITSI, Moogsoft, Dynatrace
-Davis AI, Datadog Watchdog, BigPanda) add the ML-driven correlation/anomaly-detection layer
-on top of exactly that kind of telemetry data — this repo documents the substrate layer,
-not (yet) any of the correlation-layer products.
+platform itself. Commercial AIOps-branded platforms ([Splunk](tools/splunk/README.md) ITSI,
+Moogsoft, [Dynatrace](tools/dynatrace/README.md) Davis AI, [Datadog](tools/datadog/README.md)
+Watchdog, BigPanda) add the ML-driven correlation/anomaly-detection layer on top of exactly
+that kind of telemetry data — this repo documents the substrate layer and, for Dynatrace,
+Datadog, and Splunk, has dedicated tool docs; the rest aren't (yet) covered in depth.
 
 ## LLMOps
 

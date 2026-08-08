@@ -13,6 +13,7 @@ skill (see `../../.claude/skills/tech-log/SKILL.md`, at the repo root).
 - [ClickHouse](tools/clickhouse/README.md) — database (column-oriented OLAP)
 - [Databricks Lakehouse Monitoring](tools/databricks-lakehouse-monitoring/README.md) — ML monitoring / observability (Databricks-native)
 - [Datadog](tools/datadog/README.md) — observability / monitoring (commercial, all-in-one)
+- [Dynatrace](tools/dynatrace/README.md) — observability / monitoring (commercial, all-in-one)
 - [Elasticsearch (ELK / EFK Stack)](tools/elasticsearch/README.md) — observability / monitoring (logs), search
 - [Evidently (Evidently AI)](tools/evidently/README.md) — ML monitoring / observability
 - [Feast](tools/feast/README.md) — feature store

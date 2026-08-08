@@ -27,8 +27,10 @@ Service Intelligence), into AIOps-style event correlation and anomaly detection.
 
 - **Elasticsearch/OpenSearch** — open-source alternative for the full-text log/search use
   case specifically, without the SIEM-specific tooling.
-- **Datadog / New Relic** — closer competitors for the general observability/APM use case,
-  without Splunk's security/SIEM depth.
+- **Datadog / New Relic / Dynatrace** — closer competitors for the general
+  observability/APM use case, without Splunk's security/SIEM depth. See
+  [Datadog](../datadog/README.md), [New Relic](../new-relic/README.md),
+  [Dynatrace](../dynatrace/README.md).
 
 ## Related
 
